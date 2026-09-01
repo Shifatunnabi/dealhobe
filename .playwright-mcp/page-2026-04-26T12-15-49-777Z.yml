@@ -1,0 +1,299 @@
+- generic [active] [ref=e1]:
+  - img "JoyToy" [ref=e4]
+  - generic [ref=e7]:
+    - generic [ref=e8]:
+      - generic [ref=e10]:
+        - generic [ref=e12]:
+          - text: Free shipping over
+          - strong [ref=e13]: 2999BDT
+          - text: shopping
+        - generic [ref=e14]:
+          - link "Facebook" [ref=e15] [cursor=pointer]:
+            - /url: https://facebook.com/joytoybd
+            - img [ref=e16]
+          - link "Instagram" [ref=e18] [cursor=pointer]:
+            - /url: https://instagram.com/joytoybd
+            - img [ref=e19]
+          - link "WhatsApp" [ref=e21] [cursor=pointer]:
+            - /url: https://wa.me/
+            - img [ref=e22]
+      - banner [ref=e24]:
+        - link "JoyToy" [ref=e26] [cursor=pointer]:
+          - /url: /
+          - img "JoyToy" [ref=e28]
+        - generic [ref=e29]:
+          - navigation [ref=e30]:
+            - link "Boys" [ref=e31] [cursor=pointer]:
+              - /url: /products?gender=Boys
+              - text: Boys
+            - link "Girls" [ref=e32] [cursor=pointer]:
+              - /url: /products?gender=Girls
+              - text: Girls
+            - link "By Age" [ref=e33] [cursor=pointer]:
+              - /url: /#shop-by-age
+              - text: By Age
+            - link "Products" [ref=e34] [cursor=pointer]:
+              - /url: /products
+              - text: Products
+            - link "Offers" [ref=e35] [cursor=pointer]:
+              - /url: /offers
+              - text: Offers
+            - link "Blogs" [ref=e36] [cursor=pointer]:
+              - /url: /blogs
+              - text: Blogs
+          - generic [ref=e37]:
+            - button "Search" [ref=e38]:
+              - img [ref=e39]
+            - link "View cart" [ref=e42] [cursor=pointer]:
+              - /url: /cart
+              - generic "View cart" [ref=e43]:
+                - img [ref=e44]
+            - link "Account" [ref=e48] [cursor=pointer]:
+              - /url: /auth/login
+              - generic "Account" [ref=e49]:
+                - img [ref=e50]
+    - main [ref=e53]:
+      - generic [ref=e54]:
+        - generic [ref=e55]:
+          - img "Global Quality Local Joy" [ref=e57]
+          - generic [ref=e60]:
+            - heading "Global Quality Local Joy" [level=1] [ref=e61]
+            - link "Shop Now" [ref=e63] [cursor=pointer]:
+              - /url: /products
+              - generic [ref=e64]:
+                - text: Shop Now
+                - img [ref=e65]
+        - generic [ref=e67]:
+          - button "Previous slide" [ref=e68]:
+            - img [ref=e69]
+          - generic [ref=e71]:
+            - button "Go to slide 1" [ref=e72]
+            - button "Go to slide 2" [ref=e74]
+          - button "Next slide" [ref=e76]:
+            - img [ref=e77]
+      - generic [ref=e80]:
+        - heading "Shop by Age" [level=2] [ref=e82]
+        - generic [ref=e83]:
+          - link "0-2 0-2" [ref=e85] [cursor=pointer]:
+            - /url: /products?age=69e4bf15b64159fc43473de3
+            - img "0-2" [ref=e87]
+            - generic [ref=e88]: 0-2
+          - link "3-5 3-5" [ref=e90] [cursor=pointer]:
+            - /url: /products?age=69e4bf31b64159fc43473de4
+            - img "3-5" [ref=e92]
+            - generic [ref=e93]: 3-5
+          - link "6-9 6-9" [ref=e95] [cursor=pointer]:
+            - /url: /products?age=69e4bf5cb64159fc43473de5
+            - img "6-9" [ref=e97]
+            - generic [ref=e98]: 6-9
+          - link "10+ 10+" [ref=e100] [cursor=pointer]:
+            - /url: /products?age=69e4bf7cb64159fc43473de6
+            - img "10+" [ref=e102]
+            - generic [ref=e103]: 10+
+      - generic [ref=e105]:
+        - heading "Top Favorites" [level=2] [ref=e107]
+        - generic [ref=e108]:
+          - article [ref=e109]:
+            - link "Rainbow Stacking Rings Rainbow Stacking Rings ৳1,299.00 ৳1,899" [ref=e110] [cursor=pointer]:
+              - /url: /product/rainbow-stacking-rings
+              - img "Rainbow Stacking Rings" [ref=e113]
+              - generic [ref=e114]:
+                - heading "Rainbow Stacking Rings" [level=3] [ref=e115]
+                - generic [ref=e116]:
+                  - paragraph [ref=e117]: ৳1,299.00
+                  - generic [ref=e118]: ৳1,899
+            - button "Add to cart" [ref=e119]:
+              - generic [ref=e120]:
+                - img [ref=e121]
+                - img [ref=e123]
+          - article [ref=e127]:
+            - link "Cosmic Glow Puzzle Cosmic Glow Puzzle ৳1,899.00 ৳2,200" [ref=e128] [cursor=pointer]:
+              - /url: /product/cosmic-glow-puzzle
+              - img "Cosmic Glow Puzzle" [ref=e131]
+              - generic [ref=e132]:
+                - heading "Cosmic Glow Puzzle" [level=3] [ref=e133]
+                - generic [ref=e134]:
+                  - paragraph [ref=e135]: ৳1,899.00
+                  - generic [ref=e136]: ৳2,200
+            - button "Add to cart" [ref=e137]:
+              - generic [ref=e138]:
+                - img [ref=e139]
+                - img [ref=e141]
+        - link "View All Products →" [ref=e146] [cursor=pointer]:
+          - /url: /products
+          - generic [ref=e147]: View All Products →
+      - generic [ref=e149]:
+        - heading "Favourite Categories" [level=2] [ref=e151]
+        - generic [ref=e152]:
+          - generic [ref=e153]:
+            - link "Shop Educational" [ref=e154] [cursor=pointer]:
+              - /url: /products?category=Educational
+              - img "Educational" [ref=e156]
+            - link "Educational" [ref=e157] [cursor=pointer]:
+              - /url: /products?category=Educational
+            - link "Shop Now" [ref=e158] [cursor=pointer]:
+              - /url: /products?category=Educational
+          - generic [ref=e159]:
+            - link "Shop DIY" [ref=e160] [cursor=pointer]:
+              - /url: /products?category=DIY
+              - img "DIY" [ref=e162]
+            - link "DIY" [ref=e163] [cursor=pointer]:
+              - /url: /products?category=DIY
+            - link "Shop Now" [ref=e164] [cursor=pointer]:
+              - /url: /products?category=DIY
+          - generic [ref=e165]:
+            - link "Shop Fun" [ref=e166] [cursor=pointer]:
+              - /url: /products?category=Fun
+              - img "Fun" [ref=e168]
+            - link "Fun" [ref=e169] [cursor=pointer]:
+              - /url: /products?category=Fun
+            - link "Shop Now" [ref=e170] [cursor=pointer]:
+              - /url: /products?category=Fun
+          - generic [ref=e171]:
+            - link "Shop Soft" [ref=e172] [cursor=pointer]:
+              - /url: /products?category=Soft
+              - img "Soft" [ref=e174]
+            - link "Soft" [ref=e175] [cursor=pointer]:
+              - /url: /products?category=Soft
+            - link "Shop Now" [ref=e176] [cursor=pointer]:
+              - /url: /products?category=Soft
+        - button "View All Categories" [ref=e178]
+      - generic [ref=e180]:
+        - heading "Offers" [level=2] [ref=e182]
+        - article [ref=e184]:
+          - img "Weekend Mega Deal" [ref=e186]
+          - generic [ref=e187]:
+            - generic [ref=e188]:
+              - heading "Weekend Mega Deal" [level=3] [ref=e189]
+              - paragraph [ref=e190]: Big savings on crowd-pleasing weekend picks.
+            - button "Offer Closed" [disabled] [ref=e191]
+        - link "View All Offers" [ref=e193] [cursor=pointer]:
+          - /url: /offers
+      - generic [ref=e195]:
+        - heading "Customer Reviews" [level=2] [ref=e197]
+        - generic [ref=e199]:
+          - article [ref=e201]:
+            - generic [ref=e202]:
+              - img [ref=e204]
+              - paragraph [ref=e207]: Shifatunnabi Shifat
+            - paragraph [ref=e208]: "\"Very good product loved it!!\""
+          - article [ref=e210]:
+            - generic [ref=e211]:
+              - img [ref=e213]
+              - paragraph [ref=e216]: Shifatunnabi Shifat
+            - paragraph [ref=e217]: "\"Very good product loved it!!\""
+          - article [ref=e219]:
+            - generic [ref=e220]:
+              - img [ref=e222]
+              - paragraph [ref=e225]: Shifatunnabi Shifat
+            - paragraph [ref=e226]: "\"Very good product loved it!!\""
+          - article [ref=e228]:
+            - generic [ref=e229]:
+              - img [ref=e231]
+              - paragraph [ref=e234]: Shifatunnabi Shifat
+            - paragraph [ref=e235]: "\"Very good product loved it!!\""
+      - generic [ref=e237]:
+        - heading "Parenting Tips" [level=2] [ref=e239]
+        - article [ref=e241]:
+          - generic [ref=e242]:
+            - img "Rotate Toys Weekly" [ref=e244]
+            - generic [ref=e246]:
+              - heading "Rotate Toys Weekly" [level=3] [ref=e247]
+              - paragraph [ref=e248]: Keep only a few toys visible and rotate every week to boost curiosity and reduce clutter.
+      - generic [ref=e250]:
+        - heading "Brands" [level=2] [ref=e252]
+        - generic [ref=e253]:
+          - button "Show previous brand" [disabled] [ref=e254]:
+            - img [ref=e255]
+          - button "Show next brand" [ref=e257]:
+            - img [ref=e258]
+          - generic [ref=e261]:
+            - article [ref=e263]:
+              - link "LEGO LEGO" [ref=e264] [cursor=pointer]:
+                - /url: /products?brand=69e4c015b64159fc43473de7
+                - img "LEGO" [ref=e266]
+                - paragraph [ref=e267]: LEGO
+            - article [ref=e269]:
+              - link "Barbie Barbie" [ref=e270] [cursor=pointer]:
+                - /url: /products?brand=69e4c022b64159fc43473de8
+                - img "Barbie" [ref=e272]
+                - paragraph [ref=e273]: Barbie
+            - article [ref=e275]:
+              - link "Disney Disney" [ref=e276] [cursor=pointer]:
+                - /url: /products?brand=69e4c034b64159fc43473de9
+                - img "Disney" [ref=e278]
+                - paragraph [ref=e279]: Disney
+            - article [ref=e281]:
+              - link "Hot Wheels Hot Wheels" [ref=e282] [cursor=pointer]:
+                - /url: /products?brand=69e4c048b64159fc43473dea
+                - img "Hot Wheels" [ref=e284]
+                - paragraph [ref=e285]: Hot Wheels
+            - article [ref=e287]:
+              - link "Funko Funko" [ref=e288] [cursor=pointer]:
+                - /url: /products?brand=69e4c056b64159fc43473deb
+                - img "Funko" [ref=e290]
+                - paragraph [ref=e291]: Funko
+    - button "Chat with JoyToy" [ref=e293]:
+      - img [ref=e294]
+    - contentinfo [ref=e296]:
+      - generic [ref=e297]:
+        - generic [ref=e298]:
+          - generic [ref=e299]:
+            - img "JoyToy" [ref=e300]
+            - paragraph [ref=e301]: Premium imported toys for curious little minds in Bangladesh. Bringing global joy home since 2022.
+            - generic [ref=e302]:
+              - link "Facebook" [ref=e303] [cursor=pointer]:
+                - /url: https://facebook.com/joytoybd
+                - img [ref=e304]
+              - link "Instagram" [ref=e306] [cursor=pointer]:
+                - /url: https://instagram.com/joytoybd
+                - img [ref=e307]
+              - link "YouTube" [ref=e310] [cursor=pointer]:
+                - /url: https://youtube.com/@joytoybd
+                - img [ref=e311]
+          - generic [ref=e314]:
+            - heading "Quick Links" [level=3] [ref=e315]
+            - list [ref=e316]:
+              - listitem [ref=e317]:
+                - link "Home" [ref=e318] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e319]:
+                - link "Products" [ref=e320] [cursor=pointer]:
+                  - /url: /products
+              - listitem [ref=e321]:
+                - link "Offers" [ref=e322] [cursor=pointer]:
+                  - /url: /offers
+              - listitem [ref=e323]:
+                - link "Blogs" [ref=e324] [cursor=pointer]:
+                  - /url: /blogs
+          - generic [ref=e325]:
+            - heading "Contact Us" [level=3] [ref=e326]
+            - list [ref=e327]:
+              - listitem [ref=e328]:
+                - img [ref=e329]
+                - generic [ref=e332]: Mirpur, Dhaka — Bangladesh
+              - listitem [ref=e333]:
+                - link "+880 1XXX-XXXXXX" [ref=e334] [cursor=pointer]:
+                  - /url: tel:+8801XXXXXXXX
+                  - img [ref=e335]
+                  - text: +880 1XXX-XXXXXX
+              - listitem [ref=e337]:
+                - link "hello@joytoy.com.bd" [ref=e338] [cursor=pointer]:
+                  - /url: mailto:hello@joytoy.com.bd
+                  - img [ref=e339]
+                  - text: hello@joytoy.com.bd
+            - generic [ref=e342]:
+              - paragraph [ref=e343]: 🛡️ Secure Shopping
+              - paragraph [ref=e344]: SSL encrypted · COD available
+        - generic [ref=e345]:
+          - paragraph [ref=e346]: © 2026 JoyToy Bangladesh. All rights reserved.
+          - generic [ref=e347]:
+            - link "Privacy Policy" [ref=e348] [cursor=pointer]:
+              - /url: /privacy-policy
+            - link "Terms" [ref=e349] [cursor=pointer]:
+              - /url: /terms
+            - link "Returns" [ref=e350] [cursor=pointer]:
+              - /url: /returns
+  - button "Open Next.js Dev Tools" [ref=e356] [cursor=pointer]:
+    - img [ref=e357]
+  - alert [ref=e360]

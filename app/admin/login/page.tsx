@@ -1,0 +1,86 @@
+'use client';
+
+import { signIn } from 'next-auth/react';
+import { useState, FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
+
+export default function AdminLoginPage() {
+  const [email,    setEmail]    = useState('');
+  const [password, setPassword] = useState('');
+  const [error,    setError]    = useState('');
+  const [loading,  setLoading]  = useState(false);
+  const router = useRouter();
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    const result = await signIn('credentials', {
+      email,
+      password,
+      redirect: false,
+    });
+
+    setLoading(false);
+
+    if (result?.error) {
+      setError('Invalid email or password. Please try again.');
+    } else {
+      router.replace('/admin');
+    }
+  };
+
+  return (
+    <div className="admin-login-page">
+      <div className="admin-login-card">
+        <div className="login-logo">
+          <span className="logo-emoji">🧸</span>
+          <h1>JoyToy Admin</h1>
+          <p>Sign in to manage your store</p>
+        </div>
+
+        <form className="login-form" onSubmit={handleSubmit}>
+          {error && <div className="login-error">{error}</div>}
+
+          <div className="login-input-wrap">
+            <label className="login-input-label">Email Address</label>
+            <input
+              id="admin-email"
+              type="email"
+              className="login-input"
+              placeholder="admin@joytoy.com"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              required
+              autoComplete="email"
+            />
+          </div>
+
+          <div className="login-input-wrap">
+            <label className="login-input-label">Password</label>
+            <input
+              id="admin-password"
+              type="password"
+              className="login-input"
+              placeholder="••••••••"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              required
+              autoComplete="current-password"
+            />
+          </div>
+
+          <button
+            id="admin-login-btn"
+            type="submit"
+            className="login-submit"
+            disabled={loading}
+          >
+            {loading ? 'Signing in…' : 'Sign In →'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
