@@ -40,7 +40,7 @@ function BrandCard({ id, name, logo }: { id?: string; name: string; logo: string
           />
         </div>
 
-        <p className="pt-3 text-center font-inter text-base font-semibold leading-tight text-text-dark sm:text-lg">
+        <p className="pt-3 text-center font-poppins text-base font-semibold leading-tight text-text-dark sm:text-lg">
           {name}
         </p>
       </Link>

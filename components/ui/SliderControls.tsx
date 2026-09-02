@@ -72,7 +72,7 @@ export default function SliderControls({
 
       {/* Counter */}
       {showCounter && (
-        <span className="min-w-[3rem] text-center font-inter text-sm text-text-muted">
+        <span className="min-w-[3rem] text-center font-poppins text-sm text-text-muted">
           {currentIndex! + 1}&nbsp;/&nbsp;{total}
         </span>
       )}

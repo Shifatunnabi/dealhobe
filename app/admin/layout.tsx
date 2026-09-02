@@ -4,8 +4,8 @@ import './admin.css';
 import { AdminLayoutClient } from '@/components/admin/AdminLayoutClient';
 
 export const metadata: Metadata = {
-  title: 'JoyToy Admin',
-  description: 'JoyToy Admin Panel — manage content, products, and orders.',
+  title: 'DealHobe Admin',
+  description: 'DealHobe Admin Panel — manage content, products, and orders.',
 };
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

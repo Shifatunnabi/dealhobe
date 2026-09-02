@@ -14,10 +14,10 @@ function ReviewCard({ name, text }: { name: string; text: string }) {
         <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary-pink/10 text-primary-pink">
           <FiUser className="h-4 w-4" />
         </span>
-        <p className="font-inter text-base font-semibold text-text-dark">{name}</p>
+        <p className="font-poppins text-base font-semibold text-text-dark">{name}</p>
       </div>
 
-      <p className="font-inter text-sm leading-relaxed text-text-muted md:text-base">
+      <p className="font-poppins text-sm leading-relaxed text-text-muted md:text-base">
         &quot;{text}&quot;
       </p>
     </article>

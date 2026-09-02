@@ -65,7 +65,7 @@ export default function Button({
       className={cn(
         // Base
         "relative inline-flex items-center justify-center",
-        "rounded-2xl font-inter font-semibold tracking-wide",
+        "rounded-2xl font-poppins font-semibold tracking-wide",
         "transition-all duration-200 cursor-pointer select-none",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-pink",
         // Variant + size

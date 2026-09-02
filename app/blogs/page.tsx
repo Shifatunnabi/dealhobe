@@ -24,7 +24,7 @@ export default async function BlogsPage() {
       date:        blog.publishedAt || blog.createdAt,
       readTime,
       excerpt,
-      author:      'JoyToy Team',
+      author:      'DealHobe Team',
       isFeatured:  blog.isFeatured,
     };
   });

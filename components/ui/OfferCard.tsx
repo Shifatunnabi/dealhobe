@@ -44,7 +44,7 @@ export default function OfferCard({
 
       <div className="flex flex-col gap-3 p-5">
         <div>
-          <h3 className="font-inter text-lg font-semibold text-text-dark">
+          <h3 className="font-poppins text-lg font-semibold text-text-dark">
             {title}
           </h3>
           <p className="mt-1 text-sm text-text-muted">

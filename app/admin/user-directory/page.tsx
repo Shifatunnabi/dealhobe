@@ -34,7 +34,7 @@ function Initials({ name }: { name: string }) {
         width: 48,
         height: 48,
         borderRadius: "50%",
-        background: "linear-gradient(135deg, #ff6b9d, #ff8fab)",
+        background: "linear-gradient(135deg, #8B2635, #ff8fab)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -202,7 +202,7 @@ function UserCard({
                       border: "1px solid #ffd6e7",
                     }}
                   >
-                    <p style={{ fontWeight: 600, fontSize: 13, color: "#ff6b9d", margin: 0 }}>
+                    <p style={{ fontWeight: 600, fontSize: 13, color: "#8B2635", margin: 0 }}>
                       {baby.name}
                     </p>
                     <p style={{ fontSize: 12, color: "#aaa", margin: "2px 0 0" }}>
@@ -235,7 +235,7 @@ function UserCard({
             padding: "6px 14px",
             fontSize: 12,
             fontWeight: 600,
-            color: expanded ? "#ff6b9d" : "#555",
+            color: expanded ? "#8B2635" : "#555",
             cursor: "pointer",
           }}
         >
@@ -382,8 +382,8 @@ export default function UserDirectoryPage() {
                     height: 36,
                     borderRadius: 8,
                     border: "1.5px solid",
-                    borderColor: p === page ? "#ff6b9d" : "#e5e7eb",
-                    background: p === page ? "#ff6b9d" : "#fff",
+                    borderColor: p === page ? "#8B2635" : "#e5e7eb",
+                    background: p === page ? "#8B2635" : "#fff",
                     color: p === page ? "#fff" : "#333",
                     fontWeight: 700,
                     fontSize: 13,

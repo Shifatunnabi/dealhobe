@@ -33,9 +33,9 @@ function QtyStepper({
         className="flex h-8 w-8 items-center justify-center text-text-muted transition-colors hover:bg-primary-pink/8 hover:text-primary-pink active:bg-primary-pink/15"
         aria-label="Decrease quantity"
       >
-        <span className="font-inter text-base font-bold leading-none select-none">−</span>
+        <span className="font-poppins text-base font-bold leading-none select-none">−</span>
       </button>
-      <div className="flex h-8 w-9 items-center justify-center border-x border-gray-200 bg-white font-inter text-sm font-bold text-text-dark tabular-nums">
+      <div className="flex h-8 w-9 items-center justify-center border-x border-gray-200 bg-white font-poppins text-sm font-bold text-text-dark tabular-nums">
         {value}
       </div>
       <button
@@ -43,7 +43,7 @@ function QtyStepper({
         className="flex h-8 w-8 items-center justify-center text-text-muted transition-colors hover:bg-primary-pink/8 hover:text-primary-pink active:bg-primary-pink/15"
         aria-label="Increase quantity"
       >
-        <span className="font-inter text-base font-bold leading-none select-none">+</span>
+        <span className="font-poppins text-base font-bold leading-none select-none">+</span>
       </button>
     </div>
   );
@@ -80,7 +80,7 @@ export default function CartPage() {
           </nav>
 
           <ColorfulTitle title="Your Shopping Cart" as="h1" className="text-primary-pink" />
-          <p className="mt-2 font-inter text-sm text-text-muted">
+          <p className="mt-2 font-poppins text-sm text-text-muted">
             {cartItems.length === 0
               ? "Your cart is empty — go explore something fun!"
               : `You have ${itemCount} item${itemCount !== 1 ? "s" : ""} in your cart.`}
@@ -96,12 +96,12 @@ export default function CartPage() {
             variants={fadeUp}
           >
             <span className="text-7xl">🛒</span>
-            <p className="font-inter text-xl text-text-muted">
+            <p className="font-poppins text-xl text-text-muted">
               Nothing here yet — time to go toy hunting!
             </p>
             <Link
               href="/products"
-              className="flex items-center gap-2 rounded-2xl bg-gradient-primary px-8 py-3 font-inter font-semibold text-white shadow-button transition-shadow hover:shadow-hover"
+              className="flex items-center gap-2 rounded-2xl bg-gradient-primary px-8 py-3 font-poppins font-semibold text-white shadow-button transition-shadow hover:shadow-hover"
             >
               <FiShoppingBag size={16} />
               Shop Now
@@ -121,7 +121,7 @@ export default function CartPage() {
                 {["Product", "Price", "Quantity", "Total", ""].map((col) => (
                   <span
                     key={col}
-                    className="font-inter text-xs font-semibold uppercase tracking-wider text-text-muted"
+                    className="font-poppins text-xs font-semibold uppercase tracking-wider text-text-muted"
                   >
                     {col}
                   </span>
@@ -159,7 +159,7 @@ export default function CartPage() {
                         </Link>
                         <div className="min-w-0">
                           <Link href={`/product/${item.slug}`}>
-                            <p className="font-inter text-sm font-semibold leading-snug text-text-dark hover:text-primary-pink transition-colors line-clamp-2">
+                            <p className="font-poppins text-sm font-semibold leading-snug text-text-dark hover:text-primary-pink transition-colors line-clamp-2">
                               {item.name}
                             </p>
                           </Link>
@@ -167,7 +167,7 @@ export default function CartPage() {
                       </div>
 
                       {/* Unit price */}
-                      <p className="font-inter text-base font-semibold text-text-dark">
+                      <p className="font-poppins text-base font-semibold text-text-dark">
                         ৳{item.unitPrice.toLocaleString()}
                       </p>
 
@@ -178,7 +178,7 @@ export default function CartPage() {
                       />
 
                       {/* Row total */}
-                      <p className="font-inter text-base font-bold text-primary-pink">
+                      <p className="font-poppins text-base font-bold text-primary-pink">
                         ৳{(item.unitPrice * item.qty).toLocaleString()}
                       </p>
 
@@ -207,11 +207,11 @@ export default function CartPage() {
                       </Link>
                       <div className="min-w-0 flex-1">
                         <Link href={`/product/${item.slug}`}>
-                          <p className="line-clamp-2 font-inter text-sm font-semibold leading-snug text-text-dark">
+                          <p className="line-clamp-2 font-poppins text-sm font-semibold leading-snug text-text-dark">
                             {item.name}
                           </p>
                         </Link>
-                        <p className="mt-0.5 font-inter text-xs text-text-muted">
+                        <p className="mt-0.5 font-poppins text-xs text-text-muted">
                           &nbsp;
                         </p>
                         <div className="mt-2.5 flex items-center justify-between gap-2">
@@ -219,7 +219,7 @@ export default function CartPage() {
                             value={item.qty}
                             onChange={(v) => updateQty(item.productId, v)}
                           />
-                          <p className="font-inter text-base font-bold text-primary-pink">
+                          <p className="font-poppins text-base font-bold text-primary-pink">
                             ৳{(item.unitPrice * item.qty).toLocaleString()}
                           </p>
                           <button
@@ -240,17 +240,17 @@ export default function CartPage() {
 
               {/* ── Order Summary ────────────────────────────────── */}
               <div className="p-6">
-                <h2 className="mb-5 font-inter text-xl font-semibold text-text-dark">
+                <h2 className="mb-5 font-poppins text-xl font-semibold text-text-dark">
                   Order Summary
                 </h2>
 
                 <div className="space-y-3">
                   {/* Subtotal */}
                   <div className="flex items-center justify-between">
-                    <span className="font-inter text-sm text-text-muted">
+                    <span className="font-poppins text-sm text-text-muted">
                       Subtotal
                     </span>
-                    <span className="font-inter font-semibold text-text-dark">
+                    <span className="font-poppins font-semibold text-text-dark">
                       ৳{subtotal.toLocaleString()}
                     </span>
                   </div>
@@ -258,10 +258,10 @@ export default function CartPage() {
 
                 {/* Total */}
                 <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-4">
-                  <span className="font-inter text-lg font-bold text-text-dark">
+                  <span className="font-poppins text-lg font-bold text-text-dark">
                     Total
                   </span>
-                  <span className="font-inter text-2xl font-bold text-primary-pink">
+                  <span className="font-poppins text-2xl font-bold text-primary-pink">
                     ৳{subtotal.toLocaleString()}
                   </span>
                 </div>
@@ -269,10 +269,10 @@ export default function CartPage() {
                 {/* Checkout button */}
                 <Link href="/checkout">
                   <motion.div
-                    whileHover={{ y: -2, boxShadow: "0 16px 48px rgba(255,107,157,0.28)" }}
+                    whileHover={{ y: -2, boxShadow: "0 16px 48px rgba(85, 0, 0,0.28)" }}
                     whileTap={{ scale: 0.97 }}
                     transition={{ duration: 0.2 }}
-                    className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-primary py-3.5 font-inter font-semibold text-white shadow-button transition-shadow cursor-pointer"
+                    className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-primary py-3.5 font-poppins font-semibold text-white shadow-button transition-shadow cursor-pointer"
                   >
                     Proceed to Checkout
                     <FiArrowRight size={16} />
@@ -282,7 +282,7 @@ export default function CartPage() {
                 {/* Continue shopping */}
                 <Link
                   href="/products"
-                  className="mt-3 flex items-center justify-center gap-1.5 font-inter text-xs text-black transition-colors hover:text-primary-pink"
+                  className="mt-3 flex items-center justify-center gap-1.5 font-poppins text-xs text-black transition-colors hover:text-primary-pink"
                 >
                   <FiShoppingCart size={12} />
                   Continue Shopping

@@ -1,5 +1,5 @@
 /**
- * JoyToy UI component library — barrel export
+ * DealHobe UI component library — barrel export
  *
  * Usage:
  *   import { Button, Card, ProductCard } from "@/components/ui";

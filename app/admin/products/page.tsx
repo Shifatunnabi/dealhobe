@@ -337,7 +337,7 @@ export default function ProductsPage() {
                 <MultiImageUpload
                    images={form.images.map((url:string, i:number) => ({ url, publicId: form.imagePublicIds[i] }))}
                    onChange={imgs => setForm((f:any) => ({ ...f, images: imgs.map(i=>i.url), imagePublicIds: imgs.map(i=>i.publicId) }))}
-                   folder="joytoy/products"
+                   folder="dealhobe/products"
                    label="Product Images"
                 />
 

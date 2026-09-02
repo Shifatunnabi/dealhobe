@@ -36,7 +36,7 @@ export default function AdminLoginPage() {
       <div className="admin-login-card">
         <div className="login-logo">
           <span className="logo-emoji">🧸</span>
-          <h1>JoyToy Admin</h1>
+          <h1>DealHobe Admin</h1>
           <p>Sign in to manage your store</p>
         </div>
 
@@ -49,7 +49,7 @@ export default function AdminLoginPage() {
               id="admin-email"
               type="email"
               className="login-input"
-              placeholder="admin@joytoy.com"
+              placeholder="admin@dealhobe.com"
               value={email}
               onChange={e => setEmail(e.target.value)}
               required

@@ -71,7 +71,7 @@ function ProductCard({ product, index }: { product: FavoriteProduct; index: numb
               loading="lazy"
             />
             {offerBadgeText && (
-              <span className="absolute left-2 top-2 z-10 rounded-full bg-gradient-yellow px-2.5 py-0.5 text-xs font-inter font-semibold text-text-dark shadow-sm">
+              <span className="absolute left-2 top-2 z-10 rounded-full bg-gradient-yellow px-2.5 py-0.5 text-xs font-poppins font-semibold text-text-dark shadow-sm">
                 {offerBadgeText}
               </span>
             )}
@@ -79,11 +79,11 @@ function ProductCard({ product, index }: { product: FavoriteProduct; index: numb
         </div>
 
         <div className="flex flex-1 flex-col px-3 pt-2.5 pb-3">
-          <h3 className="truncate font-inter text-sm font-semibold text-gray-900 transition-colors hover:text-primary-pink">
+          <h3 className="truncate font-poppins text-sm font-semibold text-gray-900 transition-colors hover:text-primary-pink">
             {product.name}
           </h3>
           <div className="mt-auto flex items-baseline justify-start gap-1.5 whitespace-nowrap">
-            <p className="font-inter text-lg font-bold text-primary-pink">
+            <p className="font-poppins text-lg font-bold text-primary-pink">
               ৳{unitPrice.toLocaleString()}.00
             </p>
             {product.salePrice && product.price > product.salePrice && (
@@ -144,7 +144,7 @@ export default function TopFavorites({ products = [] }: { products?: FavoritePro
           <p className="mt-3 text-sm text-text-muted">No featured products are available right now.</p>
           <div className="mt-8 flex justify-center">
             <Link href="/products">
-              <span className="inline-flex items-center gap-2 rounded-2xl border-2 border-primary-pink bg-transparent px-8 py-3.5 font-inter text-base font-semibold text-primary-pink transition-all hover:bg-primary-pink hover:text-white cursor-pointer">
+              <span className="inline-flex items-center gap-2 rounded-2xl border-2 border-primary-pink bg-transparent px-8 py-3.5 font-poppins text-base font-semibold text-primary-pink transition-all hover:bg-primary-pink hover:text-white cursor-pointer">
                 Browse Products →
               </span>
             </Link>
@@ -184,7 +184,7 @@ export default function TopFavorites({ products = [] }: { products?: FavoritePro
               whileHover={{ scale: 1.04, y: -2 }}
               whileTap={{ scale: 0.96 }}
               transition={{ duration: 0.2, ease: [0.34, 1.56, 0.64, 1] }}
-              className="inline-flex items-center gap-2 rounded-2xl border-2 border-primary-pink bg-transparent px-8 py-3.5 font-inter text-base font-semibold text-primary-pink transition-all hover:bg-primary-pink hover:text-white cursor-pointer"
+              className="inline-flex items-center gap-2 rounded-2xl border-2 border-primary-pink bg-transparent px-8 py-3.5 font-poppins text-base font-semibold text-primary-pink transition-all hover:bg-primary-pink hover:text-white cursor-pointer"
             >
               View All Products →
             </motion.span>

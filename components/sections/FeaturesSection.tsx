@@ -19,7 +19,7 @@ type PanelType = "reviews" | "tips";
 const REVIEW_ITEMS = [
   { id: 1, name: "Nusrat Jahan", text: "My daughter loved the puzzle set. Quality is truly premium and delivery was super quick." },
   { id: 2, name: "Farhana Rahman", text: "Finally found imported toys that feel safe and durable. Packaging was beautiful too." },
-  { id: 3, name: "Samira Akter", text: "The toy car set is exactly as shown. JoyToy customer support was very responsive." },
+  { id: 3, name: "Samira Akter", text: "The toy car set is exactly as shown. DealHobe customer support was very responsive." },
   { id: 4, name: "Tanjina Islam", text: "Great quality and no sharp edges. My son is obsessed with his new blocks." },
   { id: 5, name: "Ishrat Moon", text: "Reliable page. I have ordered three times and every product was authentic." },
   { id: 6, name: "Rafiya Ahmed", text: "Loved the details and finishing. Kids are happy and so am I." },
@@ -106,7 +106,7 @@ function Pagination({
 
 function ReviewCard({ name, text }: { name: string; text: string }) {
   return (
-    <article className="rounded-2xl border border-primary-pink/35 bg-primary-pink p-4 text-white shadow-[0_10px_25px_rgba(232,2,129,0.35)]">
+    <article className="rounded-2xl border border-primary-pink/35 bg-primary-pink p-4 text-white shadow-[0_10px_25px_rgba(85, 0, 0,0.35)]">
       <div className="mb-2 flex items-center gap-2">
         <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
           <FiUser className="h-4 w-4" />
@@ -120,7 +120,7 @@ function ReviewCard({ name, text }: { name: string; text: string }) {
 
 function TipCard({ title, detail }: { title: string; detail: string }) {
   return (
-    <article className="rounded-2xl border border-primary-pink/35 bg-primary-pink p-4 text-white shadow-[0_10px_25px_rgba(232,2,129,0.35)]">
+    <article className="rounded-2xl border border-primary-pink/35 bg-primary-pink p-4 text-white shadow-[0_10px_25px_rgba(85, 0, 0,0.35)]">
       <h4 className="text-base font-bold text-white md:text-lg">{title}</h4>
       <div className="mt-2 h-px w-full bg-white/80" />
       <p className="mt-2 text-sm leading-relaxed md:text-base">{detail}</p>
@@ -177,7 +177,7 @@ export default function FeaturesSection() {
         animate={inView ? "visible" : "hidden"}
       >
         <motion.div variants={fadeUp} className="mb-12 text-center">
-          <ColorfulTitle title="The JoyToy Promise" />
+          <ColorfulTitle title="The DealHobe Promise" />
         </motion.div>
 
         <motion.div variants={fadeUp} className="space-y-4 md:space-y-5">
@@ -204,7 +204,7 @@ export default function FeaturesSection() {
                 type="button"
                 onClick={() => togglePanel("reviews")}
                 aria-expanded={activePanel === "reviews"}
-                aria-controls="joytoy-reviews-panel"
+                aria-controls="dealhobe-reviews-panel"
                 className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 transition-colors duration-200 hover:bg-white/30"
               >
                 {activePanel === "reviews" ? <FiChevronUp className="h-5 w-5" /> : <FiChevronDown className="h-5 w-5" />}
@@ -214,7 +214,7 @@ export default function FeaturesSection() {
             <AnimatePresence initial={false}>
               {activePanel === "reviews" && (
                 <motion.div
-                  id="joytoy-reviews-panel"
+                  id="dealhobe-reviews-panel"
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
@@ -244,7 +244,7 @@ export default function FeaturesSection() {
                 type="button"
                 onClick={() => togglePanel("tips")}
                 aria-expanded={activePanel === "tips"}
-                aria-controls="joytoy-tips-panel"
+                aria-controls="dealhobe-tips-panel"
                 className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 transition-colors duration-200 hover:bg-white/30"
               >
                 {activePanel === "tips" ? <FiChevronUp className="h-5 w-5" /> : <FiChevronDown className="h-5 w-5" />}
@@ -254,7 +254,7 @@ export default function FeaturesSection() {
             <AnimatePresence initial={false}>
               {activePanel === "tips" && (
                 <motion.div
-                  id="joytoy-tips-panel"
+                  id="dealhobe-tips-panel"
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}

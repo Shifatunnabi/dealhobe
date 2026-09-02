@@ -13,7 +13,7 @@ interface MultiImageUploadProps {
 export default function MultiImageUpload({
   images,
   onChange,
-  folder = 'joytoy',
+  folder = 'dealhobe',
   label = 'Upload Images'
 }: MultiImageUploadProps) {
   const [uploading, setUploading] = useState(false);

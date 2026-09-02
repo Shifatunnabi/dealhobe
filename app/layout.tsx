@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Loader from "@/components/layout/Loader";
@@ -10,22 +10,23 @@ import CartSidebar from "@/components/cart/CartSidebar";
 import QueryProvider from "@/components/providers/QueryProvider";
 import { Toaster } from "react-hot-toast";
 
-const inter = Inter({
-  variable: "--font-inter",
+const poppins = Poppins({
+  variable: "--font-poppins",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
   display: "swap",
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://joytoy.com.bd";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://dealhobe.com.bd";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "JoyToy - safe toys, happy kids!",
-    template: "%s | JoyToy Bangladesh",
+    default: "DealHobe - safe toys, happy kids!",
+    template: "%s | DealHobe Bangladesh",
   },
   description:
-    "JoyToy Bangladesh brings premium imported toys for kids of all ages. Safe, certified, and fun — shop online and get delivered across Dhaka and all of Bangladesh.",
+    "DealHobe Bangladesh brings premium imported toys for kids of all ages. Safe, certified, and fun — shop online and get delivered across Dhaka and all of Bangladesh.",
   keywords: [
     "toys Bangladesh",
     "buy toys online Bangladesh",
@@ -40,16 +41,16 @@ export const metadata: Metadata = {
     "best toys Bangladesh",
     "baby toys BD",
     "toddler toys Dhaka",
-    "JoyToy",
-    "joytoy bangladesh",
+    "DealHobe",
+    "dealhobe bangladesh",
     "toy delivery Bangladesh",
     "খেলনা বাংলাদেশ",
     "শিশুদের খেলনা",
     "খেলনার দোকান ঢাকা",
   ],
-  authors: [{ name: "JoyToy Bangladesh", url: siteUrl }],
-  creator: "JoyToy Bangladesh",
-  publisher: "JoyToy Bangladesh",
+  authors: [{ name: "DealHobe Bangladesh", url: siteUrl }],
+  creator: "DealHobe Bangladesh",
+  publisher: "DealHobe Bangladesh",
   category: "shopping",
   robots: {
     index: true,
@@ -66,8 +67,8 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_BD",
     url: siteUrl,
-    siteName: "JoyToy Bangladesh",
-    title: "JoyToy - safe toys, happy kids!",
+    siteName: "DealHobe Bangladesh",
+    title: "DealHobe - safe toys, happy kids!",
     description:
       "Premium imported toys for kids in Bangladesh. Safe, certified, and fun — delivered to your door.",
     images: [
@@ -75,13 +76,13 @@ export const metadata: Metadata = {
         url: "/logo/main-logo.png",
         width: 800,
         height: 600,
-        alt: "JoyToy Bangladesh — Premium Imported Toys",
+        alt: "DealHobe Bangladesh — Premium Imported Toys",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "JoyToy - safe toys, happy kids!",
+    title: "DealHobe - safe toys, happy kids!",
     description:
       "Premium imported toys for kids in Bangladesh. Safe, certified, and fun.",
     images: ["/logo/main-logo.png"],
@@ -94,12 +95,12 @@ export const metadata: Metadata = {
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "ToyStore",
-  name: "JoyToy Bangladesh",
+  name: "DealHobe Bangladesh",
   description:
     "Premium imported toys for children in Bangladesh. Safe, certified, and fun.",
   url: siteUrl,
   telephone: "+8801339562735",
-  email: "bdjoytoy@gmail.com",
+  email: "bddealhobe@gmail.com",
   address: {
     "@type": "PostalAddress",
     streetAddress: "H 3, Rd - 19/A, Sector 4, Uttara",
@@ -115,8 +116,8 @@ const jsonLd = {
   image: `${siteUrl}/logo/main-logo.png`,
   logo: `${siteUrl}/logo/main-logo.png`,
   sameAs: [
-    "https://www.facebook.com/people/JoyToy/61586803048218/",
-    "https://youtube.com/@joytoybd",
+    "https://www.facebook.com/people/DealHobe/61586803048218/",
+    "https://youtube.com/@dealhobebd",
   ],
 };
 
@@ -128,7 +129,7 @@ export default function RootLayout({
   return (
     <html lang="en-BD">
       <body
-        className={`${inter.variable} antialiased bg-soft-bg text-text-dark`}
+        className={`${poppins.variable} antialiased bg-soft-bg text-text-dark`}
       >
         <script
           type="application/ld+json"

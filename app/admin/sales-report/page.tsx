@@ -205,8 +205,8 @@ export default function SalesReportPage() {
                     alignItems: "center",
                     gap: "0.4rem",
                     padding: "0.25rem 0.75rem",
-                    background: "rgba(232,2,129,0.08)",
-                    border: "1px solid rgba(232,2,129,0.2)",
+                    background: "rgba(85, 0, 0,0.08)",
+                    border: "1px solid rgba(85, 0, 0,0.2)",
                     borderRadius: "20px",
                     fontSize: "0.8rem",
                     color: "var(--text-dark)",
@@ -219,7 +219,7 @@ export default function SalesReportPage() {
                       background: "none",
                       border: "none",
                       cursor: "pointer",
-                      color: "#E80281",
+                      color: "#550000",
                       fontSize: "0.9rem",
                       lineHeight: 1,
                       padding: 0,
@@ -294,7 +294,7 @@ export default function SalesReportPage() {
                   </tbody>
                   {totals && (
                     <tfoot>
-                      <tr style={{ fontWeight: 700, background: "rgba(232,2,129,0.04)" }}>
+                      <tr style={{ fontWeight: 700, background: "rgba(85, 0, 0,0.04)" }}>
                         <td colSpan={3}>Total</td>
                         <td>{totals.qty}</td>
                         <td>৳{totals.revenue.toLocaleString()}</td>
@@ -405,8 +405,8 @@ export default function SalesReportPage() {
                       alignItems: "center",
                       gap: "0.3rem",
                       padding: "0.2rem 0.6rem",
-                      background: "rgba(232,2,129,0.08)",
-                      border: "1px solid rgba(232,2,129,0.2)",
+                      background: "rgba(85, 0, 0,0.08)",
+                      border: "1px solid rgba(85, 0, 0,0.2)",
                       borderRadius: "20px",
                       fontSize: "0.75rem",
                       color: "var(--text-dark)",
@@ -419,7 +419,7 @@ export default function SalesReportPage() {
                         background: "none",
                         border: "none",
                         cursor: "pointer",
-                        color: "#E80281",
+                        color: "#550000",
                         fontSize: "0.9rem",
                         lineHeight: 1,
                         padding: 0,
@@ -460,9 +460,9 @@ export default function SalesReportPage() {
                       padding: "0.75rem 0.5rem",
                       borderRadius: "12px",
                       cursor: "pointer",
-                      background: isSelected ? "rgba(232,2,129,0.06)" : "transparent",
+                      background: isSelected ? "rgba(85, 0, 0,0.06)" : "transparent",
                       border: isSelected
-                        ? "1px solid rgba(232,2,129,0.2)"
+                        ? "1px solid rgba(85, 0, 0,0.2)"
                         : "1px solid transparent",
                       marginBottom: "0.35rem",
                       transition: "all 0.15s",
@@ -521,9 +521,9 @@ export default function SalesReportPage() {
                         height: 22,
                         borderRadius: "6px",
                         border: isSelected
-                          ? "2px solid #E80281"
+                          ? "2px solid #550000"
                           : "2px solid rgba(45,27,78,0.2)",
-                        background: isSelected ? "#E80281" : "transparent",
+                        background: isSelected ? "#550000" : "transparent",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",

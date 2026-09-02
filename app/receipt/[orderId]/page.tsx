@@ -77,7 +77,7 @@ export default function ReceiptPage() {
         <div className="rounded-3xl bg-white p-6 shadow-card">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h1 className="font-inter text-2xl font-bold text-text-dark">{receiptTitle}</h1>
+              <h1 className="font-poppins text-2xl font-bold text-text-dark">{receiptTitle}</h1>
               <p className="mt-1 text-sm text-text-muted">
                 {notFound ? "We could not find this order." : "Download your invoice below."}
               </p>
@@ -87,13 +87,13 @@ export default function ReceiptPage() {
                 if (!pdfDataUri) return;
                 const link = document.createElement("a");
                 link.href = pdfDataUri;
-                link.download = `${order?.orderNumber || "JoyToy-Receipt"}.pdf`;
+                link.download = `${order?.orderNumber || "DealHobe-Receipt"}.pdf`;
                 link.click();
               }}
               className={
                 notFound
-                  ? "inline-flex items-center gap-2 rounded-2xl bg-gray-200 px-6 py-3 font-inter font-semibold text-gray-400"
-                  : "inline-flex items-center gap-2 rounded-2xl bg-gradient-primary px-6 py-3 font-inter font-semibold text-white shadow-button transition-shadow hover:shadow-hover"
+                  ? "inline-flex items-center gap-2 rounded-2xl bg-gray-200 px-6 py-3 font-poppins font-semibold text-gray-400"
+                  : "inline-flex items-center gap-2 rounded-2xl bg-gradient-primary px-6 py-3 font-poppins font-semibold text-white shadow-button transition-shadow hover:shadow-hover"
               }
               disabled={notFound}
             >
@@ -133,7 +133,7 @@ export default function ReceiptPage() {
               className="w-full max-w-sm rounded-3xl bg-white p-6 text-center shadow-hover"
             >
               <div className="mx-auto mb-4 h-12 w-12 rounded-full border-4 border-primary-pink/20 border-t-primary-pink animate-spin" />
-              <p className="font-inter text-sm text-text-muted">{LOADING_STEPS[loadingStep]}</p>
+              <p className="font-poppins text-sm text-text-muted">{LOADING_STEPS[loadingStep]}</p>
             </motion.div>
           </motion.div>
         )}

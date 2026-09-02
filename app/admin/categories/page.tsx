@@ -145,7 +145,7 @@ export default function CategoriesPage() {
                 <ImageUpload
                   label="Category Image"
                   value={form.imageUrl}
-                  folder="joytoy/categories"
+                  folder="dealhobe/categories"
                   onChange={(url, pid) => setForm(f => ({ ...f, imageUrl: url, imagePublicId: pid }))}
                 />
               </div>

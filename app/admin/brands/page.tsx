@@ -120,7 +120,7 @@ export default function BrandsPage() {
                 <ImageUpload
                   label="Brand Logo"
                   value={form.logoUrl}
-                  folder="joytoy/brands"
+                  folder="dealhobe/brands"
                   onChange={(url, pid) => setForm(f => ({ ...f, logoUrl: url, logoPublicId: pid }))}
                 />
               </div>

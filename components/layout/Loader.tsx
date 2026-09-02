@@ -50,7 +50,7 @@ export default function Loader() {
           >
             <Image
               src={logoUrl}
-              alt="JoyToy"
+              alt="DealHobe"
               width={144}
               height={144}
               className="w-36 h-auto object-contain"
@@ -64,7 +64,7 @@ export default function Loader() {
               animate={{ width: "100%" }}
               transition={{ duration: 1.4, delay: 0.2, ease: "easeInOut" }}
               className="h-full rounded-full"
-              style={{ backgroundColor: "#E80281" }}
+              style={{ backgroundColor: "#550000" }}
             />
           </div>
         </motion.div>

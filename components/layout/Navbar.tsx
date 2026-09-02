@@ -31,17 +31,17 @@ const navLinks = [
   { label: "Blogs",    href: "/blogs"                  },
 ];
 
-/* Shared logo circle used in both header and sidebar */
+/* Shared logo circle used in the navbar */
 function LogoCircle({ logoUrl }: { logoUrl: string }) {
   return (
-    <Link href={"/"}>
-      <div className="w-17 h-17 bg-white rounded-full flex items-center justify-center shadow-lg border-2 border-white overflow-hidden">
+    <Link href={"/"} className="shrink-0">
+      <div className="w-11 h-11 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center shadow-md border-2 border-gray-100 overflow-hidden">
         <Image
           src={logoUrl}
-          alt="JoyToy"
-          width={56}
-          height={56}
-          className="w-14 h-14 object-contain"
+          alt="DealHobe"
+          width={40}
+          height={40}
+          className="w-9 h-9 object-contain"
           priority
         />
       </div>
@@ -57,7 +57,6 @@ export default function Navbar() {
   const [topbarTexts, setTopbarTexts]   = useState<string[]>([]);
   const [topbarIndex, setTopbarIndex]   = useState(0);
   const [isLoggedIn, setIsLoggedIn]     = useState(false);
-  const [searchOpen, setSearchOpen]     = useState(false);
   const [searchValue, setSearchValue]   = useState("");
   const searchInputRef                  = useRef<HTMLInputElement | null>(null);
   const [sidebarOpen, setSidebarOpen]   = useState(false);
@@ -84,7 +83,6 @@ export default function Navbar() {
   useEffect(() => {
     const onScroll = () => {
       const y = window.scrollY;
-      if (searchOpen) setSearchOpen(false);
       if (y < 50) {
         setVisible(true);
       } else if (y > lastScrollY.current) {
@@ -96,7 +94,7 @@ export default function Navbar() {
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, [searchOpen]);
+  }, []);
 
   useEffect(() => {
     let alive = true;
@@ -119,13 +117,6 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    if (searchOpen) {
-      window.setTimeout(() => searchInputRef.current?.focus(), 50);
-    }
-  }, [searchOpen]);
-
-  useEffect(() => {
-    setSearchOpen(false);
     setSearchValue("");
     setSuggestions([]);
     setSidebarOpen(false);
@@ -208,8 +199,8 @@ export default function Navbar() {
 
   useEffect(() => {
     const openSidebar = () => setSidebarOpen(true);
-    window.addEventListener("joytoy-open-category-sidebar", openSidebar);
-    return () => window.removeEventListener("joytoy-open-category-sidebar", openSidebar);
+    window.addEventListener("dealhobe-open-category-sidebar", openSidebar);
+    return () => window.removeEventListener("dealhobe-open-category-sidebar", openSidebar);
   }, []);
 
   useEffect(() => {
@@ -233,7 +224,7 @@ export default function Navbar() {
   useEffect(() => {
     let alive = true;
     const syncAuth = async () => {
-      const token = window.localStorage.getItem("joytoy_auth_token_v1");
+      const token = window.localStorage.getItem("dealhobe_auth_token_v1");
       if (!token) {
         if (alive) setIsLoggedIn(false);
         return;
@@ -245,17 +236,17 @@ export default function Navbar() {
         if (!res.ok) throw new Error("Invalid token");
         if (alive) setIsLoggedIn(true);
       } catch {
-        window.localStorage.removeItem("joytoy_auth_token_v1");
-        window.dispatchEvent(new Event("joytoy-auth-changed"));
+        window.localStorage.removeItem("dealhobe_auth_token_v1");
+        window.dispatchEvent(new Event("dealhobe-auth-changed"));
         if (alive) setIsLoggedIn(false);
       }
     };
 
     syncAuth();
-    window.addEventListener("joytoy-auth-changed", syncAuth);
+    window.addEventListener("dealhobe-auth-changed", syncAuth);
     return () => {
       alive = false;
-      window.removeEventListener("joytoy-auth-changed", syncAuth);
+      window.removeEventListener("dealhobe-auth-changed", syncAuth);
     };
   }, []);
 
@@ -264,13 +255,10 @@ export default function Navbar() {
   const handleSearchSubmit = (event: FormEvent) => {
     event.preventDefault();
     const term = searchValue.trim();
-    if (!term) {
-      setSearchOpen(false);
-      return;
-    }
+    if (!term) return;
     setSuggestions([]);
     router.push(`/products?q=${encodeURIComponent(term)}`);
-    setSearchOpen(false);
+    setSidebarOpen(false);
     setSearchValue("");
   };
 
@@ -316,9 +304,9 @@ export default function Navbar() {
         transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
       >
         {/* ── Top Bar ─────────────────────────────────────────────── */}
-        <div className="h-9 bg-[#e0f7fa] text-black text-xs flex items-center">
+        <div className="h-9 bg-[#550000] text-white text-xs flex items-center">
           <div className="w-full md:w-[62.5%] md:mx-auto flex items-center justify-between px-4 md:px-0">
-            <span className="font-inter font-medium relative overflow-hidden h-4">
+            <span className="font-poppins font-medium relative overflow-hidden h-4">
               <AnimatePresence mode="wait" initial={false}>
                 <motion.span
                   key={topbarTexts[topbarIndex] || "fallback"}
@@ -335,10 +323,10 @@ export default function Navbar() {
               </AnimatePresence>
             </span>
             <div className="flex items-center gap-3">
-              <a href="https://www.facebook.com/people/JoyToy/61586803048218/?mibextid=wwXIfr&rdid=TgrQrd2ZmYJd8ZO7&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1Gw29e9PZL%2F%3Fmibextid%3DwwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="hover:text-[#1877F2] transition-colors">
+              <a href="https://www.facebook.com/people/DealHobe/61586803048218/?mibextid=wwXIfr&rdid=TgrQrd2ZmYJd8ZO7&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1Gw29e9PZL%2F%3Fmibextid%3DwwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="hover:text-[#8B2635] transition-colors">
                 <FaFacebook size={14} />
               </a>
-              <a href="https://wa.me/8801339562735" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="hover:text-[#25D366] transition-colors">
+              <a href="https://wa.me/8801339562735" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="hover:text-[#8B2635] transition-colors">
                 <FaWhatsapp size={14} />
               </a>
             </div>
@@ -346,45 +334,27 @@ export default function Navbar() {
         </div>
 
         {/* ── Main Navbar ─────────────────────────────────────────── */}
-        <header className="relative h-16 bg-[#E80281]">
+        <header className="relative h-16 bg-white shadow-[0_4px_14px_rgba(0,0,0,0.08)]">
+          <div className="mx-auto flex h-full items-center justify-between px-4 md:w-[90%] md:max-w-[1400px]">
 
-          {/* Logo circle — hangs below navbar into hero */}
-          <div className="absolute left-4 md:left-[18.75vw] bottom-0 translate-y-1/2 z-20">
-            <LogoCircle logoUrl={logoUrl} />
-          </div>
+            {/* Left: hamburger — pinned to the edge */}
+            <motion.button
+              whileHover={{ scale: 1.12 }} whileTap={{ scale: 0.92 }}
+              transition={{ duration: 0.15 }}
+              className="flex h-9 w-9 items-center justify-center rounded-xl text-text-dark transition-colors hover:bg-black/5"
+              aria-label="Open menu"
+              onClick={() => setSidebarOpen(true)}
+            >
+              <FiMenu size={20} />
+            </motion.button>
 
-          {/* ── Desktop layout ─────────────────────────────────── */}
-          <div className="hidden md:flex h-full items-center mx-auto w-[62.5%]">
-            <div className="w-18 shrink-0" />
-
-            <nav className="flex flex-1 items-center justify-center gap-0.5">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.label}
-                  href={link.href}
-                  className="group relative px-4 py-2 font-inter text-sm font-medium text-white rounded-xl transition-colors duration-200 hover:bg-white/15"
-                >
-                  {link.label}
-                  <span className="absolute bottom-1.5 left-4 right-4 h-0.5 rounded-full bg-white/70 scale-x-0 origin-left transition-transform duration-300 group-hover:scale-x-100" />
-                </Link>
-              ))}
-            </nav>
-
-            <div className="flex items-center gap-1 shrink-0">
-              <motion.button
-                whileHover={{ scale: 1.12 }} whileTap={{ scale: 0.92 }}
-                transition={{ duration: 0.15 }}
-                className="flex h-9 w-9 items-center justify-center rounded-xl text-white transition-colors hover:bg-white/15"
-                aria-label="Search"
-                onClick={() => setSearchOpen((prev) => !prev)}
-              >
-                <FiSearch size={19} />
-              </motion.button>
+            {/* Right: account + cart — pinned to the edge */}
+            <div className="flex items-center gap-1">
               <Link href="/cart">
                 <motion.div
                   whileHover={{ scale: 1.12 }} whileTap={{ scale: 0.92 }}
                   transition={{ duration: 0.15 }}
-                  className="relative flex h-9 w-9 items-center justify-center rounded-xl text-white transition-colors hover:bg-white/15"
+                  className="relative flex h-9 w-9 items-center justify-center rounded-xl text-text-dark transition-colors hover:bg-black/5"
                   aria-label="View cart"
                 >
                   <FiShoppingCart size={19} />
@@ -396,7 +366,7 @@ export default function Navbar() {
                         animate={{ scale: 1 }}
                         exit={{ scale: 0 }}
                         transition={{ type: "spring", stiffness: 420, damping: 22 }}
-                        className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-white text-[10px] font-bold text-primary-pink shadow"
+                        className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary-pink text-[10px] font-bold text-white shadow"
                       >
                         {cartCount}
                       </motion.span>
@@ -408,7 +378,7 @@ export default function Navbar() {
                 <motion.div
                   whileHover={{ scale: 1.12 }} whileTap={{ scale: 0.92 }}
                   transition={{ duration: 0.15 }}
-                  className="flex h-9 w-9 items-center justify-center rounded-xl text-white transition-colors hover:bg-white/15"
+                  className="flex h-9 w-9 items-center justify-center rounded-xl text-text-dark transition-colors hover:bg-black/5"
                   aria-label="Account"
                 >
                   <FiUser size={19} />
@@ -417,99 +387,37 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* ── Mobile layout ──────────────────────────────────── */}
-          <div className="flex md:hidden h-full items-center justify-between px-4">
-            <div className="w-16 shrink-0" />
-            <div className="flex items-center gap-1">
-              <motion.button
-                whileHover={{ scale: 1.12 }} whileTap={{ scale: 0.92 }}
-                transition={{ duration: 0.15 }}
-                className="flex h-9 w-9 items-center justify-center rounded-xl text-white transition-colors hover:bg-white/15"
-                aria-label="Search"
-                onClick={() => setSearchOpen((prev) => !prev)}
-              >
-                <FiSearch size={19} />
-              </motion.button>
-              <Link href={isLoggedIn ? "/profile" : "/auth/login"}>
-                <motion.div
-                  whileHover={{ scale: 1.12 }} whileTap={{ scale: 0.92 }}
-                  transition={{ duration: 0.15 }}
-                  className="flex h-9 w-9 items-center justify-center rounded-xl text-white transition-colors hover:bg-white/15"
-                  aria-label="Account"
-                >
-                  <FiUser size={19} />
-                </motion.div>
-              </Link>
-              <motion.button
-                whileHover={{ scale: 1.12 }} whileTap={{ scale: 0.92 }}
-                transition={{ duration: 0.15 }}
-                className="flex h-9 w-9 items-center justify-center rounded-xl text-white transition-colors hover:bg-white/15"
-                aria-label="Open menu"
-                onClick={() => setSidebarOpen(true)}
-              >
-                <FiMenu size={20} />
-              </motion.button>
+          {/* Center: links hugging the logo, always centered regardless of edge icon widths */}
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+            <div className="pointer-events-auto flex items-center gap-2 md:gap-4 lg:gap-6">
+              <nav className="hidden md:flex items-center gap-0.5">
+                {navLinks.slice(0, 3).map((link) => (
+                  <Link
+                    key={link.label}
+                    href={link.href}
+                    className="group relative px-3 py-2 font-poppins text-sm font-medium text-text-dark rounded-xl transition-colors duration-200 hover:bg-black/5"
+                  >
+                    {link.label}
+                    <span className="absolute bottom-1.5 left-3 right-3 h-0.5 rounded-full bg-primary-pink/70 scale-x-0 origin-left transition-transform duration-300 group-hover:scale-x-100" />
+                  </Link>
+                ))}
+              </nav>
+              <LogoCircle logoUrl={logoUrl} />
+              <nav className="hidden md:flex items-center gap-0.5">
+                {navLinks.slice(3).map((link) => (
+                  <Link
+                    key={link.label}
+                    href={link.href}
+                    className="group relative px-3 py-2 font-poppins text-sm font-medium text-text-dark rounded-xl transition-colors duration-200 hover:bg-black/5"
+                  >
+                    {link.label}
+                    <span className="absolute bottom-1.5 left-3 right-3 h-0.5 rounded-full bg-primary-pink/70 scale-x-0 origin-left transition-transform duration-300 group-hover:scale-x-100" />
+                  </Link>
+                ))}
+              </nav>
             </div>
           </div>
         </header>
-
-        <AnimatePresence>
-          {searchOpen && (
-            <motion.div
-              key="search-bar"
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
-              className="overflow-hidden"
-            >
-              <div className="mx-auto w-full px-4 pt-8 md:pt-4 md:w-[50%] md:px-0 pb-2">
-                <form
-                  onSubmit={handleSearchSubmit}
-                  className="flex w-full items-center gap-3 rounded-2xl border border-gray-200 bg-white px-4 py-2 shadow-sm"
-                >
-                  <FiSearch className="text-primary-pink" />
-                  <input
-                    ref={searchInputRef}
-                    type="text"
-                    value={searchValue}
-                    onChange={(e) => handleSearchChange(e.target.value)}
-                    placeholder="Search toys, categories, or brands..."
-                    className="w-full bg-transparent text-sm font-inter text-text-dark outline-none placeholder:text-text-muted"
-                    autoComplete="off"
-                  />
-                  <button
-                    type="submit"
-                    className="inline-flex items-center justify-center rounded-xl bg-primary-pink p-2.5 text-white"
-                    aria-label="Search"
-                  >
-                    <FiSearch size={16} />
-                  </button>
-                </form>
-                {suggestions.length > 0 && (
-                  <div className="mt-1 rounded-2xl border border-gray-100 bg-white shadow-md overflow-hidden">
-                    {suggestions.map((s) => (
-                      <button
-                        key={s.slug}
-                        type="button"
-                        className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm font-inter text-text-dark hover:bg-gray-50 transition-colors"
-                        onClick={() => {
-                          setSuggestions([]);
-                          router.push(`/products?q=${encodeURIComponent(s.name)}`);
-                          setSearchOpen(false);
-                          setSearchValue("");
-                        }}
-                      >
-                        <FiSearch size={13} className="text-text-muted shrink-0" />
-                        {s.name}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </motion.div>
 
       {/* ── Sidebar ─────────────────────────────────────────────── */}
@@ -538,7 +446,7 @@ export default function Navbar() {
                   <Link href="/" onClick={closeSidebar} className="flex items-center">
                     <Image
                       src={logoUrl}
-                      alt="JoyToy"
+                      alt="DealHobe"
                       width={120}
                       height={36}
                       className="h-9 w-auto object-contain"
@@ -553,6 +461,43 @@ export default function Navbar() {
                     <FiX size={16} />
                   </button>
                 </div>
+
+                {/* Search */}
+                <form
+                  onSubmit={handleSearchSubmit}
+                  className="mt-4 flex w-full items-center gap-2.5 rounded-2xl border border-gray-200 bg-soft-bg px-3.5 py-2.5"
+                >
+                  <FiSearch className="shrink-0 text-primary-pink" size={16} />
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    value={searchValue}
+                    onChange={(e) => handleSearchChange(e.target.value)}
+                    placeholder="Search products..."
+                    className="w-full bg-transparent text-sm font-poppins text-text-dark outline-none placeholder:text-text-muted"
+                    autoComplete="off"
+                  />
+                </form>
+                {suggestions.length > 0 && (
+                  <div className="mt-1 rounded-2xl border border-gray-100 bg-white shadow-md overflow-hidden">
+                    {suggestions.map((s) => (
+                      <button
+                        key={s.slug}
+                        type="button"
+                        className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm font-poppins text-text-dark hover:bg-gray-50 transition-colors"
+                        onClick={() => {
+                          setSuggestions([]);
+                          router.push(`/products?q=${encodeURIComponent(s.name)}`);
+                          setSidebarOpen(false);
+                          setSearchValue("");
+                        }}
+                      >
+                        <FiSearch size={13} className="text-text-muted shrink-0" />
+                        {s.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Nav items */}
@@ -567,6 +512,19 @@ export default function Navbar() {
                   <FiHome size={17} className="shrink-0 text-primary-pink" />
                   Home
                 </Link>
+
+                {/* Boys / Girls */}
+                {navLinks.slice(0, 2).map((link) => (
+                  <Link
+                    key={link.label}
+                    href={link.href}
+                    onClick={closeSidebar}
+                    className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-text-dark transition-colors hover:bg-gray-50 hover:text-primary-pink"
+                  >
+                    <FiChevronRight size={17} className="shrink-0 text-primary-pink" />
+                    {link.label}
+                  </Link>
+                ))}
 
                 {/* By Age — accordion */}
                 <div>
@@ -654,7 +612,7 @@ export default function Navbar() {
                   </AnimatePresence>
                 </div>
 
-                {/* Products */}
+                {/* Products / Offers / Blogs */}
                 <Link
                   href="/products"
                   onClick={closeSidebar}
@@ -663,6 +621,17 @@ export default function Navbar() {
                   <FiShoppingBag size={17} className="shrink-0 text-primary-pink" />
                   Products
                 </Link>
+                {navLinks.slice(4).map((link) => (
+                  <Link
+                    key={link.label}
+                    href={link.href}
+                    onClick={closeSidebar}
+                    className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-text-dark transition-colors hover:bg-gray-50 hover:text-primary-pink"
+                  >
+                    <FiChevronRight size={17} className="shrink-0 text-primary-pink" />
+                    {link.label}
+                  </Link>
+                ))}
 
                 {/* Cart */}
                 <Link
@@ -690,7 +659,7 @@ export default function Navbar() {
                   View All Products
                 </Link>
                 <div className="flex items-center justify-center gap-4 text-text-muted">
-                  <a href="https://www.facebook.com/people/JoyToy/61586803048218/?mibextid=wwXIfr&rdid=TgrQrd2ZmYJd8ZO7&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1Gw29e9PZL%2F%3Fmibextid%3DwwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="transition-colors hover:text-[#1877F2]">
+                  <a href="https://www.facebook.com/people/DealHobe/61586803048218/?mibextid=wwXIfr&rdid=TgrQrd2ZmYJd8ZO7&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1Gw29e9PZL%2F%3Fmibextid%3DwwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="transition-colors hover:text-[#1877F2]">
                     <FaFacebook size={18} />
                   </a>
                   <a href="https://wa.me/8801339562735" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="transition-colors hover:text-[#25D366]">

@@ -1,5 +1,5 @@
 /**
- * JoyToy Framer Motion Variants
+ * DealHobe Framer Motion Variants
  *
  * Duration rules:
  *   micro-interactions → 0.2s

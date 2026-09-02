@@ -90,7 +90,7 @@ export async function getBalance(): Promise<number> {
   return data.current_balance;
 }
 
-// Maps Steadfast delivery_status to JoyToy OrderStatus
+// Maps Steadfast delivery_status to DealHobe OrderStatus
 export function mapSteadfastStatus(
   steadfastStatus: string,
 ): "Pending" | "Processing" | "Shipped" | "Delivered" | "Cancelled" | null {

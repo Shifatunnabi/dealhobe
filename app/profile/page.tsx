@@ -51,7 +51,7 @@ interface BabyEntry {
   birthday: string;
 }
 
-const AUTH_TOKEN_KEY = "joytoy_auth_token_v1";
+const AUTH_TOKEN_KEY = "dealhobe_auth_token_v1";
 
 const STATUS_STYLES: Record<OrderStatus, string> = {
   Pending: "bg-yellow-50 text-yellow-700",
@@ -121,7 +121,7 @@ function StatBadge({ status }: { status: OrderStatus }) {
   }
 
   return (
-    <span className={cn("rounded-full px-3 py-0.5 font-inter text-xs font-semibold", STATUS_STYLES[status])}>
+    <span className={cn("rounded-full px-3 py-0.5 font-poppins text-xs font-semibold", STATUS_STYLES[status])}>
       {status}
     </span>
   );
@@ -146,7 +146,7 @@ function Field({
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="font-inter text-sm font-medium text-text-dark">
+      <label htmlFor={id} className="font-poppins text-sm font-medium text-text-dark">
         {label}
       </label>
       <input
@@ -157,7 +157,7 @@ function Field({
         disabled={disabled}
         onChange={(e) => onChange?.(e.target.value)}
         className={cn(
-          "w-full rounded-2xl border px-4 py-3 font-inter text-sm transition-colors duration-200 focus:outline-none",
+          "w-full rounded-2xl border px-4 py-3 font-poppins text-sm transition-colors duration-200 focus:outline-none",
           disabled
             ? "border-gray-100 bg-gray-50 text-text-muted cursor-not-allowed"
             : "border-gray-200 bg-soft-bg text-text-dark placeholder:text-text-muted/60 focus:border-primary-pink focus:bg-white",
@@ -184,7 +184,7 @@ function NavItem({
     <button
       onClick={onClick}
       className={cn(
-        "flex w-full items-center gap-3 rounded-2xl px-4 py-3 font-inter text-sm font-medium transition-all duration-200",
+        "flex w-full items-center gap-3 rounded-2xl px-4 py-3 font-poppins text-sm font-medium transition-all duration-200",
         danger
           ? "text-red-500 hover:bg-red-50"
           : active
@@ -281,7 +281,7 @@ export default function ProfilePage() {
         if (!alive) return;
         if (typeof window !== "undefined") {
           window.localStorage.removeItem(AUTH_TOKEN_KEY);
-          window.dispatchEvent(new Event("joytoy-auth-changed"));
+          window.dispatchEvent(new Event("dealhobe-auth-changed"));
         }
         router.replace("/auth/login");
       } finally {
@@ -573,7 +573,7 @@ export default function ProfilePage() {
       <div className="min-h-screen bg-soft-bg pt-26 pb-24">
         <div className="mx-auto max-w-6xl px-section">
           <div className="rounded-3xl bg-white p-6 text-center shadow-card">
-            <p className="font-inter text-sm text-text-muted">Loading your profile...</p>
+            <p className="font-poppins text-sm text-text-muted">Loading your profile...</p>
           </div>
         </div>
       </div>
@@ -588,15 +588,15 @@ export default function ProfilePage() {
             <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-red-50">
               <span className="text-4xl">🚫</span>
             </div>
-            <h1 className="mb-3 font-inter text-2xl font-bold text-text-dark">
+            <h1 className="mb-3 font-poppins text-2xl font-bold text-text-dark">
               Account Banned
             </h1>
-            <p className="font-inter text-sm text-text-muted leading-relaxed">
+            <p className="font-poppins text-sm text-text-muted leading-relaxed">
               Your account has been suspended by the admin. Please contact us for more details.
             </p>
             <Link
               href="/"
-              className="mt-6 inline-block rounded-2xl bg-gradient-primary px-6 py-3 font-inter text-sm font-semibold text-white shadow-button"
+              className="mt-6 inline-block rounded-2xl bg-gradient-primary px-6 py-3 font-poppins text-sm font-semibold text-white shadow-button"
             >
               Back to Home
             </Link>
@@ -632,8 +632,8 @@ export default function ProfilePage() {
                 {initials}
               </div>
               <div>
-                <p className="font-inter text-lg font-semibold text-text-dark">{name || "-"}</p>
-                <p className="font-inter text-xs text-text-muted">{userEmail || "-"}</p>
+                <p className="font-poppins text-lg font-semibold text-text-dark">{name || "-"}</p>
+                <p className="font-poppins text-xs text-text-muted">{userEmail || "-"}</p>
               </div>
 
               <div className="mt-3 grid w-full grid-cols-2 gap-3 lg:hidden">
@@ -688,8 +688,8 @@ export default function ProfilePage() {
                 onClick={() => {
                   if (typeof window !== "undefined") {
                     window.localStorage.removeItem(AUTH_TOKEN_KEY);
-                    window.localStorage.removeItem("joytoy_checkout_info_v1");
-                    window.dispatchEvent(new Event("joytoy-auth-changed"));
+                    window.localStorage.removeItem("dealhobe_checkout_info_v1");
+                    window.dispatchEvent(new Event("dealhobe-auth-changed"));
                   }
                   router.push("/auth/login");
                 }}
@@ -718,8 +718,8 @@ export default function ProfilePage() {
                   <FiPackage size={17} className="text-primary-pink" />
                 </div>
                 <div>
-                  <p className="font-inter text-xs text-text-muted">Total Orders</p>
-                  <p className="font-inter text-2xl font-bold text-text-dark">{orders.length}</p>
+                  <p className="font-poppins text-xs text-text-muted">Total Orders</p>
+                  <p className="font-poppins text-2xl font-bold text-text-dark">{orders.length}</p>
                 </div>
               </motion.button>
 
@@ -728,8 +728,8 @@ export default function ProfilePage() {
                   <FiGift size={17} className="text-secondary-yellow-dark" />
                 </div>
                 <div className="mt-2">
-                  <p className="font-inter text-xs text-text-muted">Loyalty Points</p>
-                  <p className="font-inter text-2xl font-bold text-text-dark">{loyaltyPoints} pts</p>
+                  <p className="font-poppins text-xs text-text-muted">Loyalty Points</p>
+                  <p className="font-poppins text-2xl font-bold text-text-dark">{loyaltyPoints} pts</p>
                 </div>
               </motion.div>
             </motion.div>
@@ -737,18 +737,18 @@ export default function ProfilePage() {
             <AnimatePresence mode="wait">
               {activeTab === "orders" && (
                 <motion.div key="orders" {...panelAnim} className="rounded-3xl bg-white p-6 shadow-card">
-                  <h2 className="mb-5 font-inter text-xl font-semibold text-text-dark">My Orders</h2>
+                  <h2 className="mb-5 font-poppins text-xl font-semibold text-text-dark">My Orders</h2>
                   {ordersLoading ? (
                     <div className="py-10 text-center">
-                      <p className="font-inter text-sm text-text-muted">Loading your orders...</p>
+                      <p className="font-poppins text-sm text-text-muted">Loading your orders...</p>
                     </div>
                   ) : ordersError ? (
                     <div className="py-10 text-center">
-                      <p className="font-inter text-sm text-red-500">{ordersError}</p>
+                      <p className="font-poppins text-sm text-red-500">{ordersError}</p>
                     </div>
                   ) : orders.length === 0 ? (
                     <div className="py-10 text-center">
-                      <p className="font-inter text-sm text-text-muted">No orders yet.</p>
+                      <p className="font-poppins text-sm text-text-muted">No orders yet.</p>
                     </div>
                   ) : (
                     <div className="flex flex-col divide-y divide-gray-100">
@@ -756,10 +756,10 @@ export default function ProfilePage() {
                         <div key={order._id} className="py-5 first:pt-0 last:pb-0">
                           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                             <div className="flex items-center gap-2">
-                              <span className="font-inter text-sm font-bold text-text-dark">{order.orderNumber}</span>
+                              <span className="font-poppins text-sm font-bold text-text-dark">{order.orderNumber}</span>
                               <StatBadge status={order.status} />
                             </div>
-                            <span className="font-inter text-base font-bold text-primary-pink">
+                            <span className="font-poppins text-base font-bold text-primary-pink">
                               ৳{order.total.toLocaleString()}
                             </span>
                           </div>
@@ -777,18 +777,18 @@ export default function ProfilePage() {
                                 )}
                               </div>
                             ))}
-                            <p className="ml-1 font-inter text-xs text-text-muted">
+                            <p className="ml-1 font-poppins text-xs text-text-muted">
                               {order.items.map((i) => i.name).join(", ")}
                             </p>
                           </div>
 
                           <div className="flex items-center justify-between">
-                            <span className="font-inter text-xs text-text-muted">
+                            <span className="font-poppins text-xs text-text-muted">
                               {new Date(order.createdAt).toLocaleDateString()}
                             </span>
                             <Link
                               href={`/orders/${order.orderNumber}`}
-                              className="rounded-xl border border-gray-200 px-3 py-1.5 font-inter text-xs font-semibold text-text-dark transition-colors hover:border-primary-pink hover:text-primary-pink"
+                              className="rounded-xl border border-gray-200 px-3 py-1.5 font-poppins text-xs font-semibold text-text-dark transition-colors hover:border-primary-pink hover:text-primary-pink"
                             >
                               View Details
                             </Link>
@@ -802,7 +802,7 @@ export default function ProfilePage() {
 
               {activeTab === "profile" && (
                 <motion.div key="profile" {...panelAnim} className="rounded-3xl bg-white p-6 shadow-card">
-                  <h2 className="mb-5 font-inter text-xl font-semibold text-text-dark">Profile Details</h2>
+                  <h2 className="mb-5 font-poppins text-xl font-semibold text-text-dark">Profile Details</h2>
                   <div className="flex flex-col gap-5">
                     <Field label="Full Name" id="pName" placeholder="Your name" value={name} disabled />
                     <Field label="Email Address" id="pEmail" placeholder="you@example.com" value={userEmail} disabled />
@@ -817,7 +817,7 @@ export default function ProfilePage() {
               {activeTab === "addresses" && (
                 <motion.div key="addresses" {...panelAnim} className="rounded-3xl bg-white p-6 shadow-card">
                   <div className="mb-5 flex items-center justify-between gap-3">
-                    <h2 className="font-inter text-xl font-semibold text-text-dark">Addresses</h2>
+                    <h2 className="font-poppins text-xl font-semibold text-text-dark">Addresses</h2>
                     <div className="flex items-center gap-3">
                       <span className="text-xs text-text-muted">{addresses.length} saved</span>
                       <button
@@ -834,7 +834,7 @@ export default function ProfilePage() {
                           }
                           setAddressError("");
                         }}
-                        className="inline-flex items-center gap-2 rounded-2xl bg-primary-pink/10 px-4 py-2 font-inter text-sm font-semibold text-primary-pink"
+                        className="inline-flex items-center gap-2 rounded-2xl bg-primary-pink/10 px-4 py-2 font-poppins text-sm font-semibold text-primary-pink"
                       >
                         <FiPlus size={14} />
                         Add New
@@ -903,16 +903,16 @@ export default function ProfilePage() {
 
                   {showAddressForm && (
                   <div className="mt-6 rounded-2xl border border-dashed border-primary-pink/30 bg-primary-pink/5 p-4">
-                    <h3 className="mb-4 font-inter text-base font-semibold text-text-dark">
+                    <h3 className="mb-4 font-poppins text-base font-semibold text-text-dark">
                       {editingAddressId ? "Edit Address" : "Add New Address"}
                     </h3>
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <div className="flex flex-col gap-1.5">
-                        <label className="font-inter text-sm font-medium text-text-dark">Address Label</label>
+                        <label className="font-poppins text-sm font-medium text-text-dark">Address Label</label>
                         <select
                           value={addrLabel}
                           onChange={(e) => setAddrLabel(e.target.value as AddressLabel)}
-                          className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 font-inter text-sm text-text-dark focus:border-primary-pink focus:outline-none"
+                          className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 font-poppins text-sm text-text-dark focus:border-primary-pink focus:outline-none"
                         >
                           <option value="home">Home</option>
                           <option value="office">Office</option>
@@ -921,11 +921,11 @@ export default function ProfilePage() {
                       </div>
 
                       <div className="flex flex-col gap-1.5">
-                        <label className="font-inter text-sm font-medium text-text-dark">Delivery Area</label>
+                        <label className="font-poppins text-sm font-medium text-text-dark">Delivery Area</label>
                         <select
                           value={addrArea}
                           onChange={(e) => setAddrArea(e.target.value as DeliveryArea)}
-                          className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 font-inter text-sm text-text-dark focus:border-primary-pink focus:outline-none"
+                          className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 font-poppins text-sm text-text-dark focus:border-primary-pink focus:outline-none"
                         >
                           <option value="inside_dhaka">Inside Dhaka</option>
                           <option value="outside_dhaka">Outside Dhaka</option>
@@ -934,13 +934,13 @@ export default function ProfilePage() {
                     </div>
 
                     <div className="mt-4 flex flex-col gap-1.5">
-                      <label className="font-inter text-sm font-medium text-text-dark">Full Address</label>
+                      <label className="font-poppins text-sm font-medium text-text-dark">Full Address</label>
                       <textarea
                         rows={3}
                         value={addrText}
                         onChange={(e) => setAddrText(e.target.value)}
                         placeholder="House no., Road, Area, District"
-                        className="w-full resize-none rounded-2xl border border-gray-200 bg-white px-4 py-3 font-inter text-sm text-text-dark focus:border-primary-pink focus:outline-none"
+                        className="w-full resize-none rounded-2xl border border-gray-200 bg-white px-4 py-3 font-poppins text-sm text-text-dark focus:border-primary-pink focus:outline-none"
                       />
                     </div>
 
@@ -960,7 +960,7 @@ export default function ProfilePage() {
                       onClick={handleSaveAddress}
                       disabled={addressSaving}
                       className={cn(
-                        "mt-4 inline-flex items-center gap-2 rounded-2xl px-5 py-2.5 font-inter text-sm font-semibold text-white shadow-button transition-all",
+                        "mt-4 inline-flex items-center gap-2 rounded-2xl px-5 py-2.5 font-poppins text-sm font-semibold text-white shadow-button transition-all",
                         addressSaving ? "bg-gray-300" : "bg-gradient-primary hover:shadow-hover",
                       )}
                     >
@@ -992,14 +992,14 @@ export default function ProfilePage() {
               {activeTab === "baby" && (
                 <motion.div key="baby" {...panelAnim} className="rounded-3xl bg-white p-6 shadow-card">
                   <div className="mb-5 flex items-center justify-between gap-3">
-                    <h2 className="font-inter text-xl font-semibold text-text-dark">Baby Details</h2>
+                    <h2 className="font-poppins text-xl font-semibold text-text-dark">Baby Details</h2>
                     <button
                       type="button"
                       onClick={() => {
                         setShowBabyForm((prev) => !prev);
                         setBabyError("");
                       }}
-                      className="inline-flex items-center gap-2 rounded-2xl bg-primary-pink/10 px-4 py-2 font-inter text-sm font-semibold text-primary-pink"
+                      className="inline-flex items-center gap-2 rounded-2xl bg-primary-pink/10 px-4 py-2 font-poppins text-sm font-semibold text-primary-pink"
                     >
                       <FiPlus size={14} />
                       Add Another Baby
@@ -1033,7 +1033,7 @@ export default function ProfilePage() {
                         onClick={handleAddBaby}
                         disabled={babySaving}
                         className={cn(
-                          "mt-4 w-full rounded-2xl py-2.5 font-inter font-semibold text-white shadow-button transition-all",
+                          "mt-4 w-full rounded-2xl py-2.5 font-poppins font-semibold text-white shadow-button transition-all",
                           babySaving ? "bg-gray-300" : "bg-gradient-primary hover:shadow-hover",
                         )}
                       >
@@ -1050,7 +1050,7 @@ export default function ProfilePage() {
                         <div key={baby._id || `${baby.name}-${baby.birthday}`} className="rounded-2xl border border-gray-100 bg-soft-bg p-4">
                           <div className="flex items-start justify-between gap-3">
                             <div>
-                              <p className="font-inter text-base font-semibold text-text-dark">{baby.name}</p>
+                              <p className="font-poppins text-base font-semibold text-text-dark">{baby.name}</p>
                               <p className="mt-1 text-sm text-text-muted">
                                 Birthday: {new Date(baby.birthday).toLocaleDateString()}
                               </p>
@@ -1073,7 +1073,7 @@ export default function ProfilePage() {
 
               {activeTab === "settings" && (
                 <motion.div key="settings" {...panelAnim} className="rounded-3xl bg-white p-6 shadow-card">
-                  <h2 className="mb-5 font-inter text-xl font-semibold text-text-dark">Settings</h2>
+                  <h2 className="mb-5 font-poppins text-xl font-semibold text-text-dark">Settings</h2>
                   <h3 className="mb-4 text-lg font-semibold text-text-dark">Change Password</h3>
 
                   <div className="flex flex-col gap-4">
@@ -1111,7 +1111,7 @@ export default function ProfilePage() {
                     onClick={handleChangePassword}
                     disabled={passwordSaving}
                     className={cn(
-                      "mt-5 w-full rounded-2xl py-3 font-inter font-semibold text-white shadow-button transition-all",
+                      "mt-5 w-full rounded-2xl py-3 font-poppins font-semibold text-white shadow-button transition-all",
                       passwordSaving ? "bg-gray-300" : "bg-gradient-primary hover:shadow-hover",
                     )}
                   >

@@ -62,7 +62,7 @@ export default function ShopByCategories({ categories = [] }: { categories?: any
                 </div>
               </Link>
 
-              <Link href={`/products?category=${encodeURIComponent(cat.name)}`} className="font-inter text-lg font-semibold text-text-dark">
+              <Link href={`/products?category=${encodeURIComponent(cat.name)}`} className="font-poppins text-lg font-semibold text-text-dark">
                 {cat.name}
               </Link>
 
@@ -78,7 +78,7 @@ export default function ShopByCategories({ categories = [] }: { categories?: any
 
         <motion.div variants={fadeUp} className="mt-10 flex justify-center">
           <button
-            onClick={() => window.dispatchEvent(new Event("joytoy-open-category-sidebar"))}
+            onClick={() => window.dispatchEvent(new Event("dealhobe-open-category-sidebar"))}
             className="inline-flex items-center justify-center rounded-2xl border-2 border-primary-pink px-6 py-2.5 text-sm font-semibold text-primary-pink transition-colors hover:bg-primary-pink hover:text-white"
           >
             View All Categories

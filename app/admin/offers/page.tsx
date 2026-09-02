@@ -230,7 +230,7 @@ export default function OffersPage() {
                  <ImageUpload
                    label="Offer Thumbnail"
                    value={form.thumbnailUrl}
-                   folder="joytoy/offers"
+                   folder="dealhobe/offers"
                    onChange={(url, pid) => setForm((f:any) => ({...f, thumbnailUrl: url, thumbnailPublicId: pid}))}
                  />
 

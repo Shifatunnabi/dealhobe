@@ -79,10 +79,10 @@ export default function ParentingTipsSection({ tips = [] }: { tips?: any[] }) {
 
                 <div className="flex flex-1 items-center p-5 sm:p-7">
                   <div>
-                    <h3 className="font-inter text-xl font-bold text-text-dark sm:text-2xl">
+                    <h3 className="font-poppins text-xl font-bold text-text-dark sm:text-2xl">
                       {tip.title}
                     </h3>
-                    <p className="mt-3 font-inter text-sm leading-relaxed text-text-muted sm:text-base">
+                    <p className="mt-3 font-poppins text-sm leading-relaxed text-text-muted sm:text-base">
                       {tip.details || tip.text}
                     </p>
                   </div>

@@ -57,7 +57,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ ord
 
   const html = `
     <div style="font-family:Arial,sans-serif;line-height:1.5;color:#222;">
-      <h2 style="margin-bottom:8px;">Thanks for shopping with JoyToy!</h2>
+      <h2 style="margin-bottom:8px;">Thanks for shopping with DealHobe!</h2>
       <p>Your order <strong>${order.orderNumber}</strong> is confirmed.</p>
       ${trackingUrl ? `<p>Track your order: <a href="${trackingUrl}">${trackingUrl}</a></p>` : ""}
       <p>The receipt is attached as a PDF.</p>
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ ord
 
   const result = await sendReceiptEmail({
     to: order.delivery.email,
-    subject: `JoyToy Receipt ${order.orderNumber}`,
+    subject: `DealHobe Receipt ${order.orderNumber}`,
     html,
     pdfBase64,
     filename: `${order.orderNumber}.pdf`,

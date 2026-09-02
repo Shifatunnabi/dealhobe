@@ -16,8 +16,8 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ or
     <div className="min-h-screen bg-soft-bg pt-34 pb-24">
       <div className="mx-auto max-w-5xl px-section">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <h1 className="font-inter text-2xl font-bold text-text-dark">Order {order.orderNumber}</h1>
-          <span className="rounded-2xl bg-white px-4 py-2 font-inter text-lg font-semibold text-primary-pink shadow-card">
+          <h1 className="font-poppins text-2xl font-bold text-text-dark">Order {order.orderNumber}</h1>
+          <span className="rounded-2xl bg-white px-4 py-2 font-poppins text-lg font-semibold text-primary-pink shadow-card">
             Total - ৳{order.total.toLocaleString()}
           </span>
         </div>
@@ -26,7 +26,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ or
           <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
             <div>
               <p className="text-sm text-text-muted">Delivery Details</p>
-              <p className="mt-1 font-inter text-base font-semibold text-text-dark">{order.delivery.fullName}</p>
+              <p className="mt-1 font-poppins text-base font-semibold text-text-dark">{order.delivery.fullName}</p>
               <p className="text-sm text-text-muted">{order.delivery.phone}</p>
               {order.delivery.email && (
                 <p className="text-sm text-text-muted">{order.delivery.email}</p>
@@ -54,7 +54,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ or
                 {order.items.map((item: any, index: number) => (
                   <tr key={item.productId} className="border-b border-gray-100 last:border-b-0">
                     <td className="py-3 pr-2 text-sm text-text-muted">{index + 1}</td>
-                    <td className="py-3 pr-2 font-inter text-sm font-semibold text-text-dark">
+                    <td className="py-3 pr-2 font-poppins text-sm font-semibold text-text-dark">
                       {item.name}
                     </td>
                     <td className="py-3 pr-2 text-sm text-text-muted">{item.qty}</td>
@@ -84,7 +84,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ or
           <div className="mt-8">
             <Link
               href={`/receipt/${order.orderNumber}`}
-              className="inline-flex items-center gap-2 rounded-2xl bg-gradient-primary px-6 py-3 font-inter font-semibold text-white shadow-button transition-shadow hover:shadow-hover"
+              className="inline-flex items-center gap-2 rounded-2xl bg-gradient-primary px-6 py-3 font-poppins font-semibold text-white shadow-button transition-shadow hover:shadow-hover"
             >
               View Receipt
             </Link>

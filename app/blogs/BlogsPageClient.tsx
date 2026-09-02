@@ -28,7 +28,7 @@ function CategoryPill({
     <button
       onClick={onClick}
       className={cn(
-        "rounded-full px-4 py-1.5 font-inter text-sm font-semibold transition-all duration-200 whitespace-nowrap",
+        "rounded-full px-4 py-1.5 font-poppins text-sm font-semibold transition-all duration-200 whitespace-nowrap",
         active
           ? "bg-gradient-primary text-white shadow-button"
           : "border border-gray-200 bg-white text-text-muted hover:border-primary-pink/50 hover:text-primary-pink",
@@ -59,7 +59,7 @@ function BlogCard({ post, index }: { post: any; index: number }) {
             loading="lazy"
           />
           {/* Category badge */}
-          <span className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 font-inter text-xs font-semibold text-primary-pink shadow-soft backdrop-blur-sm">
+          <span className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 font-poppins text-xs font-semibold text-primary-pink shadow-soft backdrop-blur-sm">
             {post.category}
           </span>
         </div>
@@ -67,7 +67,7 @@ function BlogCard({ post, index }: { post: any; index: number }) {
         {/* Content */}
         <div className="flex flex-1 flex-col gap-2 p-5">
           {/* Meta */}
-          <div className="flex items-center gap-3 text-xs text-text-muted font-inter">
+          <div className="flex items-center gap-3 text-xs text-text-muted font-poppins">
             <span>{new Date(post.date).toLocaleDateString()}</span>
             <span className="h-1 w-1 rounded-full bg-gray-300" />
             <span className="flex items-center gap-1">
@@ -77,12 +77,12 @@ function BlogCard({ post, index }: { post: any; index: number }) {
           </div>
 
           {/* Title */}
-          <h3 className="font-inter text-lg font-semibold leading-snug text-text-dark line-clamp-2 transition-colors group-hover:text-primary-pink">
+          <h3 className="font-poppins text-lg font-semibold leading-snug text-text-dark line-clamp-2 transition-colors group-hover:text-primary-pink">
             {post.title}
           </h3>
 
           {/* Excerpt */}
-          <p className="font-inter text-sm text-text-muted line-clamp-2 leading-relaxed">
+          <p className="font-poppins text-sm text-text-muted line-clamp-2 leading-relaxed">
             {post.excerpt}
           </p>
 
@@ -91,7 +91,7 @@ function BlogCard({ post, index }: { post: any; index: number }) {
             <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-primary text-white shrink-0">
               <FiUser size={12} />
             </div>
-            <span className="font-inter text-xs font-semibold text-text-dark">{post.author}</span>
+            <span className="font-poppins text-xs font-semibold text-text-dark">{post.author}</span>
           </div>
 
           <div className="mt-auto pt-3">
@@ -129,7 +129,7 @@ function Pagination({
     pages.push(total);
   }
 
-  const btn = "flex h-9 w-9 items-center justify-center rounded-full text-sm font-inter font-semibold transition-all";
+  const btn = "flex h-9 w-9 items-center justify-center rounded-full text-sm font-poppins font-semibold transition-all";
 
   return (
     <div className="mt-12 flex items-center justify-center gap-2">
@@ -214,7 +214,7 @@ export default function BlogsPageClient({ blogs = [] }: { blogs?: any[] }) {
             <span className="font-semibold text-text-dark">Blogs</span>
           </nav>
           <ColorfulTitle title="Joy & Play Stories" as="h1" className="text-primary-pink" />
-          <p className="mt-2 font-inter text-sm text-text-muted max-w-md mx-auto">
+          <p className="mt-2 font-poppins text-sm text-text-muted max-w-md mx-auto">
             Tips, ideas, and inspiration for parents raising happy, curious kids.
           </p>
         </motion.div>
@@ -246,21 +246,21 @@ export default function BlogsPageClient({ blogs = [] }: { blogs?: any[] }) {
                   <div className="flex flex-col justify-center gap-4 p-7 md:p-10">
                     {/* Badges */}
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="rounded-full bg-gradient-primary px-3 py-1 font-inter text-xs font-semibold text-white shadow-button">
+                      <span className="rounded-full bg-gradient-primary px-3 py-1 font-poppins text-xs font-semibold text-white shadow-button">
                         Featured Story
                       </span>
-                      <span className="rounded-full border border-gray-200 bg-soft-bg px-3 py-1 font-inter text-xs text-text-muted">
+                      <span className="rounded-full border border-gray-200 bg-soft-bg px-3 py-1 font-poppins text-xs text-text-muted">
                         {featured.readTime} min read
                       </span>
                     </div>
 
                     {/* Title */}
-                    <h2 className="font-inter text-2xl font-bold leading-tight text-text-dark transition-colors group-hover:text-primary-pink md:text-3xl">
+                    <h2 className="font-poppins text-2xl font-bold leading-tight text-text-dark transition-colors group-hover:text-primary-pink md:text-3xl">
                       {featured.title}
                     </h2>
 
                     {/* Excerpt */}
-                    <p className="font-inter text-sm leading-relaxed text-text-muted line-clamp-3">
+                    <p className="font-poppins text-sm leading-relaxed text-text-muted line-clamp-3">
                       {featured.excerpt}
                     </p>
 
@@ -270,13 +270,13 @@ export default function BlogsPageClient({ blogs = [] }: { blogs?: any[] }) {
                         <FiUser size={13} />
                       </div>
                       <div>
-                        <p className="font-inter text-sm font-semibold text-text-dark">{featured.author}</p>
-                        <p className="font-inter text-xs text-text-muted">{new Date(featured.date).toLocaleDateString()}</p>
+                        <p className="font-poppins text-sm font-semibold text-text-dark">{featured.author}</p>
+                        <p className="font-poppins text-xs text-text-muted">{new Date(featured.date).toLocaleDateString()}</p>
                       </div>
                     </div>
 
                     {/* CTA */}
-                    <span className="inline-flex w-fit items-center gap-1.5 font-inter text-sm font-semibold text-primary-pink">
+                    <span className="inline-flex w-fit items-center gap-1.5 font-poppins text-sm font-semibold text-primary-pink">
                       Read Article
                       <FiChevronRight size={15} className="transition-transform duration-200 group-hover:translate-x-1" />
                     </span>
@@ -315,10 +315,10 @@ export default function BlogsPageClient({ blogs = [] }: { blogs?: any[] }) {
               className="flex flex-col items-center gap-4 py-24 text-center"
             >
               <span className="text-6xl">📖</span>
-              <p className="font-inter text-xl text-text-muted">No articles in this category yet.</p>
+              <p className="font-poppins text-xl text-text-muted">No articles in this category yet.</p>
               <button
                 onClick={() => handleCategory("All")}
-                className="rounded-2xl bg-gradient-primary px-6 py-3 font-inter font-semibold text-white shadow-button hover:shadow-hover"
+                className="rounded-2xl bg-gradient-primary px-6 py-3 font-poppins font-semibold text-white shadow-button hover:shadow-hover"
               >
                 View All Articles
               </button>

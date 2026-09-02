@@ -10,7 +10,7 @@ export { cloudinary };
 
 export async function uploadImage(
   base64Data: string,
-  folder: string = 'joytoy'
+  folder: string = 'dealhobe'
 ): Promise<{ url: string; publicId: string }> {
   const result = await cloudinary.uploader.upload(base64Data, {
     folder,

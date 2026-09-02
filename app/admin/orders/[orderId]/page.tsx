@@ -88,7 +88,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", borderTop: "1px solid rgba(0,0,0,0.08)", paddingTop: "0.5rem" }}>
                 <span>Total</span>
-                <strong style={{ color: "var(--primary-pink, #E80281)", textAlign: "right", minWidth: 90 }}>৳{order.total}</strong>
+                <strong style={{ color: "var(--primary-pink, #550000)", textAlign: "right", minWidth: 90 }}>৳{order.total}</strong>
               </div>
             </div>
           </div>

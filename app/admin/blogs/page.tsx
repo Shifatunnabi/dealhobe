@@ -171,7 +171,7 @@ export default function BlogsPage() {
                   <RichTextEditor value={form.content} onChange={html => setForm(f => ({ ...f, content: html }))} />
                 </div>
 
-                <ImageUpload label="Blog Cover Photo" value={form.imageUrl} folder="joytoy/blogs" onChange={(url, pid) => setForm(f => ({ ...f, imageUrl: url, imagePublicId: pid }))} />
+                <ImageUpload label="Blog Cover Photo" value={form.imageUrl} folder="dealhobe/blogs" onChange={(url, pid) => setForm(f => ({ ...f, imageUrl: url, imagePublicId: pid }))} />
               </div>
             </div>
             <div className="modal-footer">

@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { FiChevronRight, FiUserPlus, FiAlertCircle } from "react-icons/fi";
 import { ColorfulTitle } from "@/components/ui";
 
-const AUTH_TOKEN_KEY = "joytoy_auth_token_v1";
+const AUTH_TOKEN_KEY = "dealhobe_auth_token_v1";
 
 export default function AuthRegisterPage() {
 	const router = useRouter();
@@ -57,7 +57,7 @@ export default function AuthRegisterPage() {
 			if (data?.authToken) {
 				window.localStorage.setItem(AUTH_TOKEN_KEY, data.authToken);
 			}
-			window.dispatchEvent(new Event("joytoy-auth-changed"));
+			window.dispatchEvent(new Event("dealhobe-auth-changed"));
 			router.push("/profile");
 		} catch (err: any) {
 			setError(err?.message || "Registration failed.");
@@ -80,7 +80,7 @@ export default function AuthRegisterPage() {
 						<span className="font-semibold text-text-dark">Register</span>
 					</nav>
 					<ColorfulTitle title="Register" as="h1" className="text-primary-pink" />
-					<p className="mt-2 font-inter text-sm text-text-muted">
+					<p className="mt-2 font-poppins text-sm text-text-muted">
 						Register to manage orders and delivery addresses.
 					</p>
 				</motion.div>
@@ -88,44 +88,44 @@ export default function AuthRegisterPage() {
 				<form onSubmit={handleRegister} className="rounded-3xl bg-white p-6 shadow-card">
 					<div className="flex flex-col gap-4">
 						<div className="flex flex-col gap-1.5">
-							<label className="font-inter text-sm font-medium text-text-dark">Full Name</label>
+							<label className="font-poppins text-sm font-medium text-text-dark">Full Name</label>
 							<input
 								type="text"
 								placeholder="e.g. Maliha Rahman"
 								value={fullName}
 								onChange={(e) => setFullName(e.target.value)}
-								className="w-full rounded-2xl border border-gray-200 bg-soft-bg px-4 py-3 font-inter text-sm text-text-dark placeholder:text-text-muted/60 focus:border-primary-pink focus:bg-white focus:outline-none"
+								className="w-full rounded-2xl border border-gray-200 bg-soft-bg px-4 py-3 font-poppins text-sm text-text-dark placeholder:text-text-muted/60 focus:border-primary-pink focus:bg-white focus:outline-none"
 							/>
 						</div>
 
 						<div className="flex flex-col gap-1.5">
-							<label className="font-inter text-sm font-medium text-text-dark">Mobile</label>
+							<label className="font-poppins text-sm font-medium text-text-dark">Mobile</label>
 							<input
 								type="tel"
 								placeholder="01XXXXXXXXX"
 								value={phone}
 								onChange={(e) => setPhone(e.target.value)}
-								className="w-full rounded-2xl border border-gray-200 bg-soft-bg px-4 py-3 font-inter text-sm text-text-dark placeholder:text-text-muted/60 focus:border-primary-pink focus:bg-white focus:outline-none"
+								className="w-full rounded-2xl border border-gray-200 bg-soft-bg px-4 py-3 font-poppins text-sm text-text-dark placeholder:text-text-muted/60 focus:border-primary-pink focus:bg-white focus:outline-none"
 							/>
 						</div>
 
 						<div className="flex flex-col gap-1.5">
-							<label className="font-inter text-sm font-medium text-text-dark">Email Address (Optional)</label>
+							<label className="font-poppins text-sm font-medium text-text-dark">Email Address (Optional)</label>
 							<input
 								type="email"
 								placeholder="you@example.com"
 								value={email}
 								onChange={(e) => setEmail(e.target.value)}
-								className="w-full rounded-2xl border border-gray-200 bg-soft-bg px-4 py-3 font-inter text-sm text-text-dark placeholder:text-text-muted/60 focus:border-primary-pink focus:bg-white focus:outline-none"
+								className="w-full rounded-2xl border border-gray-200 bg-soft-bg px-4 py-3 font-poppins text-sm text-text-dark placeholder:text-text-muted/60 focus:border-primary-pink focus:bg-white focus:outline-none"
 							/>
 						</div>
 
 						<div className="flex flex-col gap-1.5">
-							<label className="font-inter text-sm font-medium text-text-dark">Delivery Area</label>
+							<label className="font-poppins text-sm font-medium text-text-dark">Delivery Area</label>
 							<select
 								value={area}
 								onChange={(e) => setArea(e.target.value as "inside_dhaka" | "outside_dhaka")}
-								className="w-full rounded-2xl border border-gray-200 bg-soft-bg px-4 py-3 font-inter text-sm text-text-dark focus:border-primary-pink focus:bg-white focus:outline-none"
+								className="w-full rounded-2xl border border-gray-200 bg-soft-bg px-4 py-3 font-poppins text-sm text-text-dark focus:border-primary-pink focus:bg-white focus:outline-none"
 							>
 								<option value="inside_dhaka">Inside Dhaka</option>
 								<option value="outside_dhaka">Outside Dhaka</option>
@@ -133,35 +133,35 @@ export default function AuthRegisterPage() {
 						</div>
 
 						<div className="flex flex-col gap-1.5">
-							<label className="font-inter text-sm font-medium text-text-dark">Full Address</label>
+							<label className="font-poppins text-sm font-medium text-text-dark">Full Address</label>
 							<textarea
 								rows={3}
 								placeholder="House no., Road, Area, District"
 								value={address}
 								onChange={(e) => setAddress(e.target.value)}
-								className="w-full resize-none rounded-2xl border border-gray-200 bg-soft-bg px-4 py-3 font-inter text-sm text-text-dark placeholder:text-text-muted/60 focus:border-primary-pink focus:bg-white focus:outline-none"
+								className="w-full resize-none rounded-2xl border border-gray-200 bg-soft-bg px-4 py-3 font-poppins text-sm text-text-dark placeholder:text-text-muted/60 focus:border-primary-pink focus:bg-white focus:outline-none"
 							/>
 						</div>
 
 						<div className="flex flex-col gap-4">
 							<div className="flex flex-col gap-1.5">
-								<label className="font-inter text-sm font-medium text-text-dark">Password</label>
+								<label className="font-poppins text-sm font-medium text-text-dark">Password</label>
 								<input
 									type="password"
 									placeholder="At least 6 characters"
 									value={password}
 									onChange={(e) => setPassword(e.target.value)}
-									className="w-full rounded-2xl border border-gray-200 bg-soft-bg px-4 py-3 font-inter text-sm text-text-dark placeholder:text-text-muted/60 focus:border-primary-pink focus:bg-white focus:outline-none"
+									className="w-full rounded-2xl border border-gray-200 bg-soft-bg px-4 py-3 font-poppins text-sm text-text-dark placeholder:text-text-muted/60 focus:border-primary-pink focus:bg-white focus:outline-none"
 								/>
 							</div>
 							<div className="flex flex-col gap-1.5">
-								<label className="font-inter text-sm font-medium text-text-dark">Confirm Password</label>
+								<label className="font-poppins text-sm font-medium text-text-dark">Confirm Password</label>
 								<input
 									type="password"
 									placeholder="Re-enter password"
 									value={confirmPassword}
 									onChange={(e) => setConfirmPassword(e.target.value)}
-									className="w-full rounded-2xl border border-gray-200 bg-soft-bg px-4 py-3 font-inter text-sm text-text-dark placeholder:text-text-muted/60 focus:border-primary-pink focus:bg-white focus:outline-none"
+									className="w-full rounded-2xl border border-gray-200 bg-soft-bg px-4 py-3 font-poppins text-sm text-text-dark placeholder:text-text-muted/60 focus:border-primary-pink focus:bg-white focus:outline-none"
 								/>
 							</div>
 						</div>
@@ -178,13 +178,13 @@ export default function AuthRegisterPage() {
 							whileHover={{ y: -2 }}
 							whileTap={{ scale: 0.97 }}
 							disabled={loading}
-							className="flex items-center justify-center gap-2 rounded-2xl bg-gradient-primary py-3 font-inter font-semibold text-white shadow-button transition-all"
+							className="flex items-center justify-center gap-2 rounded-2xl bg-gradient-primary py-3 font-poppins font-semibold text-white shadow-button transition-all"
 						>
 							<FiUserPlus size={16} />
 							{loading ? "Creating account..." : "Create Account"}
 						</motion.button>
 
-						<p className="text-center font-inter text-sm text-text-muted">
+						<p className="text-center font-poppins text-sm text-text-muted">
 							Already have an account?{" "}
 							<Link href="/auth/login" className="font-semibold text-primary-pink hover:underline">
 								Login

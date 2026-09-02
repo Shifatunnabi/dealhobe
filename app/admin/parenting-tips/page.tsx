@@ -131,7 +131,7 @@ export default function ParentingTipsPage() {
                   <label className="admin-label">Display Order</label>
                   <input type="number" className="admin-input" value={form.order} onChange={e => setForm(f => ({ ...f, order: +e.target.value }))} />
                 </div>
-                <ImageUpload label="Tip Image" value={form.imageUrl} folder="joytoy/tips" onChange={(url, pid) => setForm(f => ({ ...f, imageUrl: url, imagePublicId: pid }))} />
+                <ImageUpload label="Tip Image" value={form.imageUrl} folder="dealhobe/tips" onChange={(url, pid) => setForm(f => ({ ...f, imageUrl: url, imagePublicId: pid }))} />
               </div>
             </div>
             <div className="modal-footer">

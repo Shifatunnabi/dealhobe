@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'No image data provided' }, { status: 400 });
     }
 
-    const result = await uploadImage(data, folder || 'joytoy');
+    const result = await uploadImage(data, folder || 'dealhobe');
     return NextResponse.json(result);
   } catch (err) {
     console.error('Upload error:', err);

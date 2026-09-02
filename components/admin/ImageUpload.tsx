@@ -14,7 +14,7 @@ interface ImageUploadProps {
 export default function ImageUpload({
   value,
   onChange,
-  folder = 'joytoy',
+  folder = 'dealhobe',
   label = 'Upload Image',
   className = '',
 }: ImageUploadProps) {

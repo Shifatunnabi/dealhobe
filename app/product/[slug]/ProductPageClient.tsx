@@ -60,7 +60,7 @@ function StockBadge({ stockStr, qty }: { stockStr?: string, qty?: number }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 font-inter text-xs font-semibold",
+        "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 font-poppins text-xs font-semibold",
         pill,
       )}
     >
@@ -99,23 +99,23 @@ function RelatedCard({ product }: { product: any }) {
               loading="lazy"
             />
             {product.badge && (
-              <span className="absolute left-2 top-2 z-10 rounded-full bg-gradient-primary px-2.5 py-0.5 text-xs font-inter font-semibold text-white">
+              <span className="absolute left-2 top-2 z-10 rounded-full bg-gradient-primary px-2.5 py-0.5 text-xs font-poppins font-semibold text-white">
                 {product.badge}
               </span>
             )}
             {!product.badge && offerBadgeText && (
-              <span className="absolute left-2 top-2 z-10 rounded-full bg-gradient-yellow px-2.5 py-0.5 text-xs font-inter font-semibold text-text-dark">
+              <span className="absolute left-2 top-2 z-10 rounded-full bg-gradient-yellow px-2.5 py-0.5 text-xs font-poppins font-semibold text-text-dark">
                 {offerBadgeText}
               </span>
             )}
           </div>
         </div>
         <div className="px-3 pb-1 pt-2.5">
-          <h3 className="line-clamp-2 font-inter text-sm font-semibold leading-snug text-gray-900">
+          <h3 className="line-clamp-2 font-poppins text-sm font-semibold leading-snug text-gray-900">
             {product.name}
           </h3>
           <div className="mt-1.5 flex items-baseline gap-1.5">
-            <p className="font-inter text-lg font-bold text-primary-pink">
+            <p className="font-poppins text-lg font-bold text-primary-pink">
               ৳{(product.salePrice || product.price).toLocaleString()}.00
             </p>
             {product.salePrice && product.price > product.salePrice && (
@@ -212,7 +212,7 @@ export default function ProductDetailPageClient({
 
   const authToken = useMemo(() => {
     if (typeof window === "undefined") return "";
-    return window.localStorage.getItem("joytoy_auth_token_v1") || "";
+    return window.localStorage.getItem("dealhobe_auth_token_v1") || "";
   }, []);
 
   useEffect(() => {
@@ -258,7 +258,7 @@ export default function ProductDetailPageClient({
           </p>
           <Link
             href="/products"
-            className="inline-flex items-center gap-2 rounded-2xl bg-primary-pink px-6 py-3 font-inter font-semibold text-white shadow-button hover:shadow-hover transition-all"
+            className="inline-flex items-center gap-2 rounded-2xl bg-primary-pink px-6 py-3 font-poppins font-semibold text-white shadow-button hover:shadow-hover transition-all"
           >
             Browse All Toys <FiChevronRight size={16} />
           </Link>
@@ -486,12 +486,12 @@ export default function ProductDetailPageClient({
               />
               {/* Overlay badges */}
               {offerBadgeText && (
-                <span className="absolute left-4 top-4 rounded-full bg-gradient-yellow px-3 py-1 font-inter text-sm font-bold text-text-dark shadow-button">
+                <span className="absolute left-4 top-4 rounded-full bg-gradient-yellow px-3 py-1 font-poppins text-sm font-bold text-text-dark shadow-button">
                   {offerBadgeText} OFF
                 </span>
               )}
               {product.badge && !offerBadgeText && (
-                <span className="absolute left-4 top-4 rounded-full bg-gradient-primary px-3 py-1 font-inter text-sm font-bold text-white shadow-button">
+                <span className="absolute left-4 top-4 rounded-full bg-gradient-primary px-3 py-1 font-poppins text-sm font-bold text-white shadow-button">
                   {product.badge}
                 </span>
               )}
@@ -532,7 +532,7 @@ export default function ProductDetailPageClient({
             {/* Stock + category row */}
             <motion.div variants={fadeUp} className="flex flex-wrap items-center gap-3">
               <StockBadge qty={availableQty} stockStr="in_stock" />
-              <span className="rounded-full bg-soft-bg-alt px-3 py-1 font-inter text-xs font-semibold text-text-muted">
+              <span className="rounded-full bg-soft-bg-alt px-3 py-1 font-poppins text-xs font-semibold text-text-muted">
                 {categoryLabel}
               </span>
             </motion.div>
@@ -547,11 +547,11 @@ export default function ProductDetailPageClient({
 
             {/* Price */}
             <motion.div variants={fadeUp} className="flex items-baseline gap-3">
-              <span className="font-inter text-4xl font-bold text-primary-pink">
+              <span className="font-poppins text-4xl font-bold text-primary-pink">
                 ৳{(product.salePrice || product.price).toLocaleString()}.00
               </span>
               {product.salePrice && product.price > product.salePrice && (
-                <span className="font-inter text-lg text-text-muted line-through">
+                <span className="font-poppins text-lg text-text-muted line-through">
                   ৳{product.price.toLocaleString()}.00
                 </span>
               )}
@@ -568,14 +568,14 @@ export default function ProductDetailPageClient({
             {/* Meta pills */}
             <motion.div variants={fadeUp} className="flex flex-wrap gap-3">
               <div className="flex items-center gap-2 rounded-2xl border border-gray-100 bg-white px-4 py-2 shadow-soft">
-                <span className="font-inter text-xs text-text-muted">Brand</span>
-                <span className="font-inter text-sm font-semibold text-text-dark">
+                <span className="font-poppins text-xs text-text-muted">Brand</span>
+                <span className="font-poppins text-sm font-semibold text-text-dark">
                   {brandLabel}
                 </span>
               </div>
               <div className="flex items-center gap-2 rounded-2xl border border-gray-100 bg-white px-4 py-2 shadow-soft">
-                <span className="font-inter text-xs text-text-muted">Age</span>
-                <span className="font-inter text-sm font-semibold text-text-dark">
+                <span className="font-poppins text-xs text-text-muted">Age</span>
+                <span className="font-poppins text-sm font-semibold text-text-dark">
                   {ageLabel}
                 </span>
               </div>
@@ -596,7 +596,7 @@ export default function ProductDetailPageClient({
                 >
                   <FiMinus size={15} />
                 </button>
-                <span className="min-w-10 text-center font-inter text-sm font-semibold text-text-dark">
+                <span className="min-w-10 text-center font-poppins text-sm font-semibold text-text-dark">
                   {selectedQty}
                 </span>
                 <button
@@ -618,7 +618,7 @@ export default function ProductDetailPageClient({
                   onClick={handleAddToCart}
                   disabled={outOfStock}
                   className={cn(
-                    "flex items-center justify-center gap-2.5 rounded-2xl border-2 py-4 font-inter text-base font-semibold transition-all",
+                    "flex items-center justify-center gap-2.5 rounded-2xl border-2 py-4 font-poppins text-base font-semibold transition-all",
                     outOfStock
                       ? "cursor-not-allowed border-gray-200 text-gray-400"
                       : added
@@ -641,7 +641,7 @@ export default function ProductDetailPageClient({
                   onClick={handleBuyNow}
                   disabled={outOfStock}
                   className={cn(
-                    "flex items-center justify-center gap-2.5 rounded-2xl px-4 py-3 font-inter text-base font-semibold transition-all",
+                    "flex items-center justify-center gap-2.5 rounded-2xl px-4 py-3 font-poppins text-base font-semibold transition-all",
                     outOfStock
                       ? "cursor-not-allowed bg-gray-200 text-gray-400"
                       : "bg-gradient-primary text-white shadow-button hover:shadow-hover",
@@ -657,7 +657,7 @@ export default function ProductDetailPageClient({
                   whileHover={{ y: -2 }}
                   whileTap={{ scale: 0.96 }}
                   onClick={handleOrderWhatsApp}
-                  className="flex items-center justify-center gap-2.5 rounded-2xl border-2 border-green-500 px-4 py-3 font-inter text-base font-semibold text-green-600 transition-all hover:bg-green-500 hover:text-white"
+                  className="flex items-center justify-center gap-2.5 rounded-2xl border-2 border-green-500 px-4 py-3 font-poppins text-base font-semibold text-green-600 transition-all hover:bg-green-500 hover:text-white"
                 >
                   <FaWhatsapp size={18} />
                   Order on WhatsApp
@@ -668,7 +668,7 @@ export default function ProductDetailPageClient({
                   whileHover={{ y: -2 }}
                   whileTap={{ scale: 0.96 }}
                   onClick={() => setShareOpen(true)}
-                  className="flex items-center justify-center gap-2 rounded-2xl border-2 border-accent-blue px-4 py-3 font-inter text-sm font-semibold text-accent-blue transition-all hover:bg-accent-blue hover:text-white md:text-base"
+                  className="flex items-center justify-center gap-2 rounded-2xl border-2 border-accent-blue px-4 py-3 font-poppins text-sm font-semibold text-accent-blue transition-all hover:bg-accent-blue hover:text-white md:text-base"
                 >
                   <FiShare2 size={18} />
                   Share
@@ -698,7 +698,7 @@ export default function ProductDetailPageClient({
               onClick={(e) => e.stopPropagation()}
             >
               <div className="mb-4 flex items-center justify-between">
-                <h3 className="font-inter text-lg font-semibold text-text-dark">Share Product</h3>
+                <h3 className="font-poppins text-lg font-semibold text-text-dark">Share Product</h3>
                 <button
                   onClick={() => setShareOpen(false)}
                   className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-text-muted transition-colors hover:border-primary-pink hover:text-primary-pink"
@@ -709,7 +709,7 @@ export default function ProductDetailPageClient({
               </div>
 
               <div className="border-b border-gray-100 pb-4">
-                <p className="mb-3 font-inter text-sm font-semibold text-text-dark">Share via</p>
+                <p className="mb-3 font-poppins text-sm font-semibold text-text-dark">Share via</p>
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => openShare("facebook")}
@@ -766,13 +766,13 @@ export default function ProductDetailPageClient({
 
             {product.whyLoveIt?.length > 0 && (
               <motion.div variants={fadeUp} className="mx-auto w-full rounded-3xl p-6 sm:p-8">
-                <p className="mb-3 font-inter text-xs font-semibold uppercase tracking-widest text-primary-pink">
+                <p className="mb-3 font-poppins text-xs font-semibold uppercase tracking-widest text-primary-pink">
                   What they will love:
                 </p>
                 <ul className="space-y-2">
                   {product.whyLoveIt.map((feat: string, i: number) => (
                     <li key={i} className="flex items-start gap-2.5 text-sm text-text-muted">
-                      <span className="mt-0.5 shrink-0 font-inter font-bold text-primary-pink">✓</span>
+                      <span className="mt-0.5 shrink-0 font-poppins font-bold text-primary-pink">✓</span>
                       <span>{feat}</span>
                     </li>
                   ))}
@@ -784,7 +784,7 @@ export default function ProductDetailPageClient({
               variants={fadeUp}
               className="mx-auto w-full rounded-3xl p-6 sm:p-8"
             >
-              <p className="mb-3 font-inter text-xs font-semibold uppercase tracking-widest text-primary-pink">
+              <p className="mb-3 font-poppins text-xs font-semibold uppercase tracking-widest text-primary-pink">
                   Everything about this product
                 </p>
               <div
@@ -819,7 +819,7 @@ export default function ProductDetailPageClient({
           >
             <motion.div variants={fadeUp} className="mb-8 text-center">
               <ColorfulTitle title="Customer Reviews" className="text-primary-pink" />
-              <p className="mt-2 font-inter text-sm text-text-muted">
+              <p className="mt-2 font-poppins text-sm text-text-muted">
                 Share your thoughts on this product.
               </p>
             </motion.div>
@@ -828,7 +828,7 @@ export default function ProductDetailPageClient({
               {isLoggedIn ? (
                 <>
                   <div className="mb-4 flex items-center justify-between">
-                    <div className="font-inter text-sm font-semibold text-text-dark">
+                    <div className="font-poppins text-sm font-semibold text-text-dark">
                       Writing as {customerName || "Customer"}
                     </div>
                   </div>
@@ -879,7 +879,7 @@ export default function ProductDetailPageClient({
                           <FiUser className="h-4 w-4" />
                         </span>
                         <div>
-                          <div className="font-inter text-sm font-semibold text-text-dark">
+                          <div className="font-poppins text-sm font-semibold text-text-dark">
                             {review.customerName}
                           </div>
                           <div className="text-xs text-text-muted">
@@ -909,7 +909,7 @@ export default function ProductDetailPageClient({
             >
               <motion.div variants={fadeUp} className="mb-8 text-center">
                 <ColorfulTitle title="YOU MAY ALSO LIKE" className="text-primary-pink" />
-                <p className="mt-2 font-inter text-sm text-text-muted">
+                <p className="mt-2 font-poppins text-sm text-text-muted">
                   More picks from {product.category.name}
                 </p>
               </motion.div>
@@ -923,7 +923,7 @@ export default function ProductDetailPageClient({
               <motion.div variants={fadeUp} className="mt-10 text-center">
                 <Link
                   href="/products"
-                  className="inline-flex items-center gap-2 rounded-2xl border-2 border-primary-pink px-6 py-3 font-inter font-semibold text-primary-pink transition-all hover:bg-primary-pink hover:text-white"
+                  className="inline-flex items-center gap-2 rounded-2xl border-2 border-primary-pink px-6 py-3 font-poppins font-semibold text-primary-pink transition-all hover:bg-primary-pink hover:text-white"
                 >
                   View All Products
                   <FiChevronRight size={16} />

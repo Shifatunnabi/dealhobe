@@ -91,7 +91,7 @@ export default function ReportsPage() {
 
       {/* Print-only header */}
       <div className="print-only" style={{ marginBottom: '1.5rem', borderBottom: '2px solid #333', paddingBottom: '0.75rem' }}>
-        <h2 style={{ fontSize: '1.4rem', fontWeight: 700, margin: '0 0 0.25rem' }}>JoyToy — Sales Report</h2>
+        <h2 style={{ fontSize: '1.4rem', fontWeight: 700, margin: '0 0 0.25rem' }}>DealHobe — Sales Report</h2>
         <p style={{ margin: '0 0 0.2rem', fontSize: '0.85rem', color: '#555' }}>Generated: {generatedAt}</p>
         {filterSummary && (
           <p style={{ margin: 0, fontSize: '0.85rem', color: '#555' }}>Filters: {filterSummary}</p>

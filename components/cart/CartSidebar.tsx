@@ -35,7 +35,7 @@ export default function CartSidebar() {
           >
             {/* Header */}
             <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
-              <h2 className="font-inter text-lg font-semibold text-text-dark">Your Cart</h2>
+              <h2 className="font-poppins text-lg font-semibold text-text-dark">Your Cart</h2>
               <button
                 onClick={closeSidebar}
                 aria-label="Close cart"
@@ -50,7 +50,7 @@ export default function CartSidebar() {
               {items.length === 0 ? (
                 <div className="flex flex-col items-center justify-center gap-4 py-20 text-center">
                   <FiShoppingBag size={40} className="text-gray-200" />
-                  <p className="font-inter text-sm text-text-muted">Your cart is empty</p>
+                  <p className="font-poppins text-sm text-text-muted">Your cart is empty</p>
                 </div>
               ) : (
                 <AnimatePresence initial={false}>
@@ -93,11 +93,11 @@ export default function CartSidebar() {
                             {/* Name + price */}
                             <div className="min-w-0 flex-1">
                               <Link href={`/product/${item.slug}`} onClick={closeSidebar}>
-                                <p className="line-clamp-2 font-inter text-sm font-semibold leading-snug text-text-dark hover:text-primary-pink transition-colors">
+                                <p className="line-clamp-2 font-poppins text-sm font-semibold leading-snug text-text-dark hover:text-primary-pink transition-colors">
                                   {item.name}
                                 </p>
                               </Link>
-                              <p className="mt-0.5 font-inter text-xs text-text-muted">
+                              <p className="mt-0.5 font-poppins text-xs text-text-muted">
                                 ৳{item.unitPrice.toLocaleString()} each
                               </p>
                             </div>
@@ -113,7 +113,7 @@ export default function CartSidebar() {
                               >
                                 <FiMinus size={12} />
                               </button>
-                              <span className="flex h-7 w-8 items-center justify-center border-x border-gray-200 font-inter text-xs font-bold text-text-dark tabular-nums">
+                              <span className="flex h-7 w-8 items-center justify-center border-x border-gray-200 font-poppins text-xs font-bold text-text-dark tabular-nums">
                                 {item.qty}
                               </span>
                               <button
@@ -125,7 +125,7 @@ export default function CartSidebar() {
                                 <FiPlus size={12} />
                               </button>
                             </div>
-                            <p className="font-inter text-sm font-bold text-primary-pink">
+                            <p className="font-poppins text-sm font-bold text-primary-pink">
                               ৳{rowTotal.toLocaleString()}
                             </p>
                           </div>
@@ -141,18 +141,18 @@ export default function CartSidebar() {
             {items.length > 0 && (
               <div className="border-t border-gray-100 px-5 py-4">
                 <div className="mb-4 flex items-center justify-between">
-                  <span className="font-inter text-sm text-text-muted">Subtotal</span>
-                  <span className="font-inter text-lg font-bold text-text-dark">
+                  <span className="font-poppins text-sm text-text-muted">Subtotal</span>
+                  <span className="font-poppins text-lg font-bold text-text-dark">
                     ৳{subtotal.toLocaleString()}
                   </span>
                 </div>
 
                 <Link href="/checkout" onClick={closeSidebar}>
                   <motion.div
-                    whileHover={{ y: -2, boxShadow: "0 16px 48px rgba(255,107,157,0.28)" }}
+                    whileHover={{ y: -2, boxShadow: "0 16px 48px rgba(85, 0, 0,0.28)" }}
                     whileTap={{ scale: 0.97 }}
                     transition={{ duration: 0.2 }}
-                    className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-gradient-primary py-3.5 font-inter font-semibold text-white shadow-button transition-shadow"
+                    className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-gradient-primary py-3.5 font-poppins font-semibold text-white shadow-button transition-shadow"
                   >
                     Proceed to Checkout
                     <FiArrowRight size={16} />
@@ -162,7 +162,7 @@ export default function CartSidebar() {
                 <Link
                   href="/cart"
                   onClick={closeSidebar}
-                  className="mt-3 flex items-center justify-center font-inter text-xs text-text-muted transition-colors hover:text-primary-pink"
+                  className="mt-3 flex items-center justify-center font-poppins text-xs text-text-muted transition-colors hover:text-primary-pink"
                 >
                   View full cart
                 </Link>

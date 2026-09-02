@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────────
-   JoyToy — Shared Product Data
+   DealHobe — Shared Product Data
    Used by:  /app/products/page.tsx
              /app/product/[slug]/page.tsx
    ───────────────────────────────────────────────────────────────── */

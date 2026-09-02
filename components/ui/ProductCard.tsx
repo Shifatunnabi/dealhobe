@@ -50,12 +50,12 @@ export default function ProductCard({
     >
       {/* ---- Badges ---- */}
       {badge && (
-        <span className="absolute left-3 top-3 z-10 rounded-full bg-gradient-primary px-3 py-1 text-xs font-inter font-semibold text-white shadow-button">
+        <span className="absolute left-3 top-3 z-10 rounded-full bg-gradient-primary px-3 py-1 text-xs font-poppins font-semibold text-white shadow-button">
           {badge}
         </span>
       )}
       {offerBadgeText && (
-        <span className={`absolute ${badge ? "right-3" : "left-3"} top-3 z-10 rounded-full bg-gradient-yellow px-3 py-1 text-xs font-inter font-semibold text-text-dark shadow-button`}>
+        <span className={`absolute ${badge ? "right-3" : "left-3"} top-3 z-10 rounded-full bg-gradient-yellow px-3 py-1 text-xs font-poppins font-semibold text-text-dark shadow-button`}>
           {offerBadgeText}
         </span>
       )}
@@ -76,7 +76,7 @@ export default function ProductCard({
         <h3 className="text-card-title truncate text-text-dark">{name}</h3>
 
         <div className="mt-auto flex items-baseline gap-2 whitespace-nowrap">
-          <span className="font-inter text-xl font-bold text-primary-pink">
+          <span className="font-poppins text-xl font-bold text-primary-pink">
             ${price.toFixed(2)}
           </span>
           {originalPrice && (

@@ -44,7 +44,7 @@ export default function AdminSidebar() {
       <div className="admin-sidebar-header">
         <div className="admin-logo">
           <span className="admin-logo-icon">🧸</span>
-          {!collapsed && <span className="admin-logo-text">JoyToy <span>Admin</span></span>}
+          {!collapsed && <span className="admin-logo-text">DealHobe <span>Admin</span></span>}
         </div>
         <button
           className="sidebar-toggle"

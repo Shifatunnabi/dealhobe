@@ -16,16 +16,16 @@ export default function FloatingCart() {
 
         {/* Desktop card — square, NO rounded corners per spec */}
         <motion.div
-          whileHover={{ x: -4, boxShadow: "0 16px 48px rgba(255,107,157,0.28)" }}
+          whileHover={{ x: -4, boxShadow: "0 16px 48px rgba(85, 0, 0,0.28)" }}
           transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
           className="hidden md:flex flex-col items-center justify-center gap-1.5 w-18 py-4 bg-primary-pink text-white shadow-button cursor-pointer"
           style={{ borderRadius: "0 0 0 0" }} /* explicitly square */
         >
           <FiShoppingCart size={22} className="shrink-0" />
-          <span className="font-inter text-xl font-bold leading-none">{count}</span>
-          <span className="font-inter text-[10px] font-semibold opacity-80 leading-none">items</span>
+          <span className="font-poppins text-xl font-bold leading-none">{count}</span>
+          <span className="font-poppins text-[10px] font-semibold opacity-80 leading-none">items</span>
           <div className="w-8 h-px bg-white/30 my-0.5" />
-          <span className="font-inter text-xs font-semibold leading-none">৳{total.toLocaleString()}</span>
+          <span className="font-poppins text-xs font-semibold leading-none">৳{total.toLocaleString()}</span>
         </motion.div>
 
         {/* Mobile icon — circular with badge */}

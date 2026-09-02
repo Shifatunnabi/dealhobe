@@ -194,7 +194,7 @@ export default function HeroPage() {
             </div>
             <div className="modal-body">
               <div className="admin-form">
-                <ImageUpload label="Slide Image" value={slideForm.imageUrl} folder="joytoy/hero" onChange={(url, pid) => setSlideForm(f => ({ ...f, imageUrl: url, imagePublicId: pid }))} />
+                <ImageUpload label="Slide Image" value={slideForm.imageUrl} folder="dealhobe/hero" onChange={(url, pid) => setSlideForm(f => ({ ...f, imageUrl: url, imagePublicId: pid }))} />
                 <div className="admin-field"><label className="admin-label">Title</label><input className="admin-input" value={slideForm.title} onChange={e => setSlideForm(f => ({ ...f, title: e.target.value }))} placeholder="e.g. Explore Our World of Toys" /></div>
                 <div className="admin-field"><label className="admin-label">Subtitle</label><input className="admin-input" value={slideForm.subtitle} onChange={e => setSlideForm(f => ({ ...f, subtitle: e.target.value }))} placeholder="e.g. Premium imported toys for every child" /></div>
                 <div className="admin-form-row">

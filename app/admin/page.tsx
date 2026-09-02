@@ -46,7 +46,7 @@ export default function AdminDashboard() {
       <div className="admin-page-header">
         <div>
           <h1 className="admin-page-title"><span className="page-icon">🏠</span> Dashboard</h1>
-          <p className="admin-page-subtitle">Welcome back! Here's what's happening at JoyToy.</p>
+          <p className="admin-page-subtitle">Welcome back! Here's what's happening at DealHobe.</p>
         </div>
       </div>
 

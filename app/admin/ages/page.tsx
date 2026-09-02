@@ -129,7 +129,7 @@ export default function AgesPage() {
                 <ImageUpload
                   label="Age Range Image"
                   value={form.imageUrl}
-                  folder="joytoy/ages"
+                  folder="dealhobe/ages"
                   onChange={(url, pid) => setForm(f => ({ ...f, imageUrl: url, imagePublicId: pid }))}
                 />
               </div>

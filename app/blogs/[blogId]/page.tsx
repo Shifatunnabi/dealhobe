@@ -53,14 +53,14 @@ export default async function BlogDetailPage({
             />
           </div>
           <div className="p-6 md:p-10">
-            <h1 className="font-inter text-3xl font-bold text-text-dark md:text-4xl">
+            <h1 className="font-poppins text-3xl font-bold text-text-dark md:text-4xl">
               {blog.title}
             </h1>
             <p className="mt-2 text-sm text-text-muted">
               {formattedDate}{formattedTime ? ` at ${formattedTime}` : ""}
             </p>
             <div
-              className="prose prose-p:font-inter prose-p:text-text-muted prose-h2:text-text-dark prose-h3:text-text-dark max-w-none mt-6"
+              className="prose prose-p:font-poppins prose-p:text-text-muted prose-h2:text-text-dark prose-h3:text-text-dark max-w-none mt-6"
               dangerouslySetInnerHTML={{ __html: blog.content }}
             />
           </div>
