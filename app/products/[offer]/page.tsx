@@ -1,7 +1,7 @@
 // ISR: pre-build one page per offer slug; revalidate every 5 min.
 export const revalidate = 300;
 
-import { getProducts, getCategories, getAgeRanges, getBrands, getOffers, getAllOfferSlugs } from '@/lib/data';
+import { getProducts, getCategories, getSubCategories, getBrands, getOffers, getAllOfferSlugs } from '@/lib/data';
 import ProductsPageClient from '@/components/pages/ProductsPageClient';
 import { applyOffersToProducts, isOfferActive } from '@/lib/offers';
 
@@ -18,10 +18,10 @@ export default async function OfferProductsPage({
 }) {
   const { offer } = await params;
 
-  const [products, categories, ages, brands, offers] = await Promise.all([
+  const [products, categories, subCategories, brands, offers] = await Promise.all([
     getProducts(),
     getCategories(),
-    getAgeRanges(),
+    getSubCategories(),
     getBrands(),
     getOffers(),
   ]);
@@ -33,7 +33,7 @@ export default async function OfferProductsPage({
     <ProductsPageClient
       products={pricedProducts}
       categories={categories}
-      ages={ages}
+      subCategories={subCategories}
       brands={brands}
       offers={activeOffers}
       offerParam={offer}

@@ -36,22 +36,6 @@ const normalizeAddresses = (addresses: any, fallback?: { area?: string; address?
   return mapped;
 };
 
-const normalizeBabies = (babies: any) => {
-  const raw = Array.isArray(babies) ? babies : [];
-  return raw
-    .map((item: any) => {
-      const name = String(item?.name || "").trim();
-      const birthday = String(item?.birthday || "").trim();
-      if (!name || !birthday) return null;
-      return {
-        _id: item?._id ? String(item._id) : undefined,
-        name,
-        birthday,
-      };
-    })
-    .filter(Boolean);
-};
-
 export async function POST(req: NextRequest) {
   await connectDB();
   const body = await req.json();
@@ -99,7 +83,6 @@ export async function POST(req: NextRequest) {
       area: defaultAddress?.area || user.area,
       address: defaultAddress?.fullAddress || user.address,
       addresses,
-      babies: normalizeBabies(user.babies),
     },
   });
 }

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
+import { FiEdit2, FiTrash2, FiRefreshCw, FiPackage, FiPlus, FiX } from 'react-icons/fi';
 import MultiImageUpload from '@/components/admin/MultiImageUpload';
 
 const RichTextEditor = dynamic(() => import('@/components/admin/RichTextEditor'), { ssr: false });
@@ -18,22 +19,40 @@ interface Product {
   quantity: number;
   shortDescription: string;
   brand: string;
-  ageRange: string;
   category: string;
-  toysFor: string;
+  subCategory: string;
   whyLoveIt: string[];
   description: string;
   images: string[];
   imagePublicIds: string[];
   isFeatured: boolean;
+  isTrending: boolean;
+  isNewArrival: boolean;
+  isTopSeller: boolean;
 }
 
-const generateSku = () => 'JT-' + Math.random().toString(36).substring(2, 10).toUpperCase();
+/* Homepage placement tags — independently toggleable, both from the form and
+   as quick-toggle buttons on each product row. */
+const TAGS: { key: 'isTrending' | 'isNewArrival' | 'isFeatured' | 'isTopSeller'; label: string }[] = [
+  { key: 'isTrending',  label: 'Trending' },
+  { key: 'isNewArrival', label: 'New' },
+  { key: 'isFeatured',  label: 'Featured' },
+  { key: 'isTopSeller', label: 'Top Seller' },
+];
+
+const randomDigits = (n: number) => Array.from({ length: n }, () => Math.floor(Math.random() * 10)).join('');
+const generateSku = () => 'DH-' + randomDigits(8);
+const slugify = (name: string) => name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+const generateSlug = (name: string) => {
+  const base = slugify(name);
+  return (base ? `${base}-` : '') + randomDigits(7);
+};
 
 const emptyForm = {
     sku: '', name: '', slug: '', price: 0, salePrice: 0, quantity: 0, shortDescription: '',
-    brand: '', ageRange: '', category: '', toysFor: 'both', whyLoveIt: [], description: '',
-    images: [], imagePublicIds: [], isFeatured: false
+    brand: '', category: '', subCategory: '', whyLoveIt: [] as string[], description: '',
+    images: [] as string[], imagePublicIds: [] as string[],
+    isFeatured: false, isTrending: false, isNewArrival: false, isTopSeller: false,
 };
 
 export default function ProductsPage() {
@@ -46,23 +65,21 @@ export default function ProductsPage() {
 
   // Reference data
   const [brands, setBrands] = useState([] as any[]);
-  const [ages, setAges] = useState([] as any[]);
   const [categories, setCategories] = useState([] as any[]);
-
-  const [whyLoveItInput, setWhyLoveItInput] = useState('');
+  const [subCategories, setSubCategories] = useState([] as any[]);
 
   const load = async () => {
     setLoading(true);
-    const [pRes, bRes, aRes, cRes] = await Promise.all([
+    const [pRes, bRes, cRes, sRes] = await Promise.all([
         fetch('/api/admin/products'),
         fetch('/api/admin/brands'),
-        fetch('/api/admin/ages'),
-        fetch('/api/admin/categories')
+        fetch('/api/admin/categories'),
+        fetch('/api/admin/subcategories'),
     ]);
     setProducts(await pRes.json());
     setBrands(await bRes.json());
-    setAges(await aRes.json());
     setCategories(await cRes.json());
+    setSubCategories(await sRes.json());
     setLoading(false);
   };
 
@@ -73,8 +90,6 @@ export default function ProductsPage() {
       setForm({
           ...emptyForm,
           sku: generateSku(),
-          brand: brands.length > 0 ? brands[0]._id : '',
-          ageRange: ages.length > 0 ? ages[0]._id : '',
           category: categories.length > 0 ? categories[0]._id : ''
       });
       setModal(true);
@@ -82,12 +97,12 @@ export default function ProductsPage() {
 
   const openEdit = (p: Product) => {
     setEditing(p);
-    setForm({ ...p });
+    setForm({ ...p, whyLoveIt: p.whyLoveIt || [] });
     setModal(true);
   };
 
   const handleSave = async () => {
-    if (!form.name || !form.slug || form.price <= 0 || !form.brand || !form.ageRange || !form.category) {
+    if (!form.name || !form.slug || form.price <= 0 || !form.category) {
       toast.error('Please fill all required fields');
       return;
     }
@@ -117,8 +132,8 @@ export default function ProductsPage() {
     load();
   };
 
-  const toggleFeatured = async (p: Product) => {
-    await fetch('/api/admin/products', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: p._id, isFeatured: !p.isFeatured }) });
+  const toggleTag = async (p: Product, key: string) => {
+    await fetch('/api/admin/products', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: p._id, [key]: !(p as any)[key] }) });
     load();
   };
 
@@ -127,30 +142,18 @@ export default function ProductsPage() {
       setForm((f: any) => ({
           ...f,
           name,
-          slug: !editing ? name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') : f.slug
+          slug: !editing ? generateSlug(name) : f.slug
       }));
   };
 
-  const addWhyLoveIt = () => {
-      if(whyLoveItInput.trim() && form.whyLoveIt.length < 5) {
-          setForm((f:any) => ({ ...f, whyLoveIt: [...f.whyLoveIt, whyLoveItInput.trim()] }));
-          setWhyLoveItInput('');
-      }
-  };
-  const removeWhyLoveIt = (i: number) => {
-      setForm((f:any) => {
-          const newWli = [...f.whyLoveIt];
-          newWli.splice(i, 1);
-          return { ...f, whyLoveIt: newWli };
-      });
-  };
+  const categorySubCategories = subCategories.filter((s) => s.category === form.category);
 
   return (
     <div>
       <div className="admin-page-header">
         <div>
-          <h1 className="admin-page-title"><span className="page-icon">📦</span> Product Listing</h1>
-          <p className="admin-page-subtitle">Manage inventory, prices, and product details.</p>
+          <h1 className="admin-page-title"><span className="page-icon"><FiPackage size={20} /></span> Product Listing</h1>
+          <p className="admin-page-subtitle">Manage inventory, prices, categorisation, and homepage placement.</p>
         </div>
         <button className="btn-admin-primary" onClick={openAdd}>+ Add New Product</button>
       </div>
@@ -159,9 +162,9 @@ export default function ProductsPage() {
         <div className="admin-empty"><div className="spinner" style={{ margin: '0 auto 1rem' }} /><p>Loading…</p></div>
       ) : products.length === 0 ? (
         <div className="admin-empty">
-          <div className="empty-icon">📦</div>
+          <div className="empty-icon"><FiPackage size={40} /></div>
           <h3>No Products Yet</h3>
-          <p>Click "Add New Product" to populate your store inventory.</p>
+          <p>Click &quot;Add New Product&quot; to populate your store inventory.</p>
         </div>
       ) : (
         <div className="admin-table-wrap">
@@ -178,6 +181,7 @@ export default function ProductsPage() {
             <tbody>
               {products.map(p => {
                   const cat = categories.find(c => c._id === p.category)?.name || 'Unknown';
+                  const subCat = subCategories.find(s => s._id === p.subCategory)?.name;
                   return (
                       <tr key={p._id}>
                         <td style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -198,18 +202,29 @@ export default function ProductsPage() {
                              p.quantity < 10 ? <span className="badge badge-yellow">Low: {p.quantity}</span> :
                              <span className="badge badge-green">In Stock: {p.quantity}</span>}
                         </td>
-                        <td>{cat}</td>
                         <td>
-                            <div className="admin-item-actions">
-                                <button className="btn-admin-edit" onClick={() => openEdit(p)}>✏️ Edit</button>
-                                <button className="btn-admin-danger" onClick={() => handleDelete(p._id)}>🗑️ Del</button>
-                                <button
-                                    className={p.isFeatured ? 'btn-admin-success' : 'btn-admin-secondary'}
-                                    onClick={() => toggleFeatured(p)}
-                                    style={{ fontSize: '0.75rem', padding: '0.2rem 0.5rem', borderRadius: 4 }}
-                                >
-                                    {p.isFeatured ? '⭐ On Home' : '☆ Add to Home'}
+                            <div>{cat}</div>
+                            {subCat && <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 400 }}>{subCat}</div>}
+                        </td>
+                        <td>
+                            <div className="admin-item-actions" style={{ flexWrap: 'wrap', rowGap: '0.35rem' }}>
+                                <button className="btn-admin-edit" aria-label="Edit product" onClick={() => openEdit(p)}>
+                                    <FiEdit2 size={14} />
                                 </button>
+                                <button className="btn-admin-danger" aria-label="Delete product" onClick={() => handleDelete(p._id)}>
+                                    <FiTrash2 size={14} />
+                                </button>
+                                {TAGS.map(tag => (
+                                    <button
+                                        key={tag.key}
+                                        className={(p as any)[tag.key] ? 'btn-admin-success' : 'btn-admin-secondary'}
+                                        onClick={() => toggleTag(p, tag.key)}
+                                        style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem', borderRadius: 4 }}
+                                        title={`Toggle ${tag.label} on homepage`}
+                                    >
+                                        {tag.label}
+                                    </button>
+                                ))}
                             </div>
                         </td>
                       </tr>
@@ -225,19 +240,26 @@ export default function ProductsPage() {
         <div className="modal-overlay">
           <div className="modal-box modal-lg" style={{ maxWidth: 900 }}>
             <div className="modal-header">
-              {editing ? '✏️ Edit Product' : '➕ Add New Product'}
-              <button className="modal-close" onClick={() => setModal(false)}>✕</button>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                {editing ? <FiEdit2 size={16} /> : <FiPlus size={16} />} {editing ? 'Edit Product' : 'Add New Product'}
+              </span>
+              <button className="modal-close" onClick={() => setModal(false)}><FiX size={16} /></button>
             </div>
             <div className="modal-body">
               <div className="admin-form">
                 <div className="admin-form-row">
                     <div className="admin-field">
                         <label className="admin-label">Product Name</label>
-                        <input className="admin-input" value={form.name} onChange={handleNameChange} placeholder="Educational Toy" />
+                        <input className="admin-input" value={form.name} onChange={handleNameChange} placeholder="e.g. Matte Lipstick" />
                     </div>
                     <div className="admin-field">
                         <label className="admin-label">URL Slug</label>
-                        <input className="admin-input" value={form.slug} onChange={e => setForm((f:any) => ({...f, slug: e.target.value}))} />
+                        <div style={{display:'flex', gap:'0.5rem'}}>
+                            <input className="admin-input" value={form.slug} onChange={e => setForm((f:any) => ({...f, slug: e.target.value}))} style={{fontFamily:'monospace', fontSize:'0.85rem'}} />
+                            <button type="button" className="btn-admin-secondary" title="Regenerate slug" onClick={() => setForm((f:any) => ({...f, slug: generateSlug(f.name)}))}>
+                                <FiRefreshCw size={14} />
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -275,58 +297,47 @@ export default function ProductsPage() {
                         <input type="number" className="admin-input" value={form.quantity} onChange={e => setForm((f:any) => ({...f, quantity: +e.target.value}))} />
                     </div>
                     <div className="admin-field">
-                        <label className="admin-label">Toys For</label>
-                        <select className="admin-select" value={form.toysFor} onChange={e => setForm((f:any) => ({...f, toysFor: e.target.value}))}>
-                            <option value="both">Boys & Girls</option>
-                            <option value="boys">Boys</option>
-                            <option value="girls">Girls</option>
+                        <label className="admin-label">Brand (Optional)</label>
+                        <select className="admin-select" value={form.brand} onChange={e => setForm((f:any) => ({...f, brand: e.target.value}))}>
+                            <option value="">No Brand</option>
+                            {brands.map(b => <option key={b._id} value={b._id}>{b.name}</option>)}
                         </select>
                     </div>
                 </div>
 
                 <div className="admin-form-row">
                     <div className="admin-field">
-                        <label className="admin-label">Brand</label>
-                        <select className="admin-select" value={form.brand} onChange={e => setForm((f:any) => ({...f, brand: e.target.value}))}>
-                            <option value="">Select Brand...</option>
-                            {brands.map(b => <option key={b._id} value={b._id}>{b.name}</option>)}
+                        <label className="admin-label">Category</label>
+                        <select
+                            className="admin-select"
+                            value={form.category}
+                            onChange={e => setForm((f:any) => ({...f, category: e.target.value, subCategory: ''}))}
+                        >
+                            <option value="">Select Category...</option>
+                            {categories.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
                         </select>
                     </div>
                     <div className="admin-field">
-                        <label className="admin-label">Age Range</label>
-                        <select className="admin-select" value={form.ageRange} onChange={e => setForm((f:any) => ({...f, ageRange: e.target.value}))}>
-                            <option value="">Select Age...</option>
-                            {ages.map(a => <option key={a._id} value={a._id}>{a.label}</option>)}
+                        <label className="admin-label">Sub-category (Optional)</label>
+                        <select
+                            className="admin-select"
+                            value={form.subCategory}
+                            onChange={e => setForm((f:any) => ({...f, subCategory: e.target.value}))}
+                            disabled={!form.category || categorySubCategories.length === 0}
+                        >
+                            <option value="">
+                                {form.category
+                                    ? (categorySubCategories.length === 0 ? 'No sub-categories yet' : 'None')
+                                    : 'Select a category first'}
+                            </option>
+                            {categorySubCategories.map(s => <option key={s._id} value={s._id}>{s.name}</option>)}
                         </select>
                     </div>
-                </div>
-
-                 <div className="admin-field">
-                    <label className="admin-label">Category</label>
-                    <select className="admin-select" value={form.category} onChange={e => setForm((f:any) => ({...f, category: e.target.value}))}>
-                        <option value="">Select Category...</option>
-                        {categories.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
-                    </select>
                 </div>
 
                 <div className="admin-field">
                   <label className="admin-label">Short Description</label>
                   <textarea className="admin-textarea" value={form.shortDescription} onChange={e => setForm((f:any) => ({...f, shortDescription: e.target.value}))} rows={2} />
-                </div>
-
-                <div className="admin-field">
-                   <label className="admin-label">Why they will love it (Max 5)</label>
-                   <div style={{display:'flex', gap:'0.5rem', marginBottom: '0.5rem'}}>
-                       <input className="admin-input" placeholder="Add a reason and press enter..." value={whyLoveItInput} onChange={e=>setWhyLoveItInput(e.target.value)} onKeyDown={e => { if(e.key === 'Enter') { e.preventDefault(); addWhyLoveIt(); } }} disabled={form.whyLoveIt.length >= 5} />
-                       <button type="button" className="btn-admin-secondary" onClick={addWhyLoveIt} disabled={form.whyLoveIt.length >= 5}>Add</button>
-                   </div>
-                   <div style={{display:'flex', gap:'0.5rem', flexWrap:'wrap'}}>
-                       {form.whyLoveIt.map((w: string, i: number) => (
-                           <span key={i} className="badge badge-pink" style={{padding: '0.4rem 0.6rem'}}>
-                               {w} <span onClick={()=>removeWhyLoveIt(i)} style={{marginLeft:'0.5rem', cursor:'pointer'}}>&times;</span>
-                           </span>
-                       ))}
-                   </div>
                 </div>
 
                 <div className="admin-field">
@@ -342,10 +353,20 @@ export default function ProductsPage() {
                 />
 
                 <div className="admin-field">
-                    <label className="admin-checkbox-row">
-                      <input type="checkbox" className="admin-checkbox" checked={form.isFeatured} onChange={e => setForm((f:any) => ({ ...f, isFeatured: e.target.checked }))} />
-                      <span className="admin-label">⭐ Add to Homepage</span>
-                    </label>
+                    <label className="admin-label">Homepage Placement</label>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.25rem' }}>
+                        {TAGS.map(tag => (
+                            <label key={tag.key} className="admin-checkbox-row">
+                                <input
+                                    type="checkbox"
+                                    className="admin-checkbox"
+                                    checked={!!form[tag.key]}
+                                    onChange={e => setForm((f:any) => ({ ...f, [tag.key]: e.target.checked }))}
+                                />
+                                <span className="admin-label">{tag.label}</span>
+                            </label>
+                        ))}
+                    </div>
                 </div>
               </div>
             </div>

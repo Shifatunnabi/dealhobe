@@ -28,7 +28,7 @@ export async function PUT(req: NextRequest) {
   await connectDB();
   const { id, ...data } = await req.json();
   const updated = await Review.findByIdAndUpdate(id, data, { new: true });
-  revalidateTag('reviews', {});
+  revalidateTag('reviews', { expire: 0 });
   revalidatePath('/');
   revalidatePath('/product/[slug]', 'page');
   return NextResponse.json(updated);
@@ -41,7 +41,7 @@ export async function DELETE(req: NextRequest) {
   await connectDB();
   const { id } = await req.json();
   await Review.findByIdAndDelete(id);
-  revalidateTag('reviews', {});
+  revalidateTag('reviews', { expire: 0 });
   revalidatePath('/');
   revalidatePath('/product/[slug]', 'page');
   return NextResponse.json({ success: true });

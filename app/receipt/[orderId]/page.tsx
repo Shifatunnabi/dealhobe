@@ -7,7 +7,7 @@ import { FiDownload } from "react-icons/fi";
 import { buildInvoicePdf, loadInvoiceLogoDataUrl } from "@/lib/invoice-pdf";
 
 const LOADING_STEPS = [
-  "Finding your toys",
+  "Finding your products",
   "Packing the gift box",
   "Confirming your order",
   "Preparing your receipt",

@@ -4,53 +4,62 @@
 export const revalidate = 300;
 
 import HeroSection            from "@/components/sections/HeroSection";
-import ShopByAge              from "@/components/sections/ShopByAge";
-import TopFavorites           from "@/components/sections/TopFavorites";
-import ShopByCategories       from "@/components/sections/ShopByCategories";
+import TopCategoriesCarousel  from "@/components/sections/TopCategoriesCarousel";
+import TrendingProducts       from "@/components/sections/TrendingProducts";
+import ForYouSection          from "@/components/sections/ForYouSection";
 import PromotionsSection      from "@/components/sections/PromotionsSection";
 import CustomerReviewsSection from "@/components/sections/CustomerReviewsSection";
-import ParentingTipsSection   from "@/components/sections/ParentingTipsSection";
 import BrandSlider            from "@/components/sections/BrandSlider";
 
 import {
   getActiveHeroSlides,
-  getAgeRanges,
   getCategories,
   getBrands,
+  getTrendingProducts,
+  getNewProducts,
   getFeaturedProducts,
+  getTopSellerProducts,
   getFeaturedReviews,
-  getParentingTips,
   getOffers,
 } from '@/lib/data';
 import { applyOffersToProducts, isOfferActive } from '@/lib/offers';
 
 export default async function Home() {
-  // All 8 queries run in parallel; each is independently cached with its own TTL.
-  const [slides, ages, categories, brands, products, reviews, tips, offers] =
+  // All 9 queries run in parallel; each is independently cached with its own TTL.
+  const [slides, categories, brands, trendingProducts, newProducts, featuredProducts, topSellerProducts, reviews, offers] =
     await Promise.all([
       getActiveHeroSlides(),
-      getAgeRanges(),
       getCategories(),
       getBrands(),
+      getTrendingProducts(),
+      getNewProducts(),
       getFeaturedProducts(),
+      getTopSellerProducts(),
       getFeaturedReviews(),
-      getParentingTips(),
       getOffers(),
     ]);
 
-  const activeOffers   = offers.filter((o) => isOfferActive(o));
-  const pricedProducts = applyOffersToProducts(products, activeOffers);
-  const latestOffer    = offers[0] ?? null;
+  const activeOffers = offers.filter((o) => isOfferActive(o));
+
+  const pricedTrending   = applyOffersToProducts(trendingProducts, activeOffers);
+  const pricedNew        = applyOffersToProducts(newProducts, activeOffers);
+  const pricedFeatured   = applyOffersToProducts(featuredProducts, activeOffers);
+  const pricedTopSellers = applyOffersToProducts(topSellerProducts, activeOffers);
+
+  const latestOffer = offers[0] ?? null;
 
   return (
     <>
       <HeroSection slides={slides} />
-      <ShopByAge ages={ages} />
-      <TopFavorites products={pricedProducts} />
-      <ShopByCategories categories={categories} />
+      <TopCategoriesCarousel categories={categories} />
+      <TrendingProducts products={pricedTrending} />
+      <ForYouSection
+        newProducts={pricedNew}
+        featuredProducts={pricedFeatured}
+        topSellingProducts={pricedTopSellers}
+      />
       <PromotionsSection offer={latestOffer} />
       <CustomerReviewsSection reviews={reviews} />
-      <ParentingTipsSection tips={tips} />
       <BrandSlider brands={brands} />
     </>
   );

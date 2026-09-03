@@ -3,6 +3,7 @@
 import { signIn } from 'next-auth/react';
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import { FiShoppingBag, FiArrowRight } from 'react-icons/fi';
 
 export default function AdminLoginPage() {
   const [email,    setEmail]    = useState('');
@@ -35,7 +36,7 @@ export default function AdminLoginPage() {
     <div className="admin-login-page">
       <div className="admin-login-card">
         <div className="login-logo">
-          <span className="logo-emoji">🧸</span>
+          <span className="logo-emoji"><FiShoppingBag size={32} /></span>
           <h1>DealHobe Admin</h1>
           <p>Sign in to manage your store</p>
         </div>
@@ -77,7 +78,11 @@ export default function AdminLoginPage() {
             className="login-submit"
             disabled={loading}
           >
-            {loading ? 'Signing in…' : 'Sign In →'}
+            {loading ? 'Signing in…' : (
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+                Sign In <FiArrowRight size={15} />
+              </span>
+            )}
           </button>
         </form>
       </div>

@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
 
   switch (type) {
     case 'product':
-      revalidateTag('products', {});
+      revalidateTag('products', { expire: 0 });
       revalidatePath('/products');
       revalidatePath('/product/[slug]', 'page');
       revalidatePath('/');
@@ -68,54 +68,54 @@ export async function POST(req: NextRequest) {
       break;
 
     case 'listing':
-      revalidateTag('products', {});
+      revalidateTag('products', { expire: 0 });
       revalidatePath('/products');
       revalidatePath('/');
       break;
 
     case 'categories':
-      revalidateTag('categories', {});
+      revalidateTag('categories', { expire: 0 });
       revalidatePath('/products');
       revalidatePath('/');
       break;
 
     case 'ages':
-      revalidateTag('ages', {});
+      revalidateTag('ages', { expire: 0 });
       revalidatePath('/products');
       revalidatePath('/');
       break;
 
     case 'brands':
-      revalidateTag('brands', {});
+      revalidateTag('brands', { expire: 0 });
       revalidatePath('/');
       break;
 
     case 'offers':
-      revalidateTag('offers', {});
-      revalidateTag('products', {});   // offers affect displayed prices
+      revalidateTag('offers', { expire: 0 });
+      revalidateTag('products', { expire: 0 });   // offers affect displayed prices
       revalidatePath('/offers');
       revalidatePath('/products');
       revalidatePath('/');
       break;
 
     case 'hero':
-      revalidateTag('hero', {});
+      revalidateTag('hero', { expire: 0 });
       revalidatePath('/');
       break;
 
     case 'reviews':
-      revalidateTag('reviews', {});
+      revalidateTag('reviews', { expire: 0 });
       revalidatePath('/');
       revalidatePath('/product/[slug]', 'page');
       break;
 
     case 'tips':
-      revalidateTag('tips', {});
+      revalidateTag('tips', { expire: 0 });
       revalidatePath('/');
       break;
 
     case 'blogs':
-      revalidateTag('blogs', {});
+      revalidateTag('blogs', { expire: 0 });
       revalidatePath('/blogs');
       revalidatePath('/blogs/[blogId]', 'page');
       if (slug) revalidatePath(`/blogs/${slug}`);
@@ -124,7 +124,7 @@ export async function POST(req: NextRequest) {
     case 'all':
       (
         ['products', 'categories', 'ages', 'brands', 'offers', 'hero', 'reviews', 'tips', 'blogs'] as const
-      ).forEach((tag) => revalidateTag(tag, {}));
+      ).forEach((tag) => revalidateTag(tag, { expire: 0 }));
       revalidatePath('/', 'layout');  // wipes every cached page
       break;
 

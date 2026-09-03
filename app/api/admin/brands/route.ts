@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
   await connectDB();
   const body  = await req.json();
   const brand = await Brand.create(body);
-  revalidateTag('brands', {});
+  revalidateTag('brands', { expire: 0 });
   revalidatePath('/');
   return NextResponse.json(brand, { status: 201 });
 }
@@ -30,7 +30,7 @@ export async function PUT(req: NextRequest) {
   await connectDB();
   const { id, ...data } = await req.json();
   const updated = await Brand.findByIdAndUpdate(id, data, { new: true });
-  revalidateTag('brands', {});
+  revalidateTag('brands', { expire: 0 });
   revalidatePath('/');
   return NextResponse.json(updated);
 }
@@ -43,7 +43,7 @@ export async function DELETE(req: NextRequest) {
   const { id }  = await req.json();
   const brand   = await Brand.findByIdAndDelete(id);
   if (brand?.logoPublicId) await deleteImage(brand.logoPublicId);
-  revalidateTag('brands', {});
+  revalidateTag('brands', { expire: 0 });
   revalidatePath('/');
   return NextResponse.json({ success: true });
 }

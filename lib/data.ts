@@ -9,12 +9,10 @@
  * Cache tags (used with revalidateTag() for on-demand invalidation):
  *   'products'   products, featured, related, by-category
  *   'categories' category list
- *   'ages'       age-range list
  *   'brands'     brand list
  *   'offers'     offer list
  *   'hero'       hero slides
  *   'reviews'    approved reviews (homepage + product detail)
- *   'tips'       parenting tips
  *   'blogs'      blog list + individual posts
  */
 
@@ -23,12 +21,11 @@ import { unstable_cache } from 'next/cache';
 import connectDB from './mongodb';
 import Product from './models/Product';
 import Category from './models/Category';
-import AgeRange from './models/AgeRange';
+import SubCategory from './models/SubCategory';
 import Brand from './models/Brand';
 import Offer from './models/Offer';
 import HeroSlide from './models/HeroSlide';
 import Review from './models/Review';
-import ParentingTip from './models/ParentingTip';
 import Blog from './models/Blog';
 import mongoose from 'mongoose';
 
@@ -44,15 +41,17 @@ export type PlainProduct = {
   salePrice?: number;
   quantity: number;
   shortDescription: string;
-  brand: string;
-  ageRange: string;
+  brand?: string;
   category: string;
-  toysFor: string;
+  subCategory?: string;
   whyLoveIt: string[];
   description: string;
   images: string[];
   imagePublicIds: string[];
   isFeatured: boolean;
+  isTrending: boolean;
+  isNewArrival: boolean;
+  isTopSeller: boolean;
   createdAt: string;
   updatedAt: string;
   // Applied offer fields (added by applyOffersToProduct)
@@ -62,7 +61,7 @@ export type PlainProduct = {
   // Hydrated display fields (only on detail page)
   brandDisplay?: string;
   categoryDisplay?: string;
-  ageRangeDisplay?: string;
+  subCategoryDisplay?: string;
 };
 
 export type PlainCategory = {
@@ -76,13 +75,10 @@ export type PlainCategory = {
   updatedAt: string;
 };
 
-export type PlainAgeRange = {
+export type PlainSubCategory = {
   _id: string;
-  label: string;
-  minAge: number;
-  maxAge: number;
-  imageUrl: string;
-  imagePublicId: string;
+  name: string;
+  category: string;
   order: number;
   createdAt: string;
   updatedAt: string;
@@ -119,10 +115,10 @@ export type PlainHeroSlide = {
   _id: string;
   imageUrl: string;
   imagePublicId: string;
-  title: string;
-  subtitle: string;
   ctaText: string;
   ctaLink: string;
+  ctaColor: string;
+  ctaTextColor: string;
   order: number;
   isActive: boolean;
   createdAt: string;
@@ -139,17 +135,6 @@ export type PlainReview = {
   productId: string;
   isApproved: boolean;
   isFeatured: boolean;
-  createdAt: string;
-  updatedAt: string;
-};
-
-export type PlainParentingTip = {
-  _id: string;
-  title: string;
-  details: string;
-  imageUrl: string;
-  imagePublicId: string;
-  order: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -200,6 +185,45 @@ const _getFeaturedProducts = unstable_cache(
 );
 /** Featured products (homepage). Cached 5 min, tag: products. */
 export const getFeaturedProducts = cache(_getFeaturedProducts);
+
+// Admin-controlled homepage placement tags — one cached query per tag,
+// mirroring getFeaturedProducts. Set from the product form or the quick-toggle
+// buttons on the admin product list.
+const _getTrendingProducts = unstable_cache(
+  async (): Promise<PlainProduct[]> => {
+    await connectDB();
+    const docs = await Product.find({ isTrending: true }).lean();
+    return s(docs) as unknown as PlainProduct[];
+  },
+  ['products-trending'],
+  { revalidate: 300, tags: ['products'] }
+);
+/** Trending products (homepage). Cached 5 min, tag: products. */
+export const getTrendingProducts = cache(_getTrendingProducts);
+
+const _getNewProducts = unstable_cache(
+  async (): Promise<PlainProduct[]> => {
+    await connectDB();
+    const docs = await Product.find({ isNewArrival: true }).sort({ createdAt: -1 }).lean();
+    return s(docs) as unknown as PlainProduct[];
+  },
+  ['products-new'],
+  { revalidate: 300, tags: ['products'] }
+);
+/** Admin-flagged new products (homepage "For You" New tab). Cached 5 min, tag: products. */
+export const getNewProducts = cache(_getNewProducts);
+
+const _getTopSellerProducts = unstable_cache(
+  async (): Promise<PlainProduct[]> => {
+    await connectDB();
+    const docs = await Product.find({ isTopSeller: true }).lean();
+    return s(docs) as unknown as PlainProduct[];
+  },
+  ['products-top-sellers'],
+  { revalidate: 300, tags: ['products'] }
+);
+/** Admin-flagged top sellers (homepage "For You" Top Seller tab). Cached 5 min, tag: products. */
+export const getTopSellerProducts = cache(_getTopSellerProducts);
 
 const _getProduct = unstable_cache(
   async (slug: string): Promise<PlainProduct | null> => {
@@ -257,21 +281,17 @@ const _getCategories = unstable_cache(
 /** All categories. Cached 1 h (rarely changes), tag: categories. */
 export const getCategories = cache(_getCategories);
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// AGE RANGES
-// ═══════════════════════════════════════════════════════════════════════════════
-
-const _getAgeRanges = unstable_cache(
-  async (): Promise<PlainAgeRange[]> => {
+const _getSubCategories = unstable_cache(
+  async (): Promise<PlainSubCategory[]> => {
     await connectDB();
-    const docs = await AgeRange.find().sort({ order: 1 }).lean();
-    return s(docs) as unknown as PlainAgeRange[];
+    const docs = await SubCategory.find().sort({ order: 1, createdAt: -1 }).lean();
+    return s(docs) as unknown as PlainSubCategory[];
   },
-  ['age-ranges'],
-  { revalidate: 3600, tags: ['ages'] }
+  ['subcategories'],
+  { revalidate: 3600, tags: ['categories'] }
 );
-/** All age ranges. Cached 1 h, tag: ages. */
-export const getAgeRanges = cache(_getAgeRanges);
+/** All sub-categories. Cached 1 h, tag: categories. */
+export const getSubCategories = cache(_getSubCategories);
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // BRANDS
@@ -362,22 +382,6 @@ const _getProductReviews = unstable_cache(
 );
 /** Approved reviews for one product. Cached 5 min, tag: reviews. */
 export const getProductReviews = cache(_getProductReviews);
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// PARENTING TIPS
-// ═══════════════════════════════════════════════════════════════════════════════
-
-const _getParentingTips = unstable_cache(
-  async (): Promise<PlainParentingTip[]> => {
-    await connectDB();
-    const docs = await ParentingTip.find().sort({ order: 1 }).lean();
-    return s(docs) as unknown as PlainParentingTip[];
-  },
-  ['parenting-tips'],
-  { revalidate: 3600, tags: ['tips'] }
-);
-/** All parenting tips. Cached 1 h, tag: tips. */
-export const getParentingTips = cache(_getParentingTips);
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // BLOGS

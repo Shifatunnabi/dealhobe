@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
+import { FiUploadCloud } from 'react-icons/fi';
 import Image from 'next/image';
 
 interface ImageUploadProps {
@@ -74,7 +75,7 @@ export default function ImageUpload({
           </div>
         ) : (
           <div className="upload-placeholder">
-            <div className="upload-icon">📁</div>
+            <div className="upload-icon"><FiUploadCloud size={28} /></div>
             <p>Drag & drop or <span>browse</span></p>
             <p className="upload-hint">PNG, JPG, WEBP up to 10MB</p>
           </div>

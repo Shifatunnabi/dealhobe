@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
+import { FaStar, FaRegStar } from 'react-icons/fa';
+import { FiTrash2 } from 'react-icons/fi';
 
 interface Review {
   _id:          string;
@@ -48,13 +50,19 @@ export default function ReviewsPage() {
     return true;
   });
 
-  const stars = (n: number) => '★'.repeat(n) + '☆'.repeat(5 - n);
+  const stars = (n: number) => (
+    <>
+      {Array.from({ length: 5 }, (_, i) =>
+        i < n ? <FaStar key={i} size={13} /> : <FaRegStar key={i} size={13} />
+      )}
+    </>
+  );
 
   return (
     <div>
       <div className="admin-page-header">
         <div>
-          <h1 className="admin-page-title"><span className="page-icon">⭐</span> Customer Reviews</h1>
+          <h1 className="admin-page-title"><span className="page-icon"><FaStar size={18} /></span> Customer Reviews</h1>
           <p className="admin-page-subtitle">Moderate reviews and feature them on the homepage.</p>
         </div>
         <div className="badge badge-yellow">{reviews.filter(r => !r.isApproved).length} Pending</div>
@@ -79,7 +87,7 @@ export default function ReviewsPage() {
         <div className="admin-empty"><div className="spinner" style={{ margin: '0 auto 1rem' }} /><p>Loading…</p></div>
       ) : filtered.length === 0 ? (
         <div className="admin-empty">
-          <div className="empty-icon">⭐</div>
+          <div className="empty-icon"><FaStar size={36} /></div>
           <h3>No Reviews Here</h3>
           <p>{filter === 'pending' ? 'All reviews have been moderated.' : 'No reviews in this category.'}</p>
         </div>
@@ -104,9 +112,9 @@ export default function ReviewsPage() {
                 <button
                   className={r.isFeatured ? 'btn-admin-success' : 'btn-admin-secondary'}
                   onClick={() => update(r._id, { isFeatured: true, isApproved: true })}
-                  style={{ fontSize: '0.75rem' }}
+                  style={{ fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
                 >
-                  {r.isFeatured ? '⭐ On Homepage' : '+ Add to Homepage'}
+                  {r.isFeatured && <FaStar size={12} />} {r.isFeatured ? 'On Homepage' : '+ Add to Homepage'}
                 </button>
                 <button
                   className="btn-admin-danger"
@@ -115,7 +123,7 @@ export default function ReviewsPage() {
                 >
                   Hide
                 </button>
-                <button className="btn-admin-danger" onClick={() => del(r._id)}>🗑️</button>
+                <button className="btn-admin-danger" aria-label="Delete review" onClick={() => del(r._id)}><FiTrash2 size={13} /></button>
               </div>
             </div>
           ))}

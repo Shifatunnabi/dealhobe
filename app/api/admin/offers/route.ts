@@ -19,8 +19,8 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   try {
       const offer = await Offer.create(body);
-      revalidateTag('offers', {});
-      revalidateTag('products', {});
+      revalidateTag('offers', { expire: 0 });
+      revalidateTag('products', { expire: 0 });
       revalidatePath('/');
       revalidatePath('/products');
       revalidatePath('/offers');
@@ -38,8 +38,8 @@ export async function PUT(req: NextRequest) {
   await connectDB();
   const { id, ...data } = await req.json();
   const updated = await Offer.findByIdAndUpdate(id, data, { new: true });
-  revalidateTag('offers', {});
-  revalidateTag('products', {});
+  revalidateTag('offers', { expire: 0 });
+  revalidateTag('products', { expire: 0 });
   revalidatePath('/');
   revalidatePath('/products');
   revalidatePath('/offers');
@@ -54,8 +54,8 @@ export async function DELETE(req: NextRequest) {
   const { id } = await req.json();
   const offer = await Offer.findByIdAndDelete(id);
   if (offer && offer.thumbnailPublicId) await deleteImage(offer.thumbnailPublicId);
-  revalidateTag('offers', {});
-  revalidateTag('products', {});
+  revalidateTag('offers', { expire: 0 });
+  revalidateTag('products', { expire: 0 });
   revalidatePath('/');
   revalidatePath('/products');
   revalidatePath('/offers');

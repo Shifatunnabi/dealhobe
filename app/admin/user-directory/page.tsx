@@ -1,12 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-
-interface BabyEntry {
-  _id?: string;
-  name: string;
-  birthday: string;
-}
+import { FiUsers, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
 interface UserEntry {
   _id: string;
@@ -15,7 +10,6 @@ interface UserEntry {
   email: string | null;
   area: string;
   address: string;
-  babies: BabyEntry[];
   isBanned: boolean;
   createdAt: string;
   totalOrders: number;
@@ -34,7 +28,7 @@ function Initials({ name }: { name: string }) {
         width: 48,
         height: 48,
         borderRadius: "50%",
-        background: "linear-gradient(135deg, #8B2635, #ff8fab)",
+        background: "linear-gradient(135deg, #A41B15, #ff8fab)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -185,42 +179,6 @@ function UserCard({
               </p>
             </div>
           </div>
-
-          {user.babies.length > 0 ? (
-            <div>
-              <p style={{ fontSize: 12, fontWeight: 700, color: "#888", marginBottom: 8 }}>
-                Baby Details
-              </p>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                {user.babies.map((baby, i) => (
-                  <div
-                    key={baby._id || `${baby.name}-${i}`}
-                    style={{
-                      background: "#fff0f5",
-                      borderRadius: 10,
-                      padding: "8px 14px",
-                      border: "1px solid #ffd6e7",
-                    }}
-                  >
-                    <p style={{ fontWeight: 600, fontSize: 13, color: "#8B2635", margin: 0 }}>
-                      {baby.name}
-                    </p>
-                    <p style={{ fontSize: 12, color: "#aaa", margin: "2px 0 0" }}>
-                      {new Date(baby.birthday).toLocaleDateString("en-GB", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <p style={{ fontSize: 13, color: "#ccc", fontStyle: "italic" }}>
-              No baby details added.
-            </p>
-          )}
         </div>
       )}
 
@@ -235,7 +193,7 @@ function UserCard({
             padding: "6px 14px",
             fontSize: 12,
             fontWeight: 600,
-            color: expanded ? "#8B2635" : "#555",
+            color: expanded ? "#A41B15" : "#555",
             cursor: "pointer",
           }}
         >
@@ -294,7 +252,7 @@ export default function UserDirectoryPage() {
       <div className="admin-page-header">
         <div>
           <h1 className="admin-page-title">
-            <span className="page-icon">👥</span> Users
+            <span className="page-icon"><FiUsers size={20} /></span> Users
           </h1>
           <p className="admin-page-subtitle">
             Manage registered users — view details, ban, or unban.
@@ -329,7 +287,7 @@ export default function UserDirectoryPage() {
         </div>
       ) : users.length === 0 ? (
         <div className="admin-empty">
-          <div className="empty-icon">👥</div>
+          <div className="empty-icon"><FiUsers size={40} /></div>
           <h3>No Users Found</h3>
           <p>Try adjusting your search query.</p>
         </div>
@@ -368,9 +326,10 @@ export default function UserDirectoryPage() {
                   fontSize: 13,
                   fontWeight: 600,
                   color: page === 1 ? "#ccc" : "#333",
+                  display: "inline-flex", alignItems: "center", gap: "0.35rem",
                 }}
               >
-                ← Prev
+                <FiChevronLeft size={14} /> Prev
               </button>
 
               {Array.from({ length: pages }, (_, i) => i + 1).map((p) => (
@@ -382,8 +341,8 @@ export default function UserDirectoryPage() {
                     height: 36,
                     borderRadius: 8,
                     border: "1.5px solid",
-                    borderColor: p === page ? "#8B2635" : "#e5e7eb",
-                    background: p === page ? "#8B2635" : "#fff",
+                    borderColor: p === page ? "#A41B15" : "#e5e7eb",
+                    background: p === page ? "#A41B15" : "#fff",
                     color: p === page ? "#fff" : "#333",
                     fontWeight: 700,
                     fontSize: 13,
@@ -406,9 +365,10 @@ export default function UserDirectoryPage() {
                   fontSize: 13,
                   fontWeight: 600,
                   color: page === pages ? "#ccc" : "#333",
+                  display: "inline-flex", alignItems: "center", gap: "0.35rem",
                 }}
               >
-                Next →
+                Next <FiChevronRight size={14} />
               </button>
             </div>
           )}

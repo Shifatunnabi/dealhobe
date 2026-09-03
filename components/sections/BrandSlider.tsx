@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion, useInView as useFramerInView } from "framer-motion";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { cn } from "@/lib/utils";
-import { ColorfulTitle } from "@/components/ui";
+import SectionHeader from "./SectionHeader";
 
 /* ── Brand data ──────────────────────────────────────────────── */
 const BRANDS = [
@@ -110,10 +110,8 @@ export default function BrandSlider({ brands = [] }: { brands?: any[] }) {
   if (!brands.length) {
     return (
       <section ref={ref} className="w-full bg-soft-bg px-section py-section">
-        <div className="mx-auto max-w-7xl text-center">
-          <div className="mb-4 text-center">
-            <ColorfulTitle title="Brands" />
-          </div>
+        <div className="mx-auto max-w-7xl">
+          <SectionHeader title="Brands" />
           <p className="text-sm text-text-muted">No brands are available right now.</p>
         </div>
       </section>
@@ -141,9 +139,8 @@ export default function BrandSlider({ brands = [] }: { brands?: any[] }) {
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-          className="mb-10 text-center"
         >
-          <ColorfulTitle title="Brands" />
+          <SectionHeader title="Brands" />
         </motion.div>
 
         <motion.div

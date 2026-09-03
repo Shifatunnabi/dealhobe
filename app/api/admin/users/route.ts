@@ -51,11 +51,6 @@ export async function GET(req: NextRequest) {
       area: a.area,
       isDefault: Boolean(a.isDefault),
     })),
-    babies: (u.babies || []).map((b: any) => ({
-      _id: b._id ? String(b._id) : undefined,
-      name: b.name,
-      birthday: b.birthday,
-    })),
     isBanned: Boolean(u.isBanned),
     createdAt: u.createdAt,
     totalOrders: orderCountMap[String(u._id)] || 0,

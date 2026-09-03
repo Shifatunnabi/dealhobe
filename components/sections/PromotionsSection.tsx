@@ -3,13 +3,15 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { fadeUp } from "@/components/animations/variants";
-import { ColorfulTitle, OfferCard } from "@/components/ui";
+import { OfferCard } from "@/components/ui";
+import SectionHeader from "./SectionHeader";
 
 export default function PromotionsSection({ offer }: { offer?: any | null }) {
   if (!offer) {
     return (
       <section className="w-full bg-soft-bg px-section pb-4 md:pb-6">
-        <div className="mx-auto max-w-7xl text-center">
+        <div className="mx-auto max-w-7xl">
+          <SectionHeader title="Offers" />
           <p className="text-sm text-text-muted">No offers are available right now.</p>
         </div>
       </section>
@@ -28,9 +30,7 @@ export default function PromotionsSection({ offer }: { offer?: any | null }) {
         viewport={{ once: true, margin: "-60px 0px" }}
         variants={fadeUp}
       >
-        <div className="mb-6 text-center">
-          <ColorfulTitle title="Offers" as="h2" className="text-primary-pink" />
-        </div>
+        <SectionHeader title="Offers" />
 
         <div className="grid grid-cols-1">
           <OfferCard

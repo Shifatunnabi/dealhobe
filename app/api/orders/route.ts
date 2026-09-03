@@ -14,19 +14,6 @@ const DELIVERY_CHARGE = {
 
 const SETTINGS_KEY = "global";
 
-const resolveLoyaltyPoints = (
-  subtotal: number,
-  ranges: Array<{ min: number; max?: number | null; points: number }>,
-) => {
-  const match = ranges.find((range) => {
-    if (range.max === null || range.max === undefined) {
-      return subtotal >= range.min;
-    }
-    return subtotal >= range.min && subtotal <= range.max;
-  });
-  return match ? match.points : 0;
-};
-
 const parseAuthToken = (req: NextRequest) => {
   const header = req.headers.get("authorization") || "";
   const token = header.startsWith("Bearer ") ? header.slice(7) : "";
@@ -112,8 +99,6 @@ export async function POST(req: NextRequest) {
       ? 0
       : baseDeliveryCharge;
 
-  const loyaltyPoints = resolveLoyaltyPoints(subtotal, settings?.loyaltyRanges || []);
-
   const total = subtotal + deliveryCharge;
 
   const orderId = new mongoose.Types.ObjectId();
@@ -135,7 +120,6 @@ export async function POST(req: NextRequest) {
     },
     subtotal,
     deliveryCharge,
-    loyaltyPoints,
     total,
     status: "Pending",
   });

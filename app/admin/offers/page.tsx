@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import Image from 'next/image';
 import ImageUpload from '@/components/admin/ImageUpload';
+import { FiGift, FiEdit2, FiTrash2, FiPlus, FiX } from 'react-icons/fi';
 
 interface Offer {
   _id: string;
@@ -130,7 +131,7 @@ export default function OffersPage() {
     <div>
       <div className="admin-page-header">
         <div>
-          <h1 className="admin-page-title"><span className="page-icon">🎁</span> Offer Management</h1>
+          <h1 className="admin-page-title"><span className="page-icon"><FiGift size={20} /></span> Offer Management</h1>
           <p className="admin-page-subtitle">Create discount offers and assign products to them.</p>
         </div>
         <button className="btn-admin-primary" onClick={openAdd}>+ Create New Offer</button>
@@ -140,7 +141,7 @@ export default function OffersPage() {
         <div className="admin-empty"><div className="spinner" style={{ margin: '0 auto 1rem' }} /><p>Loading…</p></div>
       ) : offers.length === 0 ? (
         <div className="admin-empty">
-          <div className="empty-icon">🎁</div>
+          <div className="empty-icon"><FiGift size={40} /></div>
           <h3>No Offers Yet</h3>
           <p>Click "Create New Offer" to start your first campaign.</p>
         </div>
@@ -169,8 +170,8 @@ export default function OffersPage() {
                           </div>
                         )}
                       <div className="admin-item-actions" style={{ marginTop: '0.75rem' }}>
-                          <button className="btn-admin-edit" onClick={() => openEdit(o)}>✏️ Edit</button>
-                          <button className="btn-admin-danger" onClick={() => handleDelete(o._id)}>🗑️ Del</button>
+                          <button className="btn-admin-edit" onClick={() => openEdit(o)}><FiEdit2 size={13} /> Edit</button>
+                          <button className="btn-admin-danger" onClick={() => handleDelete(o._id)}><FiTrash2 size={13} /> Del</button>
                       </div>
                   </div>
               </div>
@@ -184,8 +185,10 @@ export default function OffersPage() {
         <div className="modal-overlay">
           <div className="modal-box modal-lg" style={{ maxWidth: 800 }}>
             <div className="modal-header">
-              {editing ? '✏️ Edit Offer' : '➕ Create New Offer'}
-              <button className="modal-close" onClick={() => setModal(false)}>✕</button>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                {editing ? <FiEdit2 size={16} /> : <FiPlus size={16} />} {editing ? 'Edit Offer' : 'Create New Offer'}
+              </span>
+              <button className="modal-close" onClick={() => setModal(false)}><FiX size={16} /></button>
             </div>
             <div className="modal-body">
               <div className="admin-form">
@@ -224,7 +227,7 @@ export default function OffersPage() {
 
                 <div className="admin-field">
                   <label className="admin-label">Offer Details</label>
-                  <textarea className="admin-textarea" value={form.details} onChange={e => setForm((f:any) => ({...f, details: e.target.value}))} rows={2} placeholder="e.g. Get 20% off on premium toys" />
+                  <textarea className="admin-textarea" value={form.details} onChange={e => setForm((f:any) => ({...f, details: e.target.value}))} rows={2} placeholder="e.g. Get 20% off on premium skincare" />
                 </div>
 
                  <ImageUpload

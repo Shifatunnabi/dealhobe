@@ -11,7 +11,7 @@ import {
   getOffers,
   getBrands,
   getCategories,
-  getAgeRanges,
+  getSubCategories,
   getAllProductSlugs,
 } from '@/lib/data';
 import { applyOffersToProduct, applyOffersToProducts, isOfferActive } from '@/lib/offers';
@@ -37,14 +37,14 @@ export default async function ProductPage({
   }
 
   // Run all remaining queries in parallel — all served from the Data Cache
-  const [relatedProducts, reviews, offers, allBrands, allCategories, allAges] =
+  const [relatedProducts, reviews, offers, allBrands, allCategories, allSubCategories] =
     await Promise.all([
       getRelatedProducts(product.category, product._id),
       getProductReviews(product._id),
       getOffers(),
       getBrands(),
       getCategories(),
-      getAgeRanges(),
+      getSubCategories(),
     ]);
 
   const activeOffers   = offers.filter((o) => isOfferActive(o));
@@ -59,11 +59,11 @@ export default async function ProductPage({
   const categoryDisplay = isId(product.category)
     ? (allCategories.find((c) => c._id === product.category)?.name ?? product.category)
     : product.category;
-  const ageRangeDisplay = isId(product.ageRange)
-    ? (allAges.find((a) => a._id === product.ageRange)?.label ?? product.ageRange)
-    : product.ageRange;
+  const subCategoryDisplay = isId(product.subCategory)
+    ? (allSubCategories.find((s) => s._id === product.subCategory)?.name ?? product.subCategory)
+    : product.subCategory;
 
-  const hydratedProduct = { ...pricedProduct, brandDisplay, categoryDisplay, ageRangeDisplay };
+  const hydratedProduct = { ...pricedProduct, brandDisplay, categoryDisplay, subCategoryDisplay };
 
   return (
     <ProductDetailPageClient

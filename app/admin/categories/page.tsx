@@ -1,9 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import Image from 'next/image';
+import { Reorder, useDragControls } from 'framer-motion';
+import { FiFolder, FiEdit2, FiTrash2, FiPlus, FiX, FiZap } from 'react-icons/fi';
 import ImageUpload from '@/components/admin/ImageUpload';
+import DragHandle from '@/components/admin/DragHandle';
+import { renumbered, nextOrder, useReorderPersist } from '@/components/admin/reorderUtils';
 
 interface Category {
   _id:          string;
@@ -15,13 +20,62 @@ interface Category {
 
 const emptyForm = { name: '', imageUrl: '', imagePublicId: '', order: 0 };
 
+function CategoryCard({
+  category, isHomepage, onNavigate, onEdit, onDelete,
+}: {
+  category: Category;
+  isHomepage: boolean;
+  onNavigate: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  const dragControls = useDragControls();
+  return (
+    <Reorder.Item
+      as="div"
+      value={category}
+      dragListener={false}
+      dragControls={dragControls}
+      className="admin-item-card"
+      onClick={onNavigate}
+      style={{ cursor: 'pointer' }}
+      title="Manage sub-categories"
+    >
+      <div className="admin-item-image" style={{ position: 'relative', height: 140 }}>
+        <Image src={category.imageUrl} alt={category.name} fill style={{ objectFit: 'cover' }} />
+        {isHomepage && (
+          <span style={{
+            position: 'absolute', top: 8, right: 8,
+            background: 'var(--primary-pink)',
+            color: '#fff', fontSize: '0.65rem', fontWeight: 700,
+            padding: '0.2rem 0.5rem', borderRadius: '20px',
+          }}>Homepage</span>
+        )}
+        <div style={{ position: 'absolute', top: 8, left: 8, background: 'rgba(255,255,255,0.9)', borderRadius: 8, padding: '0.25rem' }}>
+          <DragHandle dragControls={dragControls} />
+        </div>
+      </div>
+      <div className="admin-item-body">
+        <div className="admin-item-title">{category.name}</div>
+        <div className="admin-item-meta">Order: {category.order} · Click to manage sub-categories</div>
+        <div className="admin-item-actions">
+          <button className="btn-admin-edit"   onClick={(e) => { e.stopPropagation(); onEdit(); }}><FiEdit2 size={13} /> Edit</button>
+          <button className="btn-admin-danger" onClick={(e) => { e.stopPropagation(); onDelete(); }}><FiTrash2 size={13} /> Delete</button>
+        </div>
+      </div>
+    </Reorder.Item>
+  );
+}
+
 export default function CategoriesPage() {
+  const router = useRouter();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading,    setLoading]    = useState(true);
   const [modal,      setModal]      = useState(false);
   const [editing,    setEditing]    = useState<Category | null>(null);
   const [form,       setForm]       = useState({ ...emptyForm });
   const [saving,     setSaving]     = useState(false);
+  const reorderPersist = useReorderPersist('/api/admin/categories');
 
   const load = async () => {
     setLoading(true);
@@ -32,7 +86,7 @@ export default function CategoriesPage() {
 
   useEffect(() => { load(); }, []);
 
-  const openAdd  = () => { setEditing(null); setForm({ ...emptyForm }); setModal(true); };
+  const openAdd  = () => { setEditing(null); setForm({ ...emptyForm, order: nextOrder(categories) }); setModal(true); };
   const openEdit = (c: Category) => {
     setEditing(c);
     setForm({ name: c.name, imageUrl: c.imageUrl, imagePublicId: c.imagePublicId, order: c.order });
@@ -63,13 +117,19 @@ export default function CategoriesPage() {
     load();
   };
 
+  const handleReorder = (newOrder: Category[]) => {
+    const renumberedList = renumbered(newOrder);
+    reorderPersist(categories, renumberedList);
+    setCategories(renumberedList);
+  };
+
   return (
     <div>
       <div className="admin-page-header">
         <div>
-          <h1 className="admin-page-title"><span className="page-icon">🗂️</span> Category Management</h1>
+          <h1 className="admin-page-title"><span className="page-icon"><FiFolder size={20} /></span> Category Management</h1>
           <p className="admin-page-subtitle">
-            Manage categories for favourites section and product filters. First 4 shown on homepage, rest in slider.
+            Manage categories for favourites section and product filters. First 4 shown on homepage, rest in slider. Drag cards to reorder.
           </p>
         </div>
         <button id="add-category-btn" className="btn-admin-primary" onClick={openAdd}>+ Add Category</button>
@@ -77,6 +137,7 @@ export default function CategoriesPage() {
 
       {categories.length > 4 && (
         <div style={{
+          display: 'flex', alignItems: 'center', gap: '0.5rem',
           marginBottom: '1.25rem',
           background: 'rgba(255,215,61,0.08)',
           border: '1px solid rgba(255,215,61,0.25)',
@@ -85,7 +146,8 @@ export default function CategoriesPage() {
           fontSize: '0.825rem',
           color: '#cc9900',
         }}>
-          ⚡ You have <strong>{categories.length}</strong> categories. The homepage shows 4 in a grid and the rest in a left/right slider.
+          <FiZap size={14} style={{ flexShrink: 0 }} />
+          <span>You have <strong>{categories.length}</strong> categories. The homepage shows 4 in a grid and the rest in a left/right slider.</span>
         </div>
       )}
 
@@ -93,44 +155,33 @@ export default function CategoriesPage() {
         <div className="admin-empty"><div className="spinner" style={{ margin: '0 auto 1rem' }} /><p>Loading…</p></div>
       ) : categories.length === 0 ? (
         <div className="admin-empty">
-          <div className="empty-icon">🗂️</div>
+          <div className="empty-icon"><FiFolder size={40} /></div>
           <h3>No Categories Yet</h3>
           <p>Add your first category to populate the homepage.</p>
         </div>
       ) : (
-        <div className="admin-grid">
+        <Reorder.Group as="div" axis="y" values={categories} onReorder={handleReorder} className="admin-grid">
           {categories.map((c, i) => (
-            <div key={c._id} className="admin-item-card">
-              <div className="admin-item-image" style={{ position: 'relative', height: 140 }}>
-                <Image src={c.imageUrl} alt={c.name} fill style={{ objectFit: 'cover' }} />
-                {i < 4 && (
-                  <span style={{
-                    position: 'absolute', top: 8, right: 8,
-                    background: 'var(--primary-pink)',
-                    color: '#fff', fontSize: '0.65rem', fontWeight: 700,
-                    padding: '0.2rem 0.5rem', borderRadius: '20px',
-                  }}>Homepage</span>
-                )}
-              </div>
-              <div className="admin-item-body">
-                <div className="admin-item-title">{c.name}</div>
-                <div className="admin-item-meta">Order: {c.order}</div>
-                <div className="admin-item-actions">
-                  <button className="btn-admin-edit"   onClick={() => openEdit(c)}>✏️ Edit</button>
-                  <button className="btn-admin-danger" onClick={() => handleDelete(c._id)}>🗑️ Delete</button>
-                </div>
-              </div>
-            </div>
+            <CategoryCard
+              key={c._id}
+              category={c}
+              isHomepage={i < 4}
+              onNavigate={() => router.push(`/admin/categories/${c._id}`)}
+              onEdit={() => openEdit(c)}
+              onDelete={() => handleDelete(c._id)}
+            />
           ))}
-        </div>
+        </Reorder.Group>
       )}
 
       {modal && (
         <div className="modal-overlay">
           <div className="modal-box">
             <div className="modal-header">
-              {editing ? '✏️ Edit Category' : '➕ Add Category'}
-              <button className="modal-close" onClick={() => setModal(false)}>✕</button>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                {editing ? <FiEdit2 size={16} /> : <FiPlus size={16} />} {editing ? 'Edit Category' : 'Add Category'}
+              </span>
+              <button className="modal-close" onClick={() => setModal(false)}><FiX size={16} /></button>
             </div>
             <div className="modal-body">
               <div className="admin-form">

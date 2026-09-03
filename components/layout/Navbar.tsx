@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import type { FormEvent } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
@@ -12,7 +13,7 @@ import {
   FiUser,
   FiHome,
   FiGrid,
-  FiLayers,
+  FiTag,
   FiMenu,
   FiX,
   FiChevronRight,
@@ -21,31 +22,112 @@ import {
 } from "react-icons/fi";
 import { FaFacebook, FaWhatsapp } from "react-icons/fa";
 import { useCart } from "@/components/cart/CartProvider";
+import NavSearchOverlay from "./NavSearchOverlay";
 
 const navLinks = [
-  { label: "Boys",     href: "/products?gender=Boys"  },
-  { label: "Girls",    href: "/products?gender=Girls" },
-  { label: "By Age",   href: "/#shop-by-age"           },
-  { label: "Products", href: "/products"               },
-  { label: "Offers",   href: "/offers"                 },
-  { label: "Blogs",    href: "/blogs"                  },
+  { label: "Home",     href: "/"         },
+  { label: "Products", href: "/products" },
+  { label: "Offers",   href: "/offers"   },
+  { label: "Blogs",    href: "/blogs"    },
 ];
 
-/* Shared logo circle used in the navbar */
-function LogoCircle({ logoUrl }: { logoUrl: string }) {
+/* Shared logo used in the navbar */
+function Logo({ logoUrl }: { logoUrl: string }) {
   return (
     <Link href={"/"} className="shrink-0">
-      <div className="w-11 h-11 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center shadow-md border-2 border-gray-100 overflow-hidden">
-        <Image
-          src={logoUrl}
-          alt="DealHobe"
-          width={40}
-          height={40}
-          className="w-9 h-9 object-contain"
-          priority
-        />
-      </div>
+      <Image
+        src={logoUrl}
+        alt="DealHobe"
+        width={48}
+        height={48}
+        className="w-11 h-11 md:w-12 md:h-12 object-contain"
+        priority
+      />
     </Link>
+  );
+}
+
+/**
+ * One category row in the sidebar's Categories accordion. Hovering a row
+ * that has sub-categories reveals them in a flyout beside it. The flyout is
+ * portaled to document.body — the drawer's nav list scrolls (overflow-y-auto),
+ * which would otherwise clip anything positioned beside a row via CSS alone.
+ */
+function CategoryRowWithFlyout({
+  category,
+  subCategories,
+  onNavigate,
+}: {
+  category: { _id: string; name: string };
+  subCategories: Array<{ _id: string; name: string; category: string }>;
+  onNavigate: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [rect, setRect] = useState<{ top: number; left: number } | null>(null);
+  const rowRef = useRef<HTMLDivElement>(null);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const subs = subCategories.filter((s) => s.category === category._id);
+
+  const clearCloseTimer = () => {
+    if (closeTimer.current) {
+      clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    }
+  };
+
+  const handleEnter = () => {
+    clearCloseTimer();
+    if (subs.length === 0 || !rowRef.current) return;
+    const r = rowRef.current.getBoundingClientRect();
+    setRect({ top: r.top, left: r.right });
+    setOpen(true);
+  };
+  // Closing is delayed so the cursor has time to travel from the row to the
+  // flyout (they're separate elements with a gap between them) — closing
+  // instantly on mouseleave was firing before the flyout could be reached.
+  const scheduleClose = () => {
+    clearCloseTimer();
+    closeTimer.current = setTimeout(() => setOpen(false), 300);
+  };
+
+  useEffect(() => () => clearCloseTimer(), []);
+
+  return (
+    <div ref={rowRef} onMouseEnter={handleEnter} onMouseLeave={scheduleClose} className="relative">
+      <Link
+        href={`/products?category=${category._id}`}
+        onClick={onNavigate}
+        className="flex items-center justify-between border-b border-gray-50 py-2.5 pr-3 text-sm text-text-muted transition-colors hover:text-primary-pink"
+      >
+        {category.name}
+        <FiChevronRight size={14} className="shrink-0" />
+      </Link>
+
+      {open && subs.length > 0 && rect && typeof document !== "undefined" && createPortal(
+        <div
+          onMouseEnter={clearCloseTimer}
+          onMouseLeave={scheduleClose}
+          style={{ position: "fixed", top: rect.top, left: rect.left + 6 }}
+          className="z-80 w-56 rounded-2xl border border-gray-100 bg-white p-2 shadow-hover"
+        >
+          <div className="px-2 pb-1.5 pt-1 text-xs font-semibold uppercase tracking-wide text-text-muted">
+            {category.name}
+          </div>
+          {subs.map((sub) => (
+            <Link
+              key={sub._id}
+              href={`/products?subcategory=${sub._id}`}
+              onClick={() => { setOpen(false); onNavigate(); }}
+              className="flex items-center justify-between rounded-lg px-2 py-2 text-sm text-text-dark transition-colors hover:bg-soft-bg hover:text-primary-pink"
+            >
+              {sub.name}
+              <FiChevronRight size={12} className="shrink-0 text-text-muted" />
+            </Link>
+          ))}
+        </div>,
+        document.body,
+      )}
+    </div>
   );
 }
 
@@ -60,9 +142,10 @@ export default function Navbar() {
   const [searchValue, setSearchValue]   = useState("");
   const searchInputRef                  = useRef<HTMLInputElement | null>(null);
   const [sidebarOpen, setSidebarOpen]   = useState(false);
+  const [searchOpen, setSearchOpen]     = useState(false);
   const [categories, setCategories]     = useState<Array<{ _id: string; name: string }>>([]);
-  const [ageRanges, setAgeRanges]       = useState<Array<{ _id: string; label: string }>>([]);
-  const [openSection, setOpenSection]   = useState<"byAge" | "categories" | null>(null);
+  const [subCategories, setSubCategories] = useState<Array<{ _id: string; name: string; category: string }>>([]);
+  const [openSection, setOpenSection]   = useState<"categories" | null>(null);
   const [logoUrl, setLogoUrl]           = useState("/logo/main-logo.png");
   const [suggestions, setSuggestions]   = useState<Array<{ name: string; slug: string }>>([]);
   const suggestDebounce                 = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -73,10 +156,10 @@ export default function Navbar() {
 
   const mobileBottomNav = [
     { label: "Home",       type: "link",   href: "/",                    icon: FiHome        },
-    { label: "By Age",     type: "scroll", targetId: "shop-by-age",      icon: FiLayers      },
+    { label: "Offers",     type: "link",   href: "/offers",              icon: FiTag         },
     { label: "Cart",       type: "link",   href: "/cart",                icon: FiShoppingCart, isCenter: true },
     { label: "Products",   type: "link",   href: "/products",            icon: FiShoppingBag },
-    { label: "Categories", type: "scroll", targetId: "favourite-categories", icon: FiGrid   },
+    { label: "Categories", type: "scroll", targetId: "top-categories",       icon: FiGrid   },
   ];
 
   /* Hide on scroll-down, reveal on scroll-up */
@@ -120,6 +203,7 @@ export default function Navbar() {
     setSearchValue("");
     setSuggestions([]);
     setSidebarOpen(false);
+    setSearchOpen(false);
   }, [pathname]);
 
   useEffect(() => {
@@ -167,17 +251,17 @@ export default function Navbar() {
 
   useEffect(() => {
     let alive = true;
-    const loadAgeRanges = async () => {
+    const loadSubCategories = async () => {
       try {
-        const res = await fetch("/api/admin/ages");
+        const res = await fetch("/api/admin/subcategories");
         if (!res.ok) return;
         const data = await res.json();
-        if (alive) setAgeRanges(Array.isArray(data) ? data : []);
+        if (alive) setSubCategories(Array.isArray(data) ? data : []);
       } catch {
-        if (alive) setAgeRanges([]);
+        if (alive) setSubCategories([]);
       }
     };
-    loadAgeRanges();
+    loadSubCategories();
     return () => { alive = false; };
   }, []);
 
@@ -289,7 +373,7 @@ export default function Navbar() {
     el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  const toggleSection = (key: "byAge" | "categories") => {
+  const toggleSection = (key: "categories") => {
     setOpenSection((prev) => (prev === key ? null : key));
   };
 
@@ -304,7 +388,7 @@ export default function Navbar() {
         transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
       >
         {/* ── Top Bar ─────────────────────────────────────────────── */}
-        <div className="h-9 bg-[#550000] text-white text-xs flex items-center">
+        <div className="h-9 bg-[#A41B15] text-white text-xs flex items-center">
           <div className="w-full md:w-[62.5%] md:mx-auto flex items-center justify-between px-4 md:px-0">
             <span className="font-poppins font-medium relative overflow-hidden h-4">
               <AnimatePresence mode="wait" initial={false}>
@@ -323,10 +407,10 @@ export default function Navbar() {
               </AnimatePresence>
             </span>
             <div className="flex items-center gap-3">
-              <a href="https://www.facebook.com/people/DealHobe/61586803048218/?mibextid=wwXIfr&rdid=TgrQrd2ZmYJd8ZO7&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1Gw29e9PZL%2F%3Fmibextid%3DwwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="hover:text-[#8B2635] transition-colors">
+              <a href="https://www.facebook.com/people/DealHobe/61586803048218/?mibextid=wwXIfr&rdid=TgrQrd2ZmYJd8ZO7&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1Gw29e9PZL%2F%3Fmibextid%3DwwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="hover:text-[#A41B15] transition-colors">
                 <FaFacebook size={14} />
               </a>
-              <a href="https://wa.me/8801339562735" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="hover:text-[#8B2635] transition-colors">
+              <a href="https://wa.me/8801339562735" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="hover:text-[#A41B15] transition-colors">
                 <FaWhatsapp size={14} />
               </a>
             </div>
@@ -335,88 +419,82 @@ export default function Navbar() {
 
         {/* ── Main Navbar ─────────────────────────────────────────── */}
         <header className="relative h-16 bg-white shadow-[0_4px_14px_rgba(0,0,0,0.08)]">
-          <div className="mx-auto flex h-full items-center justify-between px-4 md:w-[90%] md:max-w-[1400px]">
+          {searchOpen ? (
+            <NavSearchOverlay onClose={() => setSearchOpen(false)} />
+          ) : (
+            <>
+              <div className="mx-auto flex h-full items-center justify-between px-4 md:w-[90%] md:max-w-[1400px]">
 
-            {/* Left: hamburger — pinned to the edge */}
-            <motion.button
-              whileHover={{ scale: 1.12 }} whileTap={{ scale: 0.92 }}
-              transition={{ duration: 0.15 }}
-              className="flex h-9 w-9 items-center justify-center rounded-xl text-text-dark transition-colors hover:bg-black/5"
-              aria-label="Open menu"
-              onClick={() => setSidebarOpen(true)}
-            >
-              <FiMenu size={20} />
-            </motion.button>
-
-            {/* Right: account + cart — pinned to the edge */}
-            <div className="flex items-center gap-1">
-              <Link href="/cart">
-                <motion.div
-                  whileHover={{ scale: 1.12 }} whileTap={{ scale: 0.92 }}
-                  transition={{ duration: 0.15 }}
-                  className="relative flex h-9 w-9 items-center justify-center rounded-xl text-text-dark transition-colors hover:bg-black/5"
-                  aria-label="View cart"
-                >
-                  <FiShoppingCart size={19} />
-                  <AnimatePresence>
-                    {cartCount > 0 && (
-                      <motion.span
-                        key="cart-badge"
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        exit={{ scale: 0 }}
-                        transition={{ type: "spring", stiffness: 420, damping: 22 }}
-                        className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary-pink text-[10px] font-bold text-white shadow"
-                      >
-                        {cartCount}
-                      </motion.span>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
-              </Link>
-              <Link href={isLoggedIn ? "/profile" : "/auth/login"}>
-                <motion.div
+                {/* Left: hamburger — pinned to the edge */}
+                <motion.button
                   whileHover={{ scale: 1.12 }} whileTap={{ scale: 0.92 }}
                   transition={{ duration: 0.15 }}
                   className="flex h-9 w-9 items-center justify-center rounded-xl text-text-dark transition-colors hover:bg-black/5"
-                  aria-label="Account"
+                  aria-label="Open menu"
+                  onClick={() => setSidebarOpen(true)}
                 >
-                  <FiUser size={19} />
-                </motion.div>
-              </Link>
-            </div>
-          </div>
+                  <FiMenu size={20} />
+                </motion.button>
 
-          {/* Center: links hugging the logo, always centered regardless of edge icon widths */}
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-            <div className="pointer-events-auto flex items-center gap-2 md:gap-4 lg:gap-6">
-              <nav className="hidden md:flex items-center gap-0.5">
-                {navLinks.slice(0, 3).map((link) => (
-                  <Link
-                    key={link.label}
-                    href={link.href}
-                    className="group relative px-3 py-2 font-poppins text-sm font-medium text-text-dark rounded-xl transition-colors duration-200 hover:bg-black/5"
+                {/* Right: account + search — pinned to the edge */}
+                <div className="flex items-center gap-1">
+                  <motion.button
+                    whileHover={{ scale: 1.12 }} whileTap={{ scale: 0.92 }}
+                    transition={{ duration: 0.15 }}
+                    className="flex h-9 w-9 items-center justify-center rounded-xl text-text-dark transition-colors hover:bg-black/5"
+                    aria-label="Search"
+                    onClick={() => {
+                      setSidebarOpen(false);
+                      setSearchOpen(true);
+                    }}
                   >
-                    {link.label}
-                    <span className="absolute bottom-1.5 left-3 right-3 h-0.5 rounded-full bg-primary-pink/70 scale-x-0 origin-left transition-transform duration-300 group-hover:scale-x-100" />
+                    <FiSearch size={19} />
+                  </motion.button>
+                  <Link href={isLoggedIn ? "/profile" : "/auth/login"}>
+                    <motion.div
+                      whileHover={{ scale: 1.12 }} whileTap={{ scale: 0.92 }}
+                      transition={{ duration: 0.15 }}
+                      className="flex h-9 w-9 items-center justify-center rounded-xl text-text-dark transition-colors hover:bg-black/5"
+                      aria-label="Account"
+                    >
+                      <FiUser size={19} />
+                    </motion.div>
                   </Link>
-                ))}
-              </nav>
-              <LogoCircle logoUrl={logoUrl} />
-              <nav className="hidden md:flex items-center gap-0.5">
-                {navLinks.slice(3).map((link) => (
-                  <Link
-                    key={link.label}
-                    href={link.href}
-                    className="group relative px-3 py-2 font-poppins text-sm font-medium text-text-dark rounded-xl transition-colors duration-200 hover:bg-black/5"
-                  >
-                    {link.label}
-                    <span className="absolute bottom-1.5 left-3 right-3 h-0.5 rounded-full bg-primary-pink/70 scale-x-0 origin-left transition-transform duration-300 group-hover:scale-x-100" />
-                  </Link>
-                ))}
-              </nav>
-            </div>
-          </div>
+                </div>
+              </div>
+
+              {/* Center: links hugging the logo, always centered regardless of edge icon widths */}
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                <div className="pointer-events-auto flex items-center gap-2 md:gap-4 lg:gap-6">
+                  <nav className="hidden md:flex items-center gap-0.5">
+                    {navLinks.slice(0, 2).map((link) => (
+                      <Link
+                        key={link.label}
+                        href={link.href}
+                        className="group relative px-3 py-2 font-poppins text-sm font-medium uppercase tracking-wide text-text-dark rounded-xl transition-colors duration-200 hover:bg-black/5"
+                      >
+                        {link.label}
+                        <span className="absolute bottom-1.5 left-3 right-3 h-0.5 rounded-full bg-primary-pink/70 scale-x-0 origin-left transition-transform duration-300 group-hover:scale-x-100" />
+                      </Link>
+                    ))}
+                  </nav>
+                  <Logo logoUrl={logoUrl} />
+                  <nav className="hidden md:flex items-center gap-0.5">
+                    {navLinks.slice(2).map((link) => (
+                      <Link
+                        key={link.label}
+                        href={link.href}
+                        className="group relative px-3 py-2 font-poppins text-sm font-medium uppercase tracking-wide text-text-dark rounded-xl transition-colors duration-200 hover:bg-black/5"
+                      >
+                        {link.label}
+                        <span className="absolute bottom-1.5 left-3 right-3 h-0.5 rounded-full bg-primary-pink/70 scale-x-0 origin-left transition-transform duration-300 group-hover:scale-x-100" />
+                      </Link>
+                    ))}
+                  </nav>
+                </div>
+              </div>
+            </>
+          )}
         </header>
       </motion.div>
 
@@ -507,73 +585,17 @@ export default function Navbar() {
                 <Link
                   href="/"
                   onClick={closeSidebar}
-                  className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-text-dark transition-colors hover:bg-gray-50 hover:text-primary-pink"
+                  className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold uppercase tracking-wide text-text-dark transition-colors hover:bg-gray-50 hover:text-primary-pink"
                 >
                   <FiHome size={17} className="shrink-0 text-primary-pink" />
                   Home
                 </Link>
 
-                {/* Boys / Girls */}
-                {navLinks.slice(0, 2).map((link) => (
-                  <Link
-                    key={link.label}
-                    href={link.href}
-                    onClick={closeSidebar}
-                    className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-text-dark transition-colors hover:bg-gray-50 hover:text-primary-pink"
-                  >
-                    <FiChevronRight size={17} className="shrink-0 text-primary-pink" />
-                    {link.label}
-                  </Link>
-                ))}
-
-                {/* By Age — accordion */}
-                <div>
-                  <button
-                    onClick={() => toggleSection("byAge")}
-                    className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-text-dark transition-colors hover:bg-gray-50 hover:text-primary-pink"
-                  >
-                    <FiLayers size={17} className="shrink-0 text-primary-pink" />
-                    <span className="flex-1 text-left">By Age</span>
-                    <motion.span
-                      animate={{ rotate: openSection === "byAge" ? 180 : 0 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <FiChevronDown size={16} className="text-text-muted" />
-                    </motion.span>
-                  </button>
-                  <AnimatePresence initial={false}>
-                    {openSection === "byAge" && (
-                      <motion.div
-                        key="byAge-panel"
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
-                        className="overflow-hidden"
-                      >
-                        <div className="ml-8 mb-1 flex flex-col">
-                          {ageRanges.map((age) => (
-                            <Link
-                              key={age._id}
-                              href={`/products?ageRange=${age._id}`}
-                              onClick={closeSidebar}
-                              className="flex items-center justify-between border-b border-gray-50 py-2.5 pr-3 text-sm text-text-muted transition-colors hover:text-primary-pink"
-                            >
-                              {age.label}
-                              <FiChevronRight size={14} className="shrink-0" />
-                            </Link>
-                          ))}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-
                 {/* Categories — accordion */}
                 <div>
                   <button
                     onClick={() => toggleSection("categories")}
-                    className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-text-dark transition-colors hover:bg-gray-50 hover:text-primary-pink"
+                    className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold uppercase tracking-wide text-text-dark transition-colors hover:bg-gray-50 hover:text-primary-pink"
                   >
                     <FiGrid size={17} className="shrink-0 text-primary-pink" />
                     <span className="flex-1 text-left">Categories</span>
@@ -596,15 +618,12 @@ export default function Navbar() {
                       >
                         <div className="ml-8 mb-1 flex flex-col">
                           {categories.map((category) => (
-                            <Link
+                            <CategoryRowWithFlyout
                               key={category._id}
-                              href={`/products?category=${category._id}`}
-                              onClick={closeSidebar}
-                              className="flex items-center justify-between border-b border-gray-50 py-2.5 pr-3 text-sm text-text-muted transition-colors hover:text-primary-pink"
-                            >
-                              {category.name}
-                              <FiChevronRight size={14} className="shrink-0" />
-                            </Link>
+                              category={category}
+                              subCategories={subCategories}
+                              onNavigate={closeSidebar}
+                            />
                           ))}
                         </div>
                       </motion.div>
@@ -616,17 +635,17 @@ export default function Navbar() {
                 <Link
                   href="/products"
                   onClick={closeSidebar}
-                  className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-text-dark transition-colors hover:bg-gray-50 hover:text-primary-pink"
+                  className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold uppercase tracking-wide text-text-dark transition-colors hover:bg-gray-50 hover:text-primary-pink"
                 >
                   <FiShoppingBag size={17} className="shrink-0 text-primary-pink" />
                   Products
                 </Link>
-                {navLinks.slice(4).map((link) => (
+                {navLinks.slice(2).map((link) => (
                   <Link
                     key={link.label}
                     href={link.href}
                     onClick={closeSidebar}
-                    className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-text-dark transition-colors hover:bg-gray-50 hover:text-primary-pink"
+                    className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold uppercase tracking-wide text-text-dark transition-colors hover:bg-gray-50 hover:text-primary-pink"
                   >
                     <FiChevronRight size={17} className="shrink-0 text-primary-pink" />
                     {link.label}
@@ -637,7 +656,7 @@ export default function Navbar() {
                 <Link
                   href="/cart"
                   onClick={closeSidebar}
-                  className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-text-dark transition-colors hover:bg-gray-50 hover:text-primary-pink"
+                  className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold uppercase tracking-wide text-text-dark transition-colors hover:bg-gray-50 hover:text-primary-pink"
                 >
                   <FiShoppingCart size={17} className="shrink-0 text-primary-pink" />
                   <span className="flex-1">Cart</span>
@@ -699,7 +718,7 @@ export default function Navbar() {
                         </span>
                       )}
                     </span>
-                    <span className="text-[#6a7280]">{item.label}</span>
+                    <span className="uppercase text-[#6a7280]">{item.label}</span>
                   </button>
                 );
               }
@@ -714,7 +733,7 @@ export default function Navbar() {
                   aria-current={isActive ? "page" : undefined}
                 >
                   <Icon size={18} />
-                  <span>{item.label}</span>
+                  <span className="uppercase">{item.label}</span>
                 </button>
               );
             }
@@ -726,7 +745,7 @@ export default function Navbar() {
                 className="flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-xl text-[11px] font-semibold text-[#6a7280] transition-colors"
               >
                 <Icon size={18} />
-                <span>{item.label}</span>
+                <span className="uppercase">{item.label}</span>
               </button>
             );
           })}

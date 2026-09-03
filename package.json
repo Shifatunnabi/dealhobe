@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed": "node scripts/seed.js",
+    "seed:reset": "node scripts/seed.js --reset",
+    "seed:verify": "node scripts/verify-seed.js"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.100.1",

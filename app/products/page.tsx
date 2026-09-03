@@ -5,7 +5,7 @@
 export const dynamic = 'force-dynamic';
 
 import { Suspense } from "react";
-import { getProducts, getCategories, getAgeRanges, getBrands, getOffers } from '@/lib/data';
+import { getProducts, getCategories, getSubCategories, getBrands, getOffers } from '@/lib/data';
 import ProductsPageClient from '@/components/pages/ProductsPageClient';
 import { applyOffersToProducts, isOfferActive } from '@/lib/offers';
 
@@ -17,10 +17,10 @@ export default async function ProductsPage(props: {
   const searchQuery   = typeof searchParams.q      === 'string' ? searchParams.q      : undefined;
 
   // All cached — parallel fetch from Next.js Data Cache or MongoDB
-  const [products, categories, ages, brands, offers] = await Promise.all([
+  const [products, categories, subCategories, brands, offers] = await Promise.all([
     getProducts(),
     getCategories(),
-    getAgeRanges(),
+    getSubCategories(),
     getBrands(),
     getOffers(),
   ]);
@@ -39,7 +39,7 @@ export default async function ProductsPage(props: {
       <ProductsPageClient
         products={pricedProducts}
         categories={categories}
-        ages={ages}
+        subCategories={subCategories}
         brands={brands}
         offers={activeOffers}
         offerParam={offerParam}

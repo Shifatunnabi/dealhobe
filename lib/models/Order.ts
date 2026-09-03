@@ -30,7 +30,6 @@ export interface IOrder extends Document {
   delivery: DeliveryDetails;
   subtotal: number;
   deliveryCharge: number;
-  loyaltyPoints: number;
   total: number;
   receiptEmailSentAt?: Date;
   receiptEmailSending?: boolean;
@@ -80,7 +79,6 @@ const OrderSchema = new Schema<IOrder>(
     delivery: { type: DeliverySchema, required: true },
     subtotal: { type: Number, required: true },
     deliveryCharge: { type: Number, required: true },
-    loyaltyPoints: { type: Number, default: 0 },
     total: { type: Number, required: true },
     receiptEmailSentAt: { type: Date },
     receiptEmailSending: { type: Boolean, default: false },

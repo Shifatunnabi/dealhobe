@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
   if (!body.sku) body.sku = generateSku();
   try {
     const product = await Product.create(body);
-    revalidateTag('products', {});
+    revalidateTag('products', { expire: 0 });
     revalidatePath('/');
     revalidatePath('/products');
     revalidatePath('/product/[slug]', 'page');
@@ -48,7 +48,7 @@ export async function PUT(req: NextRequest) {
   const { id, ...data } = await req.json();
   if (!data.sku) data.sku = generateSku();
   const updated = await Product.findByIdAndUpdate(id, data, { new: true });
-  revalidateTag('products', {});
+  revalidateTag('products', { expire: 0 });
   revalidatePath('/');
   revalidatePath('/products');
   revalidatePath('/product/[slug]', 'page');
@@ -67,7 +67,7 @@ export async function DELETE(req: NextRequest) {
        await deleteImage(pid);
     }
   }
-  revalidateTag('products', {});
+  revalidateTag('products', { expire: 0 });
   revalidatePath('/');
   revalidatePath('/products');
   revalidatePath('/product/[slug]', 'page');

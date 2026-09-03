@@ -8,15 +8,17 @@ export interface IProduct extends Document {
   salePrice?: number;
   quantity: number;
   shortDescription: string;
-  brand: string;
-  ageRange: string;
+  brand?: string;
   category: string;
-  toysFor: string;
+  subCategory?: string;
   whyLoveIt: string[];
   description: string;
   images: string[];
   imagePublicIds: string[];
   isFeatured: boolean;
+  isTrending: boolean;
+  isNewArrival: boolean;
+  isTopSeller: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -30,18 +32,26 @@ const ProductSchema = new Schema<IProduct>(
     salePrice: { type: Number },
     quantity: { type: Number, required: true, default: 0 },
     shortDescription: { type: String, required: true },
-    brand: { type: String, required: true }, // Store name or ID
-    ageRange: { type: String, required: true }, // Store label or ID
+    brand: { type: String }, // Store name or ID — optional
     category: { type: String, required: true }, // Store name or ID
-    toysFor: { type: String, enum: ['boys', 'girls', 'both'], required: true },
+    subCategory: { type: String }, // Store name or ID — optional, scoped under category
     whyLoveIt: [{ type: String }],
     description: { type: String, required: true }, // HTML
     images: [{ type: String }],
     imagePublicIds: [{ type: String }],
     isFeatured: { type: Boolean, default: false },
+    isTrending: { type: Boolean, default: false },
+    isNewArrival: { type: Boolean, default: false },
+    isTopSeller: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
+
+// Search-supporting indexes: category/subCategory/brand are queried via
+// $in id-lists resolved from taxonomy name matches (see /api/products/search).
+ProductSchema.index({ category: 1 });
+ProductSchema.index({ subCategory: 1 });
+ProductSchema.index({ brand: 1 });
 
 const Product: Model<IProduct> =
   mongoose.models.Product || mongoose.model<IProduct>('Product', ProductSchema);

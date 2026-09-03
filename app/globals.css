@@ -11,9 +11,9 @@
    ---------------------------------------------------------------- */
 :root {
   /* Brand Colors */
-  --primary-pink:            #550000;
-  --primary-pink-light:      #8B2635;
-  --primary-pink-dark:       #550000;
+  --primary-pink:            #A41B15;
+  --primary-pink-light:      #A41B15;
+  --primary-pink-dark:       #A41B15;
 
   --secondary-yellow:        #FFD93D;
   --secondary-yellow-light:  #FFF3A8;
@@ -35,17 +35,17 @@
   --text-light:              #F9F4FF;
 
   /* Gradients */
-  --gradient-primary:  linear-gradient(135deg, #550000 0%, #8b2635 100%);
+  --gradient-primary:  linear-gradient(135deg, #A41B15 0%, #A41B15 100%);
   --gradient-yellow:   linear-gradient(135deg, #FFD93D 0%, #FF8C42 100%);
   --gradient-blue:     linear-gradient(135deg, #3DA7E4 0%, #3DA7E4 100%);
   --gradient-soft:     linear-gradient(135deg, #FFF5F9 0%, #FFF9F0 100%);
   --gradient-dark:     linear-gradient(135deg, #1A0A2E 0%, #2D1B4E 100%);
 
   /* Shadows */
-  --shadow-soft:   0 4px 24px  rgba(85, 0, 0, 0.12);
+  --shadow-soft:   0 4px 24px  rgba(164, 27, 21, 0.12);
   --shadow-card:   0 8px 32px  rgba(45,  27,  78,  0.08);
-  --shadow-hover:  0 16px 48px rgba(85, 0, 0, 0.22);
-  --shadow-button: 0 4px 16px  rgba(85, 0, 0, 0.38);
+  --shadow-hover:  0 16px 48px rgba(164, 27, 21, 0.22);
+  --shadow-button: 0 4px 16px  rgba(164, 27, 21, 0.38);
 
   /* Spacing Tokens */
   --space-xs:  0.25rem;   /*  4px */
@@ -324,7 +324,7 @@
   border-radius: 50%;
   background: var(--primary-pink);
   border: 2px solid #ffffff;
-  box-shadow: 0 2px 8px rgba(85, 0, 0, 0.4);
+  box-shadow: 0 2px 8px rgba(164, 27, 21, 0.4);
   pointer-events: all;
   cursor: pointer;
   transition: transform 0.15s var(--ease-bounce);
@@ -340,7 +340,7 @@
   border-radius: 50%;
   background: var(--primary-pink);
   border: 2px solid #ffffff;
-  box-shadow: 0 2px 8px rgba(85, 0, 0, 0.4);
+  box-shadow: 0 2px 8px rgba(164, 27, 21, 0.4);
   pointer-events: all;
   cursor: pointer;
 }

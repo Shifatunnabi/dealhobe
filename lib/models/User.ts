@@ -14,10 +14,6 @@ export interface IUser extends Document {
     area: "inside_dhaka" | "outside_dhaka";
     isDefault: boolean;
   }[];
-  babies: {
-    name: string;
-    birthday: string;
-  }[];
   isBanned?: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -39,15 +35,6 @@ const UserSchema = new Schema<IUser>(
           address: { type: String },
           area: { type: String, enum: ["inside_dhaka", "outside_dhaka"], required: true },
           isDefault: { type: Boolean, default: false },
-        },
-      ],
-      default: [],
-    },
-    babies: {
-      type: [
-        {
-          name: { type: String, required: true },
-          birthday: { type: String, required: true },
         },
       ],
       default: [],

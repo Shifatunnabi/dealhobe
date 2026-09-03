@@ -1,6 +1,7 @@
 import connectDB from "@/lib/mongodb";
 import Order from "@/lib/models/Order";
 import { notFound } from "next/navigation";
+import { FiFileText } from 'react-icons/fi';
 import AdminOrderActions from "@/components/admin/AdminOrderActions";
 
 export default async function AdminOrderDetailPage({ params }: { params: Promise<{ orderId: string }> }) {
@@ -32,7 +33,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
     <div>
       <div className="admin-page-header">
         <div>
-          <h1 className="admin-page-title"><span className="page-icon">🧾</span> Order {order.orderNumber}</h1>
+          <h1 className="admin-page-title"><span className="page-icon"><FiFileText size={20} /></span> Order {order.orderNumber}</h1>
           <p className="admin-page-subtitle">Review items, customer details, and download receipt.</p>
         </div>
         <AdminOrderActions order={orderForClient} />
@@ -88,7 +89,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", borderTop: "1px solid rgba(0,0,0,0.08)", paddingTop: "0.5rem" }}>
                 <span>Total</span>
-                <strong style={{ color: "var(--primary-pink, #550000)", textAlign: "right", minWidth: 90 }}>৳{order.total}</strong>
+                <strong style={{ color: "var(--primary-pink, #A41B15)", textAlign: "right", minWidth: 90 }}>৳{order.total}</strong>
               </div>
             </div>
           </div>

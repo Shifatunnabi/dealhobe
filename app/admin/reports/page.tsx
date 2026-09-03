@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
+import { FiBarChart2, FiPrinter, FiSearch, FiClipboard, FiDollarSign, FiPackage, FiCalendar, FiTag, FiFolder } from 'react-icons/fi';
 
 interface Category { _id: string; name: string; }
 interface Summary { totalOrders: number; totalRevenue: number; totalItems: number; }
@@ -81,11 +82,11 @@ export default function ReportsPage() {
 
       <div className="admin-page-header no-print">
         <div>
-          <h1 className="admin-page-title"><span className="page-icon">📊</span> Sales Reports</h1>
+          <h1 className="admin-page-title"><span className="page-icon"><FiBarChart2 size={20} /></span> Sales Reports</h1>
           <p className="admin-page-subtitle">Generate order and sales reports filtered by date range, SKU, or category.</p>
         </div>
         {data && (
-          <button className="btn-admin-secondary" onClick={() => window.print()}>🖨️ Print Report</button>
+          <button className="btn-admin-secondary" onClick={() => window.print()}><FiPrinter size={13} /> Print Report</button>
         )}
       </div>
 
@@ -100,7 +101,7 @@ export default function ReportsPage() {
 
       {/* Filters */}
       <div className="admin-card no-print" style={{ marginBottom: '1.5rem' }}>
-        <div className="admin-card-header">🔍 Report Filters</div>
+        <div className="admin-card-header"><span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}><FiSearch size={16} /> Report Filters</span></div>
         <div className="admin-card-body">
           <div className="admin-form-row">
             <div className="admin-field">
@@ -135,7 +136,7 @@ export default function ReportsPage() {
           </div>
           <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
             <button className="btn-admin-primary" onClick={generate} disabled={loading}>
-              {loading ? 'Generating…' : '📊 Generate Report'}
+              {loading ? 'Generating…' : (<span style={{display:'inline-flex',alignItems:'center',gap:'0.5rem'}}><FiBarChart2 size={14} /> Generate Report</span>)}
             </button>
             <button
               className="btn-admin-secondary"
@@ -149,7 +150,7 @@ export default function ReportsPage() {
 
       {!data && !loading && (
         <div className="admin-empty no-print">
-          <div className="empty-icon">📊</div>
+          <div className="empty-icon"><FiBarChart2 size={40} /></div>
           <h3>No Report Generated</h3>
           <p>Set your filters and click "Generate Report" to view sales data.</p>
         </div>
@@ -160,19 +161,19 @@ export default function ReportsPage() {
           {/* Summary cards */}
           <div className="admin-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', marginBottom: '1.5rem' }}>
             <div className="admin-card">
-              <div className="admin-card-header">📋 Total Orders</div>
+              <div className="admin-card-header"><span style={{display:'inline-flex',alignItems:'center',gap:'0.5rem'}}><FiClipboard size={16} /> Total Orders</span></div>
               <div className="admin-card-body" style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: '2.25rem', fontWeight: 700 }}>{data.summary.totalOrders}</div>
               </div>
             </div>
             <div className="admin-card">
-              <div className="admin-card-header">💰 Total Revenue</div>
+              <div className="admin-card-header"><span style={{display:'inline-flex',alignItems:'center',gap:'0.5rem'}}><FiDollarSign size={16} /> Total Revenue</span></div>
               <div className="admin-card-body" style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: '2.25rem', fontWeight: 700 }}>৳{data.summary.totalRevenue.toLocaleString()}</div>
               </div>
             </div>
             <div className="admin-card">
-              <div className="admin-card-header">📦 Items Sold</div>
+              <div className="admin-card-header"><span style={{display:'inline-flex',alignItems:'center',gap:'0.5rem'}}><FiPackage size={16} /> Items Sold</span></div>
               <div className="admin-card-body" style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: '2.25rem', fontWeight: 700 }}>{data.summary.totalItems}</div>
               </div>
@@ -181,7 +182,7 @@ export default function ReportsPage() {
 
           {/* Sales by Day */}
           <div className="admin-card" style={{ marginBottom: '1.5rem' }}>
-            <div className="admin-card-header">📅 Sales by Day</div>
+            <div className="admin-card-header"><span style={{display:'inline-flex',alignItems:'center',gap:'0.5rem'}}><FiCalendar size={16} /> Sales by Day</span></div>
             <div className="admin-card-body">
               {data.byDay.length === 0 ? (
                 <p style={{ color: 'var(--text-muted)' }}>No orders in the selected period.</p>
@@ -219,7 +220,7 @@ export default function ReportsPage() {
 
           {/* Sales by SKU */}
           <div className="admin-card" style={{ marginBottom: '1.5rem' }}>
-            <div className="admin-card-header">🏷️ Sales by SKU</div>
+            <div className="admin-card-header"><span style={{display:'inline-flex',alignItems:'center',gap:'0.5rem'}}><FiTag size={16} /> Sales by SKU</span></div>
             <div className="admin-card-body">
               {data.bySku.length === 0 ? (
                 <p style={{ color: 'var(--text-muted)' }}>No SKU data for the selected filters.</p>
@@ -252,7 +253,7 @@ export default function ReportsPage() {
 
           {/* Sales by Category */}
           <div className="admin-card" style={{ marginBottom: '1.5rem' }}>
-            <div className="admin-card-header">🗂️ Sales by Category</div>
+            <div className="admin-card-header"><span style={{display:'inline-flex',alignItems:'center',gap:'0.5rem'}}><FiFolder size={16} /> Sales by Category</span></div>
             <div className="admin-card-body">
               {data.byCategory.length === 0 ? (
                 <p style={{ color: 'var(--text-muted)' }}>No category data for the selected filters.</p>

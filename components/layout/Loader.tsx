@@ -64,7 +64,7 @@ export default function Loader() {
               animate={{ width: "100%" }}
               transition={{ duration: 1.4, delay: 0.2, ease: "easeInOut" }}
               className="h-full rounded-full"
-              style={{ backgroundColor: "#550000" }}
+              style={{ backgroundColor: "#A41B15" }}
             />
           </div>
         </motion.div>

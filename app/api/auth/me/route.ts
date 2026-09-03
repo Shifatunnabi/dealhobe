@@ -59,22 +59,6 @@ const normalizeAddresses = (
   return mapped;
 };
 
-const normalizeBabies = (babies: any) => {
-  const raw = Array.isArray(babies) ? babies : [];
-  return raw
-    .map((item: any) => {
-      const name = String(item?.name || "").trim();
-      const birthday = String(item?.birthday || "").trim();
-      if (!name || !birthday) return null;
-      return {
-        _id: item?._id ? String(item._id) : undefined,
-        name,
-        birthday,
-      };
-    })
-    .filter(Boolean);
-};
-
 const buildUserPayload = (user: any) => {
   const addresses = normalizeAddresses(user?.addresses, {
     area: user?.area,
@@ -89,8 +73,8 @@ const buildUserPayload = (user: any) => {
     area: defaultAddress?.area || user.area,
     address: defaultAddress?.fullAddress || user.address,
     addresses,
-    babies: normalizeBabies(user?.babies),
     isBanned: Boolean(user.isBanned),
+    createdAt: user.createdAt,
   };
 };
 
@@ -140,11 +124,6 @@ export async function PUT(req: NextRequest) {
       fullAddress: item.fullAddress,
       area: item.area,
       isDefault: item.isDefault,
-    }));
-    user.babies = normalizeBabies(user.babies).map((item: any) => ({
-      ...(item?._id ? { _id: item._id } : {}),
-      name: item.name,
-      birthday: item.birthday,
     }));
 
     const action = String(body?.action || "legacy_add_address");
@@ -251,21 +230,6 @@ export async function PUT(req: NextRequest) {
 
       const next = user.addresses.filter((item: any) => String(item?._id) !== addressId);
       user.addresses = next;
-    } else if (action === "add_baby") {
-      const name = String(body?.name || "").trim();
-      const birthday = String(body?.birthday || "").trim();
-      if (!name || !birthday) {
-        return NextResponse.json({ error: "Baby name and birthday are required." }, { status: 400 });
-      }
-
-      user.babies.push({ name, birthday });
-    } else if (action === "delete_baby") {
-      const babyId = String(body?.babyId || "").trim();
-      if (!babyId) {
-        return NextResponse.json({ error: "Baby ID is required." }, { status: 400 });
-      }
-
-      user.babies = user.babies.filter((item: any) => String(item?._id) !== babyId);
     } else {
       return NextResponse.json({ error: "Invalid action." }, { status: 400 });
     }

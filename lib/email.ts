@@ -51,15 +51,15 @@ export const sendOrderConfirmationEmail = async (payload: OrderConfirmationPaylo
 
   const html = `
     <div style="font-family:Arial,sans-serif;line-height:1.6;color:#222;max-width:560px;">
-      <h2 style="color:#550000;">Thanks for shopping with DealHobe! 🎉</h2>
+      <h2 style="color:#A41B15;">Thanks for shopping with DealHobe! 🎉</h2>
       <p>Your order <strong>${payload.orderNumber}</strong> has been placed successfully.</p>
       <table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;">
         <thead><tr style="background:#f3f4f6;"><th style="padding:6px 8px;text-align:left;">Product</th><th style="padding:6px 8px;text-align:right;">Qty</th><th style="padding:6px 8px;text-align:right;">Amount</th></tr></thead>
         <tbody>${itemRows}</tbody>
       </table>
       <p style="font-size:14px;">Delivery: <strong>৳${payload.deliveryCharge}</strong></p>
-      <p style="font-size:16px;">Total: <strong style="color:#550000;">৳${payload.total}</strong></p>
-      ${payload.trackingUrl ? `<p><a href="${payload.trackingUrl}" style="color:#550000;">Track your order</a></p>` : ""}
+      <p style="font-size:16px;">Total: <strong style="color:#A41B15;">৳${payload.total}</strong></p>
+      ${payload.trackingUrl ? `<p><a href="${payload.trackingUrl}" style="color:#A41B15;">Track your order</a></p>` : ""}
       <p style="font-size:13px;color:#666;">We'll contact you to confirm delivery. Thank you!</p>
     </div>
   `;

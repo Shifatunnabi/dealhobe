@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { FiFileText } from 'react-icons/fi';
 import Link from "next/link";
 
 interface OrderRow {
@@ -151,7 +152,7 @@ export default function AdminOrdersPage() {
     <div>
       <div className="admin-page-header">
         <div>
-          <h1 className="admin-page-title"><span className="page-icon">🧾</span> Orders</h1>
+          <h1 className="admin-page-title"><span className="page-icon"><FiFileText size={20} /></span> Orders</h1>
           <p className="admin-page-subtitle">Review customer orders and manage Steadfast shipments.</p>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}>
@@ -193,7 +194,7 @@ export default function AdminOrdersPage() {
         <div className="admin-empty"><div className="spinner" style={{ margin: "0 auto 1rem" }} /><p>Loading…</p></div>
       ) : orders.length === 0 ? (
         <div className="admin-empty">
-          <div className="empty-icon">🧾</div>
+          <div className="empty-icon"><FiFileText size={40} /></div>
           <h3>No Orders Yet</h3>
           <p>Orders will appear here as customers check out.</p>
         </div>

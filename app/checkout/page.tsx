@@ -17,7 +17,7 @@ const DELIVERY_CHARGE = {
 } as const;
 
 const LOADING_STEPS = [
-  "Finding your toys",
+  "Finding your products",
   "Packing the gift box",
   "Confirming your order",
   "Preparing your receipt",
@@ -386,13 +386,13 @@ export default function CheckoutPage() {
             Your cart is empty
           </h2>
           <p className="mt-2 font-poppins text-sm text-text-muted">
-            Add some toys before heading to checkout.
+            Add some products before heading to checkout.
           </p>
           <Link
             href="/products"
             className="mt-7 inline-flex items-center gap-2 rounded-2xl bg-gradient-primary px-8 py-3 font-poppins font-semibold text-white shadow-button transition-shadow hover:shadow-hover"
           >
-            Browse Toys
+            Browse Products
           </Link>
         </motion.div>
       </div>
@@ -761,7 +761,7 @@ export default function CheckoutPage() {
               <motion.button
                 type="submit"
                 disabled={!canSubmit}
-                whileHover={canSubmit ? { y: -2, boxShadow: "0 16px 48px rgba(85, 0, 0,0.28)" } : {}}
+                whileHover={canSubmit ? { y: -2, boxShadow: "0 16px 48px rgba(164, 27, 21, 0.28)" } : {}}
                 whileTap={canSubmit ? { scale: 0.97 } : {}}
                 transition={{ duration: 0.2 }}
                 className={cn(

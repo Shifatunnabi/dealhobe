@@ -17,25 +17,25 @@ import { cn } from "@/lib/utils";
 type PanelType = "reviews" | "tips";
 
 const REVIEW_ITEMS = [
-  { id: 1, name: "Nusrat Jahan", text: "My daughter loved the puzzle set. Quality is truly premium and delivery was super quick." },
-  { id: 2, name: "Farhana Rahman", text: "Finally found imported toys that feel safe and durable. Packaging was beautiful too." },
-  { id: 3, name: "Samira Akter", text: "The toy car set is exactly as shown. DealHobe customer support was very responsive." },
-  { id: 4, name: "Tanjina Islam", text: "Great quality and no sharp edges. My son is obsessed with his new blocks." },
+  { id: 1, name: "Nusrat Jahan", text: "The foundation shade match is perfect. Quality is truly premium and delivery was super quick." },
+  { id: 2, name: "Farhana Rahman", text: "Finally found imported cosmetics that feel authentic and gentle on skin. Packaging was beautiful too." },
+  { id: 3, name: "Samira Akter", text: "The skincare set is exactly as shown. DealHobe customer support was very responsive." },
+  { id: 4, name: "Tanjina Islam", text: "Great quality and no irritation at all. I'm obsessed with the new serum." },
   { id: 5, name: "Ishrat Moon", text: "Reliable page. I have ordered three times and every product was authentic." },
-  { id: 6, name: "Rafiya Ahmed", text: "Loved the details and finishing. Kids are happy and so am I." },
-  { id: 7, name: "Tahmina Yasmin", text: "Worth every taka. Soft materials and age-appropriate toys." },
+  { id: 6, name: "Rafiya Ahmed", text: "Loved the finish and the packaging. My skin feels amazing and so do I." },
+  { id: 7, name: "Tahmina Yasmin", text: "Worth every taka. Lightweight formulas that suit my skin type perfectly." },
   { id: 8, name: "Amena Chowdhury", text: "Easy checkout and trusted quality. Will definitely order again." },
 ];
 
 const TIP_ITEMS = [
-  { id: 1, title: "Rotate Toys Weekly", detail: "Keep only a few toys visible and rotate every week to boost curiosity and reduce clutter." },
-  { id: 2, title: "Create Play Zones", detail: "Set a small reading corner and a building corner so children can focus by activity type." },
-  { id: 3, title: "Use Open-Ended Toys", detail: "Blocks, figurines, and art kits encourage imagination more than one-action toys." },
-  { id: 4, title: "Play Together Daily", detail: "Spend 20 minutes of distraction-free play each day to strengthen bonding and confidence." },
-  { id: 5, title: "Ask Reflective Questions", detail: "Questions like 'What can we build next?' improve language and problem-solving skills." },
-  { id: 6, title: "Mix Indoor and Outdoor Play", detail: "Balance active movement with calm indoor play for healthier emotional regulation." },
-  { id: 7, title: "Praise Effort, Not Perfection", detail: "Celebrate trying and learning to help children build resilience and independent thinking." },
-  { id: 8, title: "Choose Age-Right Challenges", detail: "Slightly challenging toys keep kids engaged without causing frustration." },
+  { id: 1, title: "Cleanse Twice Daily", detail: "A gentle morning and night cleanse keeps skin clear without stripping its natural moisture." },
+  { id: 2, title: "Patch Test New Products", detail: "Try a new product on your wrist for 24 hours before applying it to your face." },
+  { id: 3, title: "Layer Light to Heavy", detail: "Apply serums before creams — thinner formulas absorb best when applied first." },
+  { id: 4, title: "Never Skip Sunscreen", detail: "Daily SPF protects against sun damage and keeps your skincare results looking their best." },
+  { id: 5, title: "Remove Makeup Before Bed", detail: "Sleeping in makeup clogs pores — always double cleanse before you turn in." },
+  { id: 6, title: "Match Foundation in Daylight", detail: "Test shades near a window, not under indoor lighting, for the truest color match." },
+  { id: 7, title: "Moisturize Even Oily Skin", detail: "Skipping moisturizer can trigger more oil production — hydration balances every skin type." },
+  { id: 8, title: "Clean Your Brushes Weekly", detail: "Regularly washed brushes apply makeup more smoothly and prevent breakouts." },
 ];
 
 function PromiseSquare({
@@ -106,7 +106,7 @@ function Pagination({
 
 function ReviewCard({ name, text }: { name: string; text: string }) {
   return (
-    <article className="rounded-2xl border border-primary-pink/35 bg-primary-pink p-4 text-white shadow-[0_10px_25px_rgba(85, 0, 0,0.35)]">
+    <article className="rounded-2xl border border-primary-pink/35 bg-primary-pink p-4 text-white shadow-[0_10px_25px_rgba(164,27,21,0.35)]">
       <div className="mb-2 flex items-center gap-2">
         <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
           <FiUser className="h-4 w-4" />
@@ -120,7 +120,7 @@ function ReviewCard({ name, text }: { name: string; text: string }) {
 
 function TipCard({ title, detail }: { title: string; detail: string }) {
   return (
-    <article className="rounded-2xl border border-primary-pink/35 bg-primary-pink p-4 text-white shadow-[0_10px_25px_rgba(85, 0, 0,0.35)]">
+    <article className="rounded-2xl border border-primary-pink/35 bg-primary-pink p-4 text-white shadow-[0_10px_25px_rgba(164,27,21,0.35)]">
       <h4 className="text-base font-bold text-white md:text-lg">{title}</h4>
       <div className="mt-2 h-px w-full bg-white/80" />
       <p className="mt-2 text-sm leading-relaxed md:text-base">{detail}</p>
@@ -236,7 +236,7 @@ export default function FeaturesSection() {
 
           <article className="overflow-hidden rounded-3xl border border-primary-pink/30 bg-primary-pink text-white shadow-card">
             <div className="flex min-h-20 items-center gap-3 px-4 py-3 md:px-6">
-              <h3 className="grow text-2xl font-semibold leading-none text-white md:text-5xl">Parenting tips</h3>
+              <h3 className="grow text-2xl font-semibold leading-none text-white md:text-5xl">Beauty tips</h3>
               <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/20">
                 <FiBookOpen className="h-5 w-5" />
               </div>

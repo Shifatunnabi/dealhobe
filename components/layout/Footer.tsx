@@ -50,7 +50,7 @@ export default function Footer() {
               className="h-11 w-auto object-contain brightness-0 invert mb-4"
             />
             <p className="font-poppins text-sm leading-relaxed text-text-light/70 max-w-60">
-              Premium imported toys for curious little minds in Bangladesh. Bringing global joy home since 2022.
+              Premium cosmetics and beauty essentials for every woman in Bangladesh. Bringing global beauty home since 2022.
             </p>
 
             {/* Social icons */}

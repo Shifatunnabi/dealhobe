@@ -6,6 +6,8 @@ import Underline from '@tiptap/extension-underline';
 import Link from '@tiptap/extension-link';
 import TextAlign from '@tiptap/extension-text-align';
 import { useEffect } from 'react';
+import { FiAlignLeft, FiAlignCenter, FiAlignRight, FiRotateCcw, FiRotateCw } from 'react-icons/fi';
+import { MdFormatQuote } from 'react-icons/md';
 
 interface RichTextEditorProps {
   value: string;
@@ -84,24 +86,24 @@ export default function RichTextEditor({ value, onChange }: RichTextEditorProps)
         </ToolbarBtn>
         <div className="rte-divider" />
         <ToolbarBtn onClick={() => editor.chain().focus().setTextAlign('left').run()} active={editor.isActive({ textAlign: 'left' })} title="Align Left">
-          ←
+          <FiAlignLeft size={14} />
         </ToolbarBtn>
-        <ToolbarBtn onClick={() => editor.chain().focus().setTextAlign('center').run()} active={editor.isActive({ textAlign: 'center' })} title="↔ Center">
-          ↔
+        <ToolbarBtn onClick={() => editor.chain().focus().setTextAlign('center').run()} active={editor.isActive({ textAlign: 'center' })} title="Align Center">
+          <FiAlignCenter size={14} />
         </ToolbarBtn>
         <ToolbarBtn onClick={() => editor.chain().focus().setTextAlign('right').run()} active={editor.isActive({ textAlign: 'right' })} title="Align Right">
-          →
+          <FiAlignRight size={14} />
         </ToolbarBtn>
         <div className="rte-divider" />
         <ToolbarBtn onClick={() => editor.chain().focus().toggleBlockquote().run()} active={editor.isActive('blockquote')} title="Blockquote">
-          ❝
+          <MdFormatQuote size={16} />
         </ToolbarBtn>
         <ToolbarBtn onClick={() => editor.chain().focus().toggleCodeBlock().run()} active={editor.isActive('codeBlock')} title="Code">
           {'</>'}
         </ToolbarBtn>
         <div className="rte-divider" />
-        <ToolbarBtn onClick={() => editor.chain().focus().undo().run()} title="Undo">↺</ToolbarBtn>
-        <ToolbarBtn onClick={() => editor.chain().focus().redo().run()} title="Redo">↻</ToolbarBtn>
+        <ToolbarBtn onClick={() => editor.chain().focus().undo().run()} title="Undo"><FiRotateCcw size={14} /></ToolbarBtn>
+        <ToolbarBtn onClick={() => editor.chain().focus().redo().run()} title="Redo"><FiRotateCw size={14} /></ToolbarBtn>
       </div>
       <EditorContent editor={editor} className="rte-content" />
     </div>

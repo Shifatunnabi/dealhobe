@@ -3,7 +3,11 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import Image from 'next/image';
+import { Reorder, useDragControls } from 'framer-motion';
+import { FiTag, FiEdit2, FiTrash2, FiPlus, FiX } from 'react-icons/fi';
 import ImageUpload from '@/components/admin/ImageUpload';
+import DragHandle from '@/components/admin/DragHandle';
+import { renumbered, nextOrder, useReorderPersist } from '@/components/admin/reorderUtils';
 
 interface Brand {
   _id:          string;
@@ -15,6 +19,31 @@ interface Brand {
 
 const emptyForm = { name: '', logoUrl: '', logoPublicId: '', order: 0 };
 
+function BrandCard({ brand, onEdit, onDelete }: { brand: Brand; onEdit: () => void; onDelete: () => void }) {
+  const dragControls = useDragControls();
+  return (
+    <Reorder.Item as="div" value={brand} dragListener={false} dragControls={dragControls} className="admin-item-card">
+      <div
+        className="admin-item-image"
+        style={{ position: 'relative', height: 120, background: 'rgba(45,27,78,0.04)' }}
+      >
+        <Image src={brand.logoUrl} alt={brand.name} fill style={{ objectFit: 'contain', padding: '1rem' }} />
+        <div style={{ position: 'absolute', top: 8, left: 8, background: 'rgba(255,255,255,0.9)', borderRadius: 8, padding: '0.25rem' }}>
+          <DragHandle dragControls={dragControls} />
+        </div>
+      </div>
+      <div className="admin-item-body">
+        <div className="admin-item-title">{brand.name}</div>
+        <div className="admin-item-meta">Order: {brand.order}</div>
+        <div className="admin-item-actions">
+          <button className="btn-admin-edit"   onClick={onEdit}><FiEdit2 size={13} /> Edit</button>
+          <button className="btn-admin-danger" onClick={onDelete}><FiTrash2 size={13} /> Delete</button>
+        </div>
+      </div>
+    </Reorder.Item>
+  );
+}
+
 export default function BrandsPage() {
   const [brands,  setBrands]  = useState<Brand[]>([]);
   const [loading, setLoading] = useState(true);
@@ -22,6 +51,7 @@ export default function BrandsPage() {
   const [editing, setEditing] = useState<Brand | null>(null);
   const [form,    setForm]    = useState({ ...emptyForm });
   const [saving,  setSaving]  = useState(false);
+  const reorderPersist = useReorderPersist('/api/admin/brands');
 
   const load = async () => {
     setLoading(true);
@@ -32,7 +62,7 @@ export default function BrandsPage() {
 
   useEffect(() => { load(); }, []);
 
-  const openAdd  = () => { setEditing(null); setForm({ ...emptyForm }); setModal(true); };
+  const openAdd  = () => { setEditing(null); setForm({ ...emptyForm, order: nextOrder(brands) }); setModal(true); };
   const openEdit = (b: Brand) => { setEditing(b); setForm({ name: b.name, logoUrl: b.logoUrl, logoPublicId: b.logoPublicId, order: b.order }); setModal(true); };
 
   const handleSave = async () => {
@@ -59,12 +89,18 @@ export default function BrandsPage() {
     load();
   };
 
+  const handleReorder = (newOrder: Brand[]) => {
+    const renumberedList = renumbered(newOrder);
+    reorderPersist(brands, renumberedList);
+    setBrands(renumberedList);
+  };
+
   return (
     <div>
       <div className="admin-page-header">
         <div>
-          <h1 className="admin-page-title"><span className="page-icon">🏷️</span> Brand Management</h1>
-          <p className="admin-page-subtitle">Manage brands shown in the slider and product filters.</p>
+          <h1 className="admin-page-title"><span className="page-icon"><FiTag size={20} /></span> Brand Management</h1>
+          <p className="admin-page-subtitle">Manage brands shown in the slider and product filters. Drag cards to reorder.</p>
         </div>
         <button id="add-brand-btn" className="btn-admin-primary" onClick={openAdd}>+ Add Brand</button>
       </div>
@@ -73,39 +109,26 @@ export default function BrandsPage() {
         <div className="admin-empty"><div className="spinner" style={{ margin: '0 auto 1rem' }} /><p>Loading…</p></div>
       ) : brands.length === 0 ? (
         <div className="admin-empty">
-          <div className="empty-icon">🏷️</div>
+          <div className="empty-icon"><FiTag size={40} /></div>
           <h3>No Brands Yet</h3>
           <p>Add your first brand to display it in the slider.</p>
         </div>
       ) : (
-        <div className="admin-grid">
+        <Reorder.Group as="div" axis="y" values={brands} onReorder={handleReorder} className="admin-grid">
           {brands.map(b => (
-            <div key={b._id} className="admin-item-card">
-              <div
-                className="admin-item-image"
-                style={{ position: 'relative', height: 120, background: 'rgba(45,27,78,0.04)' }}
-              >
-                <Image src={b.logoUrl} alt={b.name} fill style={{ objectFit: 'contain', padding: '1rem' }} />
-              </div>
-              <div className="admin-item-body">
-                <div className="admin-item-title">{b.name}</div>
-                <div className="admin-item-meta">Order: {b.order}</div>
-                <div className="admin-item-actions">
-                  <button className="btn-admin-edit"   onClick={() => openEdit(b)}>✏️ Edit</button>
-                  <button className="btn-admin-danger" onClick={() => handleDelete(b._id)}>🗑️ Delete</button>
-                </div>
-              </div>
-            </div>
+            <BrandCard key={b._id} brand={b} onEdit={() => openEdit(b)} onDelete={() => handleDelete(b._id)} />
           ))}
-        </div>
+        </Reorder.Group>
       )}
 
       {modal && (
         <div className="modal-overlay">
           <div className="modal-box">
             <div className="modal-header">
-              {editing ? '✏️ Edit Brand' : '➕ Add Brand'}
-              <button className="modal-close" onClick={() => setModal(false)}>✕</button>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                {editing ? <FiEdit2 size={16} /> : <FiPlus size={16} />} {editing ? 'Edit Brand' : 'Add Brand'}
+              </span>
+              <button className="modal-close" onClick={() => setModal(false)}><FiX size={16} /></button>
             </div>
             <div className="modal-body">
               <div className="admin-form">

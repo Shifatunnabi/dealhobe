@@ -149,7 +149,7 @@ export default function CartSidebar() {
 
                 <Link href="/checkout" onClick={closeSidebar}>
                   <motion.div
-                    whileHover={{ y: -2, boxShadow: "0 16px 48px rgba(85, 0, 0,0.28)" }}
+                    whileHover={{ y: -2, boxShadow: "0 16px 48px rgba(164, 27, 21, 0.28)" }}
                     whileTap={{ scale: 0.97 }}
                     transition={{ duration: 0.2 }}
                     className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-gradient-primary py-3.5 font-poppins font-semibold text-white shadow-button transition-shadow"

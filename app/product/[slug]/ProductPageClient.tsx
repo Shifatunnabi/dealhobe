@@ -17,6 +17,7 @@ import {
   FiUser,
   FiFacebook,
   FiInstagram,
+  FiAlertCircle,
 } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
 
@@ -249,18 +250,18 @@ export default function ProductDetailPageClient({
     return (
       <div className="flex min-h-screen items-center justify-center bg-soft-bg pt-16">
         <div className="text-center">
-          <span className="mb-4 block text-7xl">🧸</span>
+          <FiAlertCircle size={64} className="mb-4 inline-block text-primary-pink/40" />
           <h2 className="text-card-title mb-2 text-text-dark">
             Product not found
           </h2>
           <p className="text-small mb-6 text-text-muted">
-            This toy doesn&apos;t exist or may have been removed.
+            This product doesn&apos;t exist or may have been removed.
           </p>
           <Link
             href="/products"
             className="inline-flex items-center gap-2 rounded-2xl bg-primary-pink px-6 py-3 font-poppins font-semibold text-white shadow-button hover:shadow-hover transition-all"
           >
-            Browse All Toys <FiChevronRight size={16} />
+            Browse All Products <FiChevronRight size={16} />
           </Link>
         </div>
       </div>
@@ -277,15 +278,8 @@ export default function ProductDetailPageClient({
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
   const brandLabel = product.brandDisplay || product.brand?.name || product.brand;
   const categoryLabel = product.categoryDisplay || product.category?.name || product.category;
-  const rawAgeLabel = product.ageRangeDisplay || product.ageRange?.label || product.ageRange;
-  const ageLabel = (() => {
-    if (!rawAgeLabel) return "-";
-    const lowered = String(rawAgeLabel).toLowerCase();
-    if (lowered.includes("year") || lowered.includes("yrs") || lowered.includes("month")) {
-      return rawAgeLabel;
-    }
-    return `${rawAgeLabel} yrs`;
-  })();
+  const subCategoryLabel = product.subCategoryDisplay || product.subCategory?.name || product.subCategory;
+  const categoryPathLabel = subCategoryLabel ? `${categoryLabel} / ${subCategoryLabel}` : categoryLabel;
 
   const availableQty = Number(product.quantity ?? product.qty ?? 0);
   const outOfStock = availableQty <= 0;
@@ -455,7 +449,7 @@ export default function ProductDetailPageClient({
             href="/products"
             className="transition-colors hover:text-primary-pink"
           >
-            All Toys
+            All Products
           </Link>
           <FiChevronRight size={12} />
           <span className="line-clamp-1 font-semibold text-text-dark">
@@ -533,7 +527,7 @@ export default function ProductDetailPageClient({
             <motion.div variants={fadeUp} className="flex flex-wrap items-center gap-3">
               <StockBadge qty={availableQty} stockStr="in_stock" />
               <span className="rounded-full bg-soft-bg-alt px-3 py-1 font-poppins text-xs font-semibold text-text-muted">
-                {categoryLabel}
+                {categoryPathLabel}
               </span>
             </motion.div>
 
@@ -571,12 +565,6 @@ export default function ProductDetailPageClient({
                 <span className="font-poppins text-xs text-text-muted">Brand</span>
                 <span className="font-poppins text-sm font-semibold text-text-dark">
                   {brandLabel}
-                </span>
-              </div>
-              <div className="flex items-center gap-2 rounded-2xl border border-gray-100 bg-white px-4 py-2 shadow-soft">
-                <span className="font-poppins text-xs text-text-muted">Age</span>
-                <span className="font-poppins text-sm font-semibold text-text-dark">
-                  {ageLabel}
                 </span>
               </div>
             </motion.div>
@@ -772,7 +760,7 @@ export default function ProductDetailPageClient({
                 <ul className="space-y-2">
                   {product.whyLoveIt.map((feat: string, i: number) => (
                     <li key={i} className="flex items-start gap-2.5 text-sm text-text-muted">
-                      <span className="mt-0.5 shrink-0 font-poppins font-bold text-primary-pink">✓</span>
+                      <FiCheck size={14} className="mt-0.5 shrink-0 text-primary-pink" />
                       <span>{feat}</span>
                     </li>
                   ))}

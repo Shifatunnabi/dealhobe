@@ -13,16 +13,16 @@ import {
   FiUser,
   FiMapPin,
   FiLogOut,
-  FiGift,
   FiSettings,
   FiPlus,
   FiTrash2,
+  FiCalendar,
 } from "react-icons/fi";
 import { cn } from "@/lib/utils";
 import { fadeUp, staggerContainer, scaleIn } from "@/components/animations/variants";
 import { ColorfulTitle } from "@/components/ui";
 
-type Tab = "orders" | "profile" | "addresses" | "baby" | "settings";
+type Tab = "orders" | "profile" | "addresses" | "settings";
 type OrderStatus = "Pending" | "Processing" | "Shipped" | "Delivered" | "Cancelled";
 type DeliveryArea = "inside_dhaka" | "outside_dhaka";
 type AddressLabel = "home" | "office" | "other";
@@ -34,7 +34,6 @@ interface Order {
   status: OrderStatus;
   items: { name: string; image: string; qty: number }[];
   total: number;
-  loyaltyPoints?: number;
 }
 
 interface AddressEntry {
@@ -43,12 +42,6 @@ interface AddressEntry {
   fullAddress: string;
   area: DeliveryArea;
   isDefault: boolean;
-}
-
-interface BabyEntry {
-  _id?: string;
-  name: string;
-  birthday: string;
 }
 
 const AUTH_TOKEN_KEY = "dealhobe_auth_token_v1";
@@ -97,22 +90,6 @@ const normalizeAddresses = (
   }
 
   return mapped;
-};
-
-const normalizeBabies = (babies: any): BabyEntry[] => {
-  const raw = Array.isArray(babies) ? babies : [];
-  return raw
-    .map((item: any) => {
-      const name = String(item?.name || "").trim();
-      const birthday = String(item?.birthday || "").trim();
-      if (!name || !birthday) return null;
-      return {
-        _id: item?._id ? String(item._id) : undefined,
-        name,
-        birthday,
-      } as BabyEntry;
-    })
-    .filter(Boolean) as BabyEntry[];
 };
 
 function StatBadge({ status }: { status: OrderStatus }) {
@@ -214,9 +191,9 @@ export default function ProfilePage() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [userEmail, setUserEmail] = useState("");
+  const [memberSince, setMemberSince] = useState("");
 
   const [addresses, setAddresses] = useState<AddressEntry[]>([]);
-  const [babies, setBabies] = useState<BabyEntry[]>([]);
 
   const [addrLabel, setAddrLabel] = useState<AddressLabel>("home");
   const [addrArea, setAddrArea] = useState<DeliveryArea>("inside_dhaka");
@@ -227,23 +204,12 @@ export default function ProfilePage() {
   const [addressSaving, setAddressSaving] = useState(false);
   const [addressError, setAddressError] = useState("");
 
-  const [showBabyForm, setShowBabyForm] = useState(false);
-  const [babyName, setBabyName] = useState("");
-  const [babyBirthday, setBabyBirthday] = useState("");
-  const [babySaving, setBabySaving] = useState(false);
-  const [babyError, setBabyError] = useState("");
-
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordSaving, setPasswordSaving] = useState(false);
   const [passwordError, setPasswordError] = useState("");
   const [passwordSuccess, setPasswordSuccess] = useState("");
-
-  const loyaltyPoints = useMemo(
-    () => orders.reduce((sum, order) => sum + (order.loyaltyPoints || 0), 0),
-    [orders],
-  );
 
   useEffect(() => {
     let alive = true;
@@ -270,13 +236,13 @@ export default function ProfilePage() {
         setName(data?.user?.fullName || "");
         setUserEmail(data?.user?.email || "");
         setPhone(data?.user?.phone || "");
+        setMemberSince(data?.user?.createdAt || "");
         setAddresses(
           normalizeAddresses(data?.user?.addresses, {
             area: data?.user?.area,
             address: data?.user?.address,
           }),
         );
-        setBabies(normalizeBabies(data?.user?.babies));
       } catch {
         if (!alive) return;
         if (typeof window !== "undefined") {
@@ -324,6 +290,13 @@ export default function ProfilePage() {
     if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
     return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
   }, [name]);
+
+  const memberSinceLabel = useMemo(() => {
+    if (!memberSince) return "-";
+    const date = new Date(memberSince);
+    if (Number.isNaN(date.getTime())) return "-";
+    return date.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+  }, [memberSince]);
 
   const handleSaveAddress = async () => {
     setAddressError("");
@@ -458,67 +431,6 @@ export default function ProfilePage() {
     }
   };
 
-  const handleAddBaby = async () => {
-    setBabyError("");
-    if (!authToken) {
-      setBabyError("Please sign in again.");
-      return;
-    }
-    if (!babyName.trim() || !babyBirthday) {
-      setBabyError("Please provide baby name and birthday.");
-      return;
-    }
-
-    setBabySaving(true);
-    try {
-      const res = await fetch("/api/auth/me", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${authToken}`,
-        },
-        body: JSON.stringify({
-          action: "add_baby",
-          name: babyName.trim(),
-          birthday: babyBirthday,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to add baby details.");
-
-      setBabies(normalizeBabies(data?.user?.babies));
-      setBabyName("");
-      setBabyBirthday("");
-      setShowBabyForm(false);
-    } catch (err: any) {
-      setBabyError(err?.message || "Failed to add baby details.");
-    } finally {
-      setBabySaving(false);
-    }
-  };
-
-  const handleDeleteBaby = async (babyId?: string) => {
-    if (!babyId || !authToken) return;
-    setBabyError("");
-
-    try {
-      const res = await fetch("/api/auth/me", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${authToken}`,
-        },
-        body: JSON.stringify({ action: "delete_baby", babyId }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to delete baby details.");
-
-      setBabies(normalizeBabies(data?.user?.babies));
-    } catch (err: any) {
-      setBabyError(err?.message || "Failed to delete baby details.");
-    }
-  };
-
   const handleChangePassword = async () => {
     setPasswordError("");
     setPasswordSuccess("");
@@ -642,8 +554,8 @@ export default function ProfilePage() {
                   <p className="mt-1 text-xl font-bold text-text-dark">{orders.length}</p>
                 </div>
                 <div className="rounded-2xl border border-gray-100 bg-soft-bg p-3 text-left">
-                  <p className="text-xs text-text-muted">Loyalty Points</p>
-                  <p className="mt-1 text-xl font-bold text-text-dark">{loyaltyPoints}</p>
+                  <p className="text-xs text-text-muted">Member Since</p>
+                  <p className="mt-1 text-xl font-bold text-text-dark">{memberSinceLabel}</p>
                 </div>
               </div>
             </div>
@@ -670,12 +582,6 @@ export default function ProfilePage() {
                 onClick={() => handleTabSelect("addresses")}
               />
               <NavItem
-                icon={<FiGift size={16} />}
-                label="Baby Details"
-                active={activeTab === "baby"}
-                onClick={() => handleTabSelect("baby")}
-              />
-              <NavItem
                 icon={<FiSettings size={16} />}
                 label="Settings"
                 active={activeTab === "settings"}
@@ -700,7 +606,7 @@ export default function ProfilePage() {
 
           <div ref={sectionContainerRef} className="min-w-0 flex-1 flex flex-col gap-6">
             <motion.div
-              className="hidden grid-cols-1 gap-4 lg:grid lg:grid-cols-2"
+              className="hidden lg:grid lg:grid-cols-2 lg:gap-4"
               initial="hidden"
               animate="visible"
               variants={staggerContainer}
@@ -723,13 +629,17 @@ export default function ProfilePage() {
                 </div>
               </motion.button>
 
-              <motion.div variants={scaleIn} custom={1} className="rounded-2xl bg-white p-4 shadow-card">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-secondary-yellow/25">
-                  <FiGift size={17} className="text-secondary-yellow-dark" />
+              <motion.div
+                variants={scaleIn}
+                custom={1}
+                className="flex flex-col items-start gap-2 rounded-2xl bg-white p-4 text-left shadow-card"
+              >
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-pink/10">
+                  <FiCalendar size={17} className="text-primary-pink" />
                 </div>
-                <div className="mt-2">
-                  <p className="font-poppins text-xs text-text-muted">Loyalty Points</p>
-                  <p className="font-poppins text-2xl font-bold text-text-dark">{loyaltyPoints} pts</p>
+                <div>
+                  <p className="font-poppins text-xs text-text-muted">Member Since</p>
+                  <p className="font-poppins text-2xl font-bold text-text-dark">{memberSinceLabel}</p>
                 </div>
               </motion.div>
             </motion.div>
@@ -985,88 +895,6 @@ export default function ProfilePage() {
                       </button>
                     )}
                   </div>
-                  )}
-                </motion.div>
-              )}
-
-              {activeTab === "baby" && (
-                <motion.div key="baby" {...panelAnim} className="rounded-3xl bg-white p-6 shadow-card">
-                  <div className="mb-5 flex items-center justify-between gap-3">
-                    <h2 className="font-poppins text-xl font-semibold text-text-dark">Baby Details</h2>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowBabyForm((prev) => !prev);
-                        setBabyError("");
-                      }}
-                      className="inline-flex items-center gap-2 rounded-2xl bg-primary-pink/10 px-4 py-2 font-poppins text-sm font-semibold text-primary-pink"
-                    >
-                      <FiPlus size={14} />
-                      Add Another Baby
-                    </button>
-                  </div>
-
-                  {showBabyForm && (
-                    <div className="mb-5 rounded-2xl border border-gray-100 bg-soft-bg p-4">
-                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                        <Field
-                          label="Baby Name"
-                          id="babyName"
-                          placeholder="Enter baby name"
-                          value={babyName}
-                          onChange={setBabyName}
-                        />
-                        <Field
-                          label="Baby Birthday"
-                          id="babyBirthday"
-                          type="date"
-                          placeholder=""
-                          value={babyBirthday}
-                          onChange={setBabyBirthday}
-                        />
-                      </div>
-
-                      {babyError && <p className="mt-3 text-xs text-red-500">{babyError}</p>}
-
-                      <button
-                        type="button"
-                        onClick={handleAddBaby}
-                        disabled={babySaving}
-                        className={cn(
-                          "mt-4 w-full rounded-2xl py-2.5 font-poppins font-semibold text-white shadow-button transition-all",
-                          babySaving ? "bg-gray-300" : "bg-gradient-primary hover:shadow-hover",
-                        )}
-                      >
-                        {babySaving ? "Saving..." : "Save"}
-                      </button>
-                    </div>
-                  )}
-
-                  {babies.length === 0 ? (
-                    <p className="text-sm text-text-muted">No baby details added yet.</p>
-                  ) : (
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                      {babies.map((baby) => (
-                        <div key={baby._id || `${baby.name}-${baby.birthday}`} className="rounded-2xl border border-gray-100 bg-soft-bg p-4">
-                          <div className="flex items-start justify-between gap-3">
-                            <div>
-                              <p className="font-poppins text-base font-semibold text-text-dark">{baby.name}</p>
-                              <p className="mt-1 text-sm text-text-muted">
-                                Birthday: {new Date(baby.birthday).toLocaleDateString()}
-                              </p>
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteBaby(baby._id)}
-                              className="text-red-500 hover:text-red-600"
-                              aria-label="Delete baby"
-                            >
-                              <FiTrash2 size={15} />
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
                   )}
                 </motion.div>
               )}

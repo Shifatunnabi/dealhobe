@@ -30,7 +30,7 @@ export default function OffersPageClient({ offers = [] }: { offers?: any[] }) {
           </nav>
           <ColorfulTitle title="Offers" as="h1" className="text-primary-pink" />
           <p className="mx-auto mt-3 max-w-2xl text-sm text-text-muted md:text-base">
-            Grab limited-time toy offers crafted for joyful play, safer choices, and smart savings for every family.
+            Grab limited-time beauty offers crafted for radiant looks, safer choices, and smart savings for every woman.
           </p>
         </motion.header>
 

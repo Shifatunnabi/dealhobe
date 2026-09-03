@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { FiSlash } from 'react-icons/fi';
 import Link from "next/link";
 
 interface OrderRow {
@@ -34,7 +35,7 @@ export default function CancelledOrdersPage() {
     <div>
       <div className="admin-page-header">
         <div>
-          <h1 className="admin-page-title"><span className="page-icon">🚫</span> Cancelled Orders</h1>
+          <h1 className="admin-page-title"><span className="page-icon"><FiSlash size={20} /></span> Cancelled Orders</h1>
           <p className="admin-page-subtitle">All orders that have been cancelled.</p>
         </div>
       </div>
@@ -46,7 +47,7 @@ export default function CancelledOrdersPage() {
         </div>
       ) : orders.length === 0 ? (
         <div className="admin-empty">
-          <div className="empty-icon">🚫</div>
+          <div className="empty-icon"><FiSlash size={40} /></div>
           <h3>No Cancelled Orders</h3>
           <p>Cancelled orders will appear here.</p>
         </div>

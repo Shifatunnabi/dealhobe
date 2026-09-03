@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect, Suspense } from "react";
+import { useState, useMemo, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
@@ -12,16 +12,16 @@ import {
   FiCheck,
   FiChevronLeft,
   FiChevronRight,
+  FiChevronDown,
   FiPlus,
   FiMinus,
+  FiInbox,
 } from "react-icons/fi";
 import { cn } from "@/lib/utils";
 import { staggerContainer, scaleIn, fadeUp } from "@/components/animations/variants";
 import { useCart } from "@/components/cart/CartProvider";
 
 /* ─── Filter Constants ───────────────────────────────────────── */
-const GENDERS = ["Boys", "Girls"] as const;
-type Gender = (typeof GENDERS)[number] | "";
 const PRICE_MIN = 0;
 const PRICE_MAX = 10000;
 const PER_PAGE = 16;
@@ -193,47 +193,79 @@ function CheckboxOption({
   );
 }
 
-/* ─── Radio Option ───────────────────────────────────────────── */
-function RadioOption({
-  label,
-  checked,
-  onChange,
+/* ─── Category row with its sub-categories nested as a dropdown ────── */
+function CategoryFilterRow({
+  category,
+  subCategories,
+  selectedCategories,
+  selectedSubCategories,
+  onToggleCategory,
+  onToggleSubCategory,
 }: {
-  label: string;
-  checked: boolean;
-  onChange: () => void;
+  category: any;
+  subCategories: any[];
+  selectedCategories: string[];
+  selectedSubCategories: string[];
+  onToggleCategory: (id: string, checked: boolean) => void;
+  onToggleSubCategory: (id: string, checked: boolean) => void;
 }) {
+  const subs = subCategories.filter((s) => s.category === category._id);
+  const hasSelectedSub = subs.some((s) => selectedSubCategories.includes(s._id));
+  const [expanded, setExpanded] = useState(false);
+
+  // Auto-open once if a deep link (e.g. from the navbar flyout) pre-selects
+  // one of this category's sub-categories; never forces it back closed.
+  useEffect(() => {
+    if (hasSelectedSub) setExpanded(true);
+  }, [hasSelectedSub]);
+
   return (
-    <label className="group flex cursor-pointer items-center gap-2.5 py-1.5">
-      <input
-        type="radio"
-        checked={checked}
-        onChange={onChange}
-        className="sr-only"
-      />
-      <div
-        className={cn(
-          "flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 transition-colors duration-150",
-          checked
-            ? "border-primary-pink bg-primary-pink"
-            : "border-gray-300 group-hover:border-primary-pink/60",
-        )}
-      >
-        {checked && (
-          <div className="h-1.5 w-1.5 rounded-full bg-white" />
+    <div>
+      <div className="flex items-center justify-between gap-1">
+        <CheckboxOption
+          label={category.name}
+          checked={selectedCategories.includes(category._id)}
+          onChange={(checked) => onToggleCategory(category._id, checked)}
+        />
+        {subs.length > 0 && (
+          <button
+            type="button"
+            onClick={() => setExpanded((e) => !e)}
+            aria-label={expanded ? `Hide ${category.name} sub-categories` : `Show ${category.name} sub-categories`}
+            aria-expanded={expanded}
+            className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-text-muted transition-colors hover:bg-gray-100 hover:text-primary-pink"
+          >
+            <motion.span animate={{ rotate: expanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
+              <FiChevronDown size={14} />
+            </motion.span>
+          </button>
         )}
       </div>
-      <span
-        className={cn(
-          "text-sm transition-colors",
-          checked
-            ? "font-semibold text-text-dark"
-            : "text-text-muted group-hover:text-text-dark",
-        )}
-      >
-        {label}
-      </span>
-    </label>
+      {subs.length > 0 && (
+        <AnimatePresence initial={false}>
+          {expanded && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+              className="overflow-hidden"
+            >
+              <div className="ml-3 border-l border-gray-100 pl-3">
+                {subs.map((sub) => (
+                  <CheckboxOption
+                    key={sub._id}
+                    label={sub.name}
+                    checked={selectedSubCategories.includes(sub._id)}
+                    onChange={(checked) => onToggleSubCategory(sub._id, checked)}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      )}
+    </div>
   );
 }
 
@@ -439,8 +471,8 @@ function Pagination({
 function EmptyState({ onClear }: { onClear: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center py-24 text-center">
-      <span className="mb-4 text-6xl">🧸</span>
-      <h3 className="text-card-title mb-2 text-text-dark">No toys found</h3>
+      <FiInbox size={56} className="mb-4 text-primary-pink/40" />
+      <h3 className="text-card-title mb-2 text-text-dark">No products found</h3>
       <p className="text-small mb-6 text-text-muted">
         Try adjusting your filters to discover something fun!
       </p>
@@ -457,7 +489,7 @@ function EmptyState({ onClear }: { onClear: () => void }) {
 /* ─── Main Page ──────────────────────────────────────────────── */
 export default function ProductsPageClient({
   categories = [],
-  ages = [],
+  subCategories = [],
   brands = [],
   products = [],
   offers = [],
@@ -465,7 +497,7 @@ export default function ProductsPageClient({
   searchQuery,
 }: {
   categories?: any[];
-  ages?: any[];
+  subCategories?: any[];
   brands?: any[];
   products?: any[];
   offers?: any[];
@@ -490,15 +522,13 @@ export default function ProductsPageClient({
   }, [brands]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [initialized, setInitialized] = useState(false);
   const [autoOpenedFilters, setAutoOpenedFilters] = useState(false);
   const expandCategories = searchParams.get("expand") === "categories";
   const offerFromUrl = offerParam ?? searchParams.get("offer");
 
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedAges, setSelectedAges] = useState<string[]>([]);
+  const [selectedSubCategories, setSelectedSubCategories] = useState<string[]>([]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
-  const [selectedGender, setSelectedGender] = useState<Gender>("");
   const [selectedOffer, setSelectedOffer] = useState<string | null>(null);
   const [priceRange, setPriceRange] = useState<[number, number]>([
     PRICE_MIN,
@@ -506,34 +536,49 @@ export default function ProductsPageClient({
   ]);
   const [currentPage, setCurrentPage] = useState(1);
 
-  /* Initialise filters from URL search params (runs once after mount) */
+  /*
+   * Re-sync filters from URL search params whenever the query string actually
+   * changes — not just on first mount. When already on /products, clicking a
+   * different category from the navbar sidebar updates the URL without
+   * remounting this component, so a mount-only effect would miss it (the
+   * previous filter would stay applied until a hard refresh). Guarded on the
+   * query string itself (not object identity) so manual checkbox toggles,
+   * which never touch the URL, are never clobbered by this effect re-running.
+   */
+  const searchParamsString = searchParams.toString();
+  const lastSyncedParams = useRef<string | null>(null);
   useEffect(() => {
-    if (initialized) return;
-    const gender = searchParams.get("gender");
-    const age = searchParams.get("age");
+    if (lastSyncedParams.current === searchParamsString) return;
+    lastSyncedParams.current = searchParamsString;
+
     const category = searchParams.get("category");
+    const subcategory = searchParams.get("subcategory");
     const brand = searchParams.get("brand");
     const initOfferId = searchParams.get("offer"); // expecting an Offer ID from URL
 
-    if (gender && (GENDERS as readonly string[]).includes(gender)) setSelectedGender(gender as Gender);
-    if (age) setSelectedAges([age]);
     if (category) {
       const matchedCat = categories.find(
         (c) => c.name.toLowerCase() === category.toLowerCase()
       );
       setSelectedCategories([matchedCat?._id || category]);
+    } else {
+      setSelectedCategories([]);
     }
+
+    setSelectedSubCategories(subcategory ? [subcategory] : []);
+
     if (brand) {
       const matchedBrand = brands.find(
         (b) => b._id === brand || b.name === brand,
       );
       setSelectedBrands([matchedBrand?._id || brand]);
+    } else {
+      setSelectedBrands([]);
     }
-    if (offerFromUrl) setSelectedOffer(offerFromUrl);
-    else if (initOfferId) setSelectedOffer(initOfferId);
 
-    setInitialized(true);
-  }, [searchParams, initialized, offerFromUrl, brands]);
+    setSelectedOffer(offerFromUrl ?? initOfferId ?? null);
+    setCurrentPage(1);
+  }, [searchParamsString, searchParams, offerFromUrl, categories, brands]);
 
   /* Responsive detection */
   useEffect(() => {
@@ -575,7 +620,6 @@ export default function ProductsPageClient({
           categoryName,
           brandName,
           brandId,
-          p.toysFor,
         ]
           .filter(Boolean)
           .map((value) => String(value).toLowerCase())
@@ -601,29 +645,27 @@ export default function ProductsPageClient({
         !selectedCategories.includes(p.category)
       )
         return false;
-      if (selectedAges.length > 0 && !selectedAges.includes(p.ageRange))
+      if (
+        selectedSubCategories.length > 0 &&
+        !selectedSubCategories.includes(p.subCategory)
+      )
         return false;
       if (
         selectedBrands.length > 0 &&
         !selectedBrands.some((selected) => selected === brandId || selected === brandName)
       )
         return false;
-        
+
       const pPrice = p.salePrice || p.price;
       if (pPrice < priceRange[0] || pPrice > priceRange[1]) return false;
-      
-      // Gender filter
-      if (selectedGender !== "" && p.toysFor !== 'both') {
-          if (selectedGender.toLowerCase() !== p.toysFor) return false;
-      }
+
       return true;
     });
   }, [
     selectedCategories,
-    selectedAges,
+    selectedSubCategories,
     selectedBrands,
     priceRange,
-    selectedGender,
     selectedOffer,
     products,
     offers,
@@ -640,27 +682,24 @@ export default function ProductsPageClient({
 
   const hasFilters =
     selectedCategories.length > 0 ||
-    selectedAges.length > 0 ||
+    selectedSubCategories.length > 0 ||
     selectedBrands.length > 0 ||
     selectedOffer !== null ||
-    selectedGender !== "" ||
     priceRange[0] > PRICE_MIN ||
     priceRange[1] < PRICE_MAX;
 
   const activeFilterCount =
     selectedCategories.length +
-    selectedAges.length +
+    selectedSubCategories.length +
     selectedBrands.length +
     (selectedOffer !== null ? 1 : 0) +
-    (selectedGender !== "" ? 1 : 0) +
     (priceRange[0] > PRICE_MIN || priceRange[1] < PRICE_MAX ? 1 : 0);
 
   const resetFilters = () => {
     setSelectedCategories([]);
-    setSelectedAges([]);
+    setSelectedSubCategories([]);
     setSelectedBrands([]);
     setSelectedOffer(null);
-    setSelectedGender("");
     setPriceRange([PRICE_MIN, PRICE_MAX]);
     setCurrentPage(1);
   };
@@ -677,9 +716,9 @@ export default function ProductsPageClient({
     setCurrentPage(1);
   };
 
-  const toggleAge = (age: string, checked: boolean) => {
-    setSelectedAges((prev) =>
-      checked ? [...prev, age] : prev.filter((x) => x !== age),
+  const toggleSubCategory = (subCat: string, checked: boolean) => {
+    setSelectedSubCategories((prev) =>
+      checked ? [...prev, subCat] : prev.filter((x) => x !== subCat),
     );
     setCurrentPage(1);
   };
@@ -712,47 +751,6 @@ export default function ProductsPageClient({
         <hr className="border-gray-100" />
       </div>
 
-      {/* Gender */}
-      <FilterSection title="Shop For" defaultOpen>
-        <div className="flex flex-wrap gap-x-4">
-          {GENDERS.map((g) => (
-            <RadioOption
-              key={g}
-              label={g}
-              checked={selectedGender === g}
-              onChange={() => {
-                setSelectedGender((prev) => (prev === g ? "" : g));
-                setCurrentPage(1);
-              }}
-            />
-          ))}
-        </div>
-      </FilterSection>
-
-      {/* Categories */}
-      <FilterSection title="Categories" defaultOpen={expandCategories}>
-        {categories.map((cat) => (
-          <CheckboxOption
-            key={cat._id}
-            label={cat.name}
-            checked={selectedCategories.includes(cat._id)}
-            onChange={(checked) => toggleCategory(cat._id, checked)}
-          />
-        ))}
-      </FilterSection>
-
-      {/* Age Group */}
-      <FilterSection title="Age Group">
-        {ages.map((age) => (
-          <CheckboxOption
-            key={age._id}
-            label={`${age.label} yrs`}
-            checked={selectedAges.includes(age._id)}
-            onChange={(checked) => toggleAge(age._id, checked)}
-          />
-        ))}
-      </FilterSection>
-
       {/* Price Range */}
       <FilterSection title="Price Range" collapsible={false}>
         <PriceRangeSlider
@@ -762,6 +760,21 @@ export default function ProductsPageClient({
             setCurrentPage(1);
           }}
         />
+      </FilterSection>
+
+      {/* Categories — each row's sub-categories nest inside it as a dropdown */}
+      <FilterSection title="Categories" defaultOpen>
+        {categories.map((cat) => (
+          <CategoryFilterRow
+            key={cat._id}
+            category={cat}
+            subCategories={subCategories}
+            selectedCategories={selectedCategories}
+            selectedSubCategories={selectedSubCategories}
+            onToggleCategory={toggleCategory}
+            onToggleSubCategory={toggleSubCategory}
+          />
+        ))}
       </FilterSection>
 
       {/* Brands */}
@@ -816,7 +829,7 @@ export default function ProductsPageClient({
           </Link>
           <FiChevronRight size={12} />
           <span className="font-semibold text-text-dark">
-            {normalizedSearch ? "Search Results" : "All Toys"}
+            {normalizedSearch ? "Search Results" : "All Products"}
           </span>
         </nav>
 
@@ -828,7 +841,7 @@ export default function ProductsPageClient({
               normalizedSearch ? "text-primary-pink" : "text-text-dark",
             )}
           >
-            {normalizedSearch ? "Search Results" : "All Toys"}{" "}
+            {normalizedSearch ? "Search Results" : "All Products"}{" "}
             <span className="font-poppins text-xl font-normal text-text-muted">
               ({filteredProducts.length} items)
             </span>
@@ -870,19 +883,6 @@ export default function ProductsPageClient({
               exit={{ opacity: 0, y: -8 }}
               className="mt-4 flex flex-wrap items-center justify-center gap-2"
             >
-              {selectedGender && (
-                <span
-                  className="flex items-center gap-1.5 rounded-full border border-primary-pink/30 bg-white px-3 py-1 text-xs font-semibold text-text-dark shadow-soft"
-                >
-                  {selectedGender}
-                  <button
-                    onClick={() => setSelectedGender("")}
-                    className="text-text-muted hover:text-primary-pink"
-                  >
-                    <FiX size={11} />
-                  </button>
-                </span>
-              )}
               {selectedCategories.map((cId) => (
                 <span
                   key={cId}
@@ -892,6 +892,22 @@ export default function ProductsPageClient({
                   <button
                     onClick={() =>
                       setSelectedCategories((p) => p.filter((x) => x !== cId))
+                    }
+                    className="text-text-muted hover:text-primary-pink"
+                  >
+                    <FiX size={11} />
+                  </button>
+                </span>
+              ))}
+              {selectedSubCategories.map((scId) => (
+                <span
+                  key={scId}
+                  className="flex items-center gap-1.5 rounded-full border border-primary-pink/30 bg-white px-3 py-1 text-xs font-semibold text-text-dark shadow-soft"
+                >
+                  {subCategories.find(s => s._id === scId)?.name || 'Sub Category'}
+                  <button
+                    onClick={() =>
+                      setSelectedSubCategories((p) => p.filter((x) => x !== scId))
                     }
                     className="text-text-muted hover:text-primary-pink"
                   >
@@ -910,22 +926,6 @@ export default function ProductsPageClient({
                   </button>
                 </span>
               )}
-              {selectedAges.map((aId) => (
-                <span
-                  key={aId}
-                  className="flex items-center gap-1.5 rounded-full border border-primary-pink/30 bg-white px-3 py-1 text-xs font-semibold text-text-dark shadow-soft"
-                >
-                  {ages.find(a => a._id === aId)?.label} yrs
-                  <button
-                    onClick={() =>
-                      setSelectedAges((p) => p.filter((x) => x !== aId))
-                    }
-                    className="text-text-muted hover:text-primary-pink"
-                  >
-                    <FiX size={11} />
-                  </button>
-                </span>
-              ))}
               {selectedBrands.map((bId) => (
                 <span
                   key={bId}
@@ -1012,7 +1012,7 @@ export default function ProductsPageClient({
             <EmptyState onClear={resetFilters} />
           ) : (
             <motion.div
-              key={`page-${currentPage}-${selectedGender}-${selectedOffer ?? ""}-${selectedCategories.join()}-${selectedAges.join()}-${selectedBrands.join()}-${priceRange.join()}`}
+              key={`page-${currentPage}-${selectedOffer ?? ""}-${selectedCategories.join()}-${selectedSubCategories.join()}-${selectedBrands.join()}-${priceRange.join()}`}
               variants={staggerContainer}
               initial="hidden"
               animate="visible"

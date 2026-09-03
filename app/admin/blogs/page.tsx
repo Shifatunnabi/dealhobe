@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
+import { FiFileText, FiEdit2, FiTrash2, FiPlus, FiX } from 'react-icons/fi';
+import { FaStar, FaRegStar } from 'react-icons/fa';
 import ImageUpload from '@/components/admin/ImageUpload';
 
 // Tiptap must be client-side only
@@ -84,7 +86,7 @@ export default function BlogsPage() {
     <div>
       <div className="admin-page-header">
         <div>
-          <h1 className="admin-page-title"><span className="page-icon">📝</span> Blogs</h1>
+          <h1 className="admin-page-title"><span className="page-icon"><FiFileText size={20} /></span> Blogs</h1>
           <p className="admin-page-subtitle">Write, publish, and manage blog posts for your customers.</p>
         </div>
         <button id="add-blog-btn" className="btn-admin-primary" onClick={openAdd}>+ Add New Blog</button>
@@ -94,7 +96,7 @@ export default function BlogsPage() {
         <div className="admin-empty"><div className="spinner" style={{ margin: '0 auto 1rem' }} /><p>Loading…</p></div>
       ) : blogs.length === 0 ? (
         <div className="admin-empty">
-          <div className="empty-icon">📝</div>
+          <div className="empty-icon"><FiFileText size={40} /></div>
           <h3>No Blog Posts Yet</h3>
           <p>Click "Add New Blog" to publish your first post.</p>
         </div>
@@ -109,7 +111,9 @@ export default function BlogsPage() {
                   <Image src={b.imageUrl} alt={b.title} fill style={{ objectFit: 'cover' }} />
                   <span className="blog-card-cat">{b.category}</span>
                   {b.isFeatured && (
-                    <span style={{ position: 'absolute', top: 8, right: 8, background: '#FFD93D', color: '#7a5c00', fontSize: '0.65rem', fontWeight: 700, padding: '0.2rem 0.5rem', borderRadius: '20px' }}>⭐ Featured</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', position: 'absolute', top: 8, right: 8, background: '#FFD93D', color: '#7a5c00', fontSize: '0.65rem', fontWeight: 700, padding: '0.2rem 0.5rem', borderRadius: '20px' }}>
+                      <FaStar size={10} /> Featured
+                    </span>
                   )}
                 </div>
                 <div className="blog-card-body">
@@ -118,15 +122,15 @@ export default function BlogsPage() {
                   <div className="blog-card-excerpt">{excerpt}{excerpt.length >= 160 ? '…' : ''}</div>
                   <div className="blog-card-footer">
                     <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                      <button className="btn-admin-edit"   onClick={() => openEdit(b)}>✏️ Edit</button>
-                      <button className="btn-admin-danger" onClick={() => handleDelete(b._id)}>🗑️</button>
+                      <button className="btn-admin-edit"   onClick={() => openEdit(b)}><FiEdit2 size={13} /> Edit</button>
+                      <button className="btn-admin-danger" aria-label="Delete" onClick={() => handleDelete(b._id)}><FiTrash2 size={13} /></button>
                     </div>
                     <button
                       className={b.isFeatured ? 'btn-admin-success' : 'btn-admin-secondary'}
                       onClick={() => toggleFeatured(b)}
-                      style={{ fontSize: '0.75rem' }}
+                      style={{ fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}
                     >
-                      {b.isFeatured ? '⭐ Featured' : '☆ Feature'}
+                      {b.isFeatured ? <FaStar size={12} /> : <FaRegStar size={12} />} {b.isFeatured ? 'Featured' : 'Feature'}
                     </button>
                   </div>
                 </div>
@@ -141,8 +145,10 @@ export default function BlogsPage() {
         <div className="modal-overlay">
           <div className="modal-box modal-lg">
             <div className="modal-header">
-              {editing ? '✏️ Edit Blog Post' : '➕ Write New Blog Post'}
-              <button className="modal-close" onClick={() => setModal(false)}>✕</button>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                {editing ? <FiEdit2 size={16} /> : <FiPlus size={16} />} {editing ? 'Edit Blog Post' : 'Write New Blog Post'}
+              </span>
+              <button className="modal-close" onClick={() => setModal(false)}><FiX size={16} /></button>
             </div>
             <div className="modal-body">
               <div className="admin-form">
@@ -161,7 +167,7 @@ export default function BlogsPage() {
                   <div className="admin-field" style={{ justifyContent: 'flex-end', paddingBottom: 6 }}>
                     <label className="admin-checkbox-row" style={{ marginTop: 'auto' }}>
                       <input type="checkbox" className="admin-checkbox" checked={form.isFeatured} onChange={e => setForm(f => ({ ...f, isFeatured: e.target.checked }))} />
-                      <span className="admin-label">⭐ Feature this blog on homepage</span>
+                      <span className="admin-label" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}><FaStar size={12} /> Feature this blog on homepage</span>
                     </label>
                   </div>
                 </div>

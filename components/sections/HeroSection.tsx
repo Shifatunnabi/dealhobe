@@ -105,44 +105,39 @@ export default function HeroSection({ slides = [] }: { slides?: any[] }) {
             <div className="absolute inset-0">
               <Image
                 src={slide.imageUrl || slide.image}
-                alt={slide.title}
+                alt={slide.ctaText || "Hero slide"}
                 fill
                 className="object-cover"
                 priority
                 sizes="100vw"
               />
             </div>
-
-            {/* Gradient + text overlay */}
-            <div className="absolute inset-x-0 bottom-0 h-2/3 bg-linear-to-t from-black/65 via-black/20 to-transparent pointer-events-none z-[5]" />
-            <div className="absolute inset-0 flex z-10 items-end px-6 pb-14 md:px-12 md:pb-16">
-              <div className="w-full max-w-xl">
-                <h1 className="text-hero-title font-semibold text-white uppercase" style={{ whiteSpace: 'pre-line' }}>
-                  {slide.title}
-                </h1>
-                {slide.subtitle && (
-                  <p className="mt-4 text-sm text-gray-200 md:text-base">{slide.subtitle}</p>
-                )}
-                <div className="mt-6 md:mt-8">
-                  <Link href={slide.ctaLink || "/products"}>
-                    <motion.span
-                      whileHover={{ scale: 1.04, y: -2 }}
-                      whileTap={{ scale: 0.96 }}
-                      transition={{ duration: 0.2, ease: [0.34, 1.56, 0.64, 1] }}
-                      className="inline-flex items-center gap-2 rounded-2xl bg-primary-pink px-7 py-3.5 font-poppins text-base font-semibold text-white shadow-button transition-shadow hover:shadow-hover cursor-pointer"
-                    >
-                      {slide.ctaText || "Shop Now"}
-                      <FiChevronRight size={18} />
-                    </motion.span>
-                  </Link>
-                </div>
-              </div>
-            </div>
           </motion.div>
         </AnimatePresence>
 
-        {/* Dots overlaid on image */}
+        {/* CTA button — sits where the dots used to, centred at the foot of the card */}
         <div className="absolute bottom-5 left-0 right-0 flex items-center justify-center z-10 md:bottom-8">
+          <Link href={slide.ctaLink || "/products"}>
+            <motion.span
+              whileHover={{ scale: 1.04, y: -2 }}
+              whileTap={{ scale: 0.96 }}
+              transition={{ duration: 0.2, ease: [0.34, 1.56, 0.64, 1] }}
+              style={{
+                backgroundColor: slide.ctaColor || "#A41B15",
+                color:           slide.ctaTextColor || "#FFFFFF",
+              }}
+              className="inline-flex items-center gap-2 rounded-2xl px-7 py-3.5 font-poppins text-base font-semibold shadow-button transition-shadow hover:shadow-hover cursor-pointer"
+            >
+              {slide.ctaText || "Shop Now"}
+              <FiChevronRight size={18} />
+            </motion.span>
+          </Link>
+        </div>
+      </div>
+
+      {/* Dots — below the card */}
+      {validSlides.length > 1 && (
+        <div className="mt-4 flex items-center justify-center">
           <div className="flex items-center gap-2">
             {validSlides.map((_, i) => (
               <button
@@ -154,7 +149,7 @@ export default function HeroSection({ slides = [] }: { slides?: any[] }) {
                 <motion.span
                   animate={{
                     width:           i === current ? 28 : 8,
-                    backgroundColor: i === current ? "#550000" : "rgba(255,255,255,0.4)",
+                    backgroundColor: i === current ? "#A41B15" : "rgba(164, 27, 21, 0.25)",
                   }}
                   transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
                   className="block h-2 rounded-full"
@@ -163,7 +158,7 @@ export default function HeroSection({ slides = [] }: { slides?: any[] }) {
             ))}
           </div>
         </div>
-      </div>
+      )}
     </section>
   );
 }

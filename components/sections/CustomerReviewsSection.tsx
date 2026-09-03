@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useInView } from "framer-motion";
 import { fadeUp, staggerContainer } from "@/components/animations/variants";
 import { FiUser } from "react-icons/fi";
-import { ColorfulTitle } from "@/components/ui";
+import SectionHeader from "./SectionHeader";
 
 
 function ReviewCard({ name, text }: { name: string; text: string }) {
@@ -75,10 +75,8 @@ export default function CustomerReviewsSection({ reviews = [] }: { reviews?: any
   if (!validReviews.length) {
     return (
       <section className="w-full bg-soft-bg px-section py-section">
-        <div className="mx-auto max-w-7xl text-center">
-          <div className="mb-4 text-center">
-            <ColorfulTitle title="Customer Reviews" />
-          </div>
+        <div className="mx-auto max-w-7xl">
+          <SectionHeader title="Customer Reviews" />
           <p className="text-sm text-text-muted">No customer reviews yet.</p>
         </div>
       </section>
@@ -94,8 +92,8 @@ export default function CustomerReviewsSection({ reviews = [] }: { reviews?: any
         whileInView="visible"
         viewport={{ once: true, margin: "-60px 0px" }}
       >
-        <motion.div variants={fadeUp} className="mb-8 text-center">
-          <ColorfulTitle title="Customer Reviews" />
+        <motion.div variants={fadeUp}>
+          <SectionHeader title="Customer Reviews" />
         </motion.div>
 
         {/* Desktop: imperative CSS slide */}

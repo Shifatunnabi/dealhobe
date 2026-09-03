@@ -86,7 +86,6 @@ export async function POST(req: NextRequest) {
         area: defaultAddress?.area || existing.area,
         address: defaultAddress?.fullAddress || existing.address,
         addresses,
-        babies: existing.babies || [],
       },
     });
   }
@@ -100,7 +99,6 @@ export async function POST(req: NextRequest) {
     address,
     passwordHash,
     addresses: [{ label: "home", fullAddress: address, area, isDefault: true }],
-    babies: [],
   });
 
   const authToken = signCustomerToken({
@@ -124,7 +122,6 @@ export async function POST(req: NextRequest) {
       area: defaultAddress?.area || user.area,
       address: defaultAddress?.fullAddress || user.address,
       addresses,
-      babies: user.babies || [],
     },
   });
 }

@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import connectDB from '@/lib/mongodb';
 import Category from '@/lib/models/Category';
+import SubCategory from '@/lib/models/SubCategory';
 import { deleteImage } from '@/lib/cloudinary';
 
 export async function GET() {
@@ -18,7 +19,7 @@ export async function POST(req: NextRequest) {
   await connectDB();
   const body     = await req.json();
   const category = await Category.create(body);
-  revalidateTag('categories', {});
+  revalidateTag('categories', { expire: 0 });
   revalidatePath('/');
   revalidatePath('/products');
   return NextResponse.json(category, { status: 201 });
@@ -31,7 +32,7 @@ export async function PUT(req: NextRequest) {
   await connectDB();
   const { id, ...data } = await req.json();
   const updated = await Category.findByIdAndUpdate(id, data, { new: true });
-  revalidateTag('categories', {});
+  revalidateTag('categories', { expire: 0 });
   revalidatePath('/');
   revalidatePath('/products');
   return NextResponse.json(updated);
@@ -45,7 +46,8 @@ export async function DELETE(req: NextRequest) {
   const { id }     = await req.json();
   const category   = await Category.findByIdAndDelete(id);
   if (category?.imagePublicId) await deleteImage(category.imagePublicId);
-  revalidateTag('categories', {});
+  await SubCategory.deleteMany({ category: id });
+  revalidateTag('categories', { expire: 0 });
   revalidatePath('/');
   revalidatePath('/products');
   return NextResponse.json({ success: true });

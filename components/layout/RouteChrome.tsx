@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import Footer from "@/components/layout/Footer";
 import FloatingSocial from "@/components/floating/FloatingSocial";
+import FloatingCart from "@/components/floating/FloatingCart";
 
 export default function RouteChrome() {
   const pathname = usePathname();
@@ -12,6 +13,7 @@ export default function RouteChrome() {
 
   return (
     <>
+      <FloatingCart />
       <FloatingSocial />
       <Footer />
     </>

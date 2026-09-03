@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
   await connectDB();
   const body  = await req.json();
   const slide = await HeroSlide.create(body);
-  revalidateTag('hero', {});
+  revalidateTag('hero', { expire: 0 });
   revalidatePath('/');
   return NextResponse.json(slide, { status: 201 });
 }
@@ -30,7 +30,7 @@ export async function PUT(req: NextRequest) {
   await connectDB();
   const { id, ...data } = await req.json();
   const updated = await HeroSlide.findByIdAndUpdate(id, data, { new: true });
-  revalidateTag('hero', {});
+  revalidateTag('hero', { expire: 0 });
   revalidatePath('/');
   return NextResponse.json(updated);
 }
@@ -43,7 +43,7 @@ export async function DELETE(req: NextRequest) {
   const { id }   = await req.json();
   const slide    = await HeroSlide.findByIdAndDelete(id);
   if (slide?.imagePublicId) await deleteImage(slide.imagePublicId);
-  revalidateTag('hero', {});
+  revalidateTag('hero', { expire: 0 });
   revalidatePath('/');
   return NextResponse.json({ success: true });
 }
