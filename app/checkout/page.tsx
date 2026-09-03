@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiChevronRight, FiLock, FiCheck, FiAlertCircle, FiMapPin } from "react-icons/fi";
+import { FiChevronRight, FiLock, FiCheck, FiAlertCircle, FiMapPin, FiShoppingCart } from "react-icons/fi";
 import { cn } from "@/lib/utils";
 import { fadeUp } from "@/components/animations/variants";
 import { ColorfulTitle } from "@/components/ui";
@@ -381,7 +381,7 @@ export default function CheckoutPage() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
         >
-          <span className="text-6xl">🛒</span>
+          <FiShoppingCart size={48} className="text-primary-pink/40" />
           <h2 className="mt-5 font-poppins text-2xl font-bold text-text-dark">
             Your cart is empty
           </h2>
@@ -775,8 +775,9 @@ export default function CheckoutPage() {
                 Confirm Purchase
               </motion.button>
 
-              <p className="mt-3 text-center font-poppins text-xs text-text-muted">
-                🔒 Secure &amp; encrypted checkout
+              <p className="mt-3 flex items-center justify-center gap-1.5 text-center font-poppins text-xs text-text-muted">
+                <FiLock size={12} className="shrink-0" />
+                Secure &amp; encrypted checkout
               </p>
             </motion.div>
           </div>

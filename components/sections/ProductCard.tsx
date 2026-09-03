@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { motion } from "framer-motion";
 import { FiShoppingCart, FiCheck } from "react-icons/fi";
 import { scaleIn } from "@/components/animations/variants";
 import { cn } from "@/lib/utils";
 import { useOptionalCart } from "@/components/cart/CartProvider";
+import FadeImage from "@/components/ui/FadeImage";
 
 export interface GridProduct {
   _id: string;
@@ -61,7 +61,7 @@ export default function ProductCard({ product, index }: { product: GridProduct; 
       <Link href={`/product/${product.slug}`} className="flex flex-1 flex-col">
         <div className="p-3 pb-0">
           <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-gray-50">
-            <Image
+            <FadeImage
               src={product.images?.[0] || "/placeholder.png"}
               alt={product.name}
               fill

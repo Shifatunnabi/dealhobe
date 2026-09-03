@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { FiFacebook, FiYoutube, FiMail, FiPhone, FiMapPin } from "react-icons/fi";
+import { FiFacebook, FiYoutube, FiMail, FiPhone, FiMapPin, FiShield } from "react-icons/fi";
 
 const QUICK_LINKS = [
   { label: "Home", href: "/" },
@@ -56,14 +56,12 @@ export default function Footer() {
             {/* Social icons */}
             <div className="mt-5 flex items-center gap-3">
               {[
-                { icon: FiFacebook, href: "https://www.facebook.com/people/DealHobe/61586803048218/?mibextid=wwXIfr&rdid=TgrQrd2ZmYJd8ZO7&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1Gw29e9PZL%2F%3Fmibextid%3DwwXIfr", label: "Facebook" },
-                { icon: FiYoutube,  href: "https://youtube.com/@dealhobebd",   label: "YouTube"   },
+                { icon: FiFacebook, href: "#", label: "Facebook" },
+                { icon: FiYoutube,  href: "#", label: "YouTube"   },
               ].map(({ icon: Icon, href, label }) => (
                 <a
                   key={label}
                   href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
                   aria-label={label}
                   className="flex h-9 w-9 items-center justify-center rounded-2xl bg-white/10 text-text-light/70 transition-all hover:bg-primary-pink hover:text-white"
                 >
@@ -122,7 +120,10 @@ export default function Footer() {
 
             {/* Trust badge */}
             <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-              <p className="font-poppins text-sm font-semibold text-primary-pink">🛡️ Secure Shopping</p>
+              <p className="flex items-center gap-1.5 font-poppins text-sm font-semibold text-primary-pink">
+                <FiShield size={15} className="shrink-0" />
+                Secure Shopping
+              </p>
               <p className="font-poppins text-xs text-text-light/50 mt-0.5">SSL encrypted · COD available</p>
             </div>
           </div>

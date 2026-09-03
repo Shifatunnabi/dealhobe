@@ -97,38 +97,40 @@ export default function NavSearchOverlay({ onClose }: { onClose: () => void }) {
 
       <form
         onSubmit={handleSubmit}
-        className="flex h-full w-full items-center gap-3 px-4 md:mx-auto md:w-[90%] md:max-w-[1400px]"
+        className="flex h-full w-full items-center px-4 md:mx-auto md:w-[90%] md:max-w-[1400px]"
       >
-        <FiSearch size={18} className="shrink-0 text-text-muted" />
-        <input
-          ref={inputRef}
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search products..."
-          className="w-full bg-transparent font-poppins text-sm text-text-dark outline-none placeholder:text-text-muted md:text-base"
-          autoComplete="off"
-        />
-        {query && (
+        <div className="flex w-full items-center gap-3 rounded-2xl bg-soft-bg px-4 py-2.5">
+          <FiSearch size={18} className="shrink-0 text-text-muted" />
+          <input
+            ref={inputRef}
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search products..."
+            className="w-full bg-transparent font-poppins text-sm text-text-dark outline-none placeholder:text-text-muted md:text-base"
+            autoComplete="off"
+          />
+          {query && (
+            <button
+              type="button"
+              onClick={() => {
+                setQuery("");
+                inputRef.current?.focus();
+              }}
+              className="shrink-0 font-poppins text-sm font-medium text-primary-pink hover:underline"
+            >
+              Clear
+            </button>
+          )}
           <button
             type="button"
-            onClick={() => {
-              setQuery("");
-              inputRef.current?.focus();
-            }}
-            className="shrink-0 font-poppins text-sm font-medium text-primary-pink hover:underline"
+            onClick={onClose}
+            aria-label="Close search"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-text-muted transition-colors hover:bg-black/5 hover:text-text-dark"
           >
-            Clear
+            <FiX size={18} />
           </button>
-        )}
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Close search"
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-text-muted transition-colors hover:bg-black/5 hover:text-text-dark"
-        >
-          <FiX size={18} />
-        </button>
+        </div>
       </form>
 
       {showPanel && (

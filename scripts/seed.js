@@ -274,7 +274,7 @@ async function seedOrders(productsBySlug, customersByEmail) {
     const placedAt = daysAgo(o.daysAgo);
 
     // Deterministic order number so re-runs update the same order.
-    const orderNumber = `JT${String(i + 1).padStart(4, '0')}SEED`;
+    const orderNumber = `DH${String(i + 1).padStart(4, '0')}SEED`;
 
     await upsert('orders', { orderNumber }, {
       orderNumber,

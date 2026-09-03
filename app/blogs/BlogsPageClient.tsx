@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiChevronRight, FiChevronLeft, FiClock, FiUser } from "react-icons/fi";
+import { FiChevronRight, FiChevronLeft, FiClock, FiUser, FiBookOpen } from "react-icons/fi";
 import { cn } from "@/lib/utils";
 import { fadeUp, staggerContainer, scaleIn } from "@/components/animations/variants";
 import { ColorfulTitle } from "@/components/ui";
@@ -213,9 +213,9 @@ export default function BlogsPageClient({ blogs = [] }: { blogs?: any[] }) {
             <FiChevronRight size={12} />
             <span className="font-semibold text-text-dark">Blogs</span>
           </nav>
-          <ColorfulTitle title="Joy & Play Stories" as="h1" className="text-primary-pink" />
+          <ColorfulTitle title="Beauty & Skincare Journal" as="h1" className="text-primary-pink" />
           <p className="mt-2 font-poppins text-sm text-text-muted max-w-md mx-auto">
-            Tips, ideas, and inspiration for parents raising happy, curious kids.
+            Tips, guides, and honest reviews to help you get the most out of your beauty routine.
           </p>
         </motion.div>
 
@@ -314,7 +314,7 @@ export default function BlogsPageClient({ blogs = [] }: { blogs?: any[] }) {
               exit={{ opacity: 0 }}
               className="flex flex-col items-center gap-4 py-24 text-center"
             >
-              <span className="text-6xl">📖</span>
+              <FiBookOpen size={56} className="text-primary-pink/40" />
               <p className="font-poppins text-xl text-text-muted">No articles in this category yet.</p>
               <button
                 onClick={() => handleCategory("All")}

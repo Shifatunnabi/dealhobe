@@ -102,7 +102,7 @@ export async function POST(req: NextRequest) {
   const total = subtotal + deliveryCharge;
 
   const orderId = new mongoose.Types.ObjectId();
-  const orderNumber = `JT${orderId.toString().slice(-8).toUpperCase()}`;
+  const orderNumber = `DH${orderId.toString().slice(-8).toUpperCase()}`;
 
   const order = await Order.create({
     _id: orderId,

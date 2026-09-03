@@ -17,6 +17,7 @@ import {
   FiPlus,
   FiTrash2,
   FiCalendar,
+  FiSlash,
 } from "react-icons/fi";
 import { cn } from "@/lib/utils";
 import { fadeUp, staggerContainer, scaleIn } from "@/components/animations/variants";
@@ -498,7 +499,7 @@ export default function ProfilePage() {
         <div className="mx-auto max-w-md px-section text-center">
           <div className="rounded-3xl bg-white p-10 shadow-card">
             <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-red-50">
-              <span className="text-4xl">🚫</span>
+              <FiSlash size={32} className="text-red-400" />
             </div>
             <h1 className="mb-3 font-poppins text-2xl font-bold text-text-dark">
               Account Banned

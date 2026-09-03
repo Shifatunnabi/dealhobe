@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView as useFramerInView } from "framer-motion";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { cn } from "@/lib/utils";
 import SectionHeader from "./SectionHeader";
+import FadeImage from "@/components/ui/FadeImage";
 
 /* ── Brand data ──────────────────────────────────────────────── */
 const BRANDS = [
@@ -31,7 +31,7 @@ function BrandCard({ id, name, logo }: { id?: string; name: string; logo: string
         className="group block"
       >
         <div className="relative aspect-square overflow-hidden rounded-2xl border border-primary-pink/15 bg-white shadow-card transition-shadow duration-300 group-hover:shadow-hover">
-          <Image
+          <FadeImage
             src={resolvedLogo}
             alt={name}
             fill

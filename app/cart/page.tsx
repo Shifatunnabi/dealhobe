@@ -95,7 +95,7 @@ export default function CartPage() {
             animate="visible"
             variants={fadeUp}
           >
-            <span className="text-7xl">🛒</span>
+            <FiShoppingCart size={56} className="text-primary-pink/40" />
             <p className="font-poppins text-xl text-text-muted">
               Nothing here yet — time to start shopping!
             </p>

@@ -3,7 +3,6 @@
 import { useState, useMemo, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FiFilter,
@@ -20,6 +19,7 @@ import {
 import { cn } from "@/lib/utils";
 import { staggerContainer, scaleIn, fadeUp } from "@/components/animations/variants";
 import { useCart } from "@/components/cart/CartProvider";
+import FadeImage from "@/components/ui/FadeImage";
 
 /* ─── Filter Constants ───────────────────────────────────────── */
 const PRICE_MIN = 0;
@@ -316,7 +316,7 @@ function ShopProductCard({
       <Link href={`/product/${product.slug}`} className="flex flex-1 flex-col">
         <div className="p-3 pb-0">
           <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-gray-50">
-            <Image
+            <FadeImage
               src={product.images?.[0] || '/placeholder.png'}
               alt={product.name}
               fill

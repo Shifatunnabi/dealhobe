@@ -115,10 +115,6 @@ const jsonLd = {
   paymentAccepted: "Cash on Delivery, Online Payment",
   image: `${siteUrl}/logo/main-logo.png`,
   logo: `${siteUrl}/logo/main-logo.png`,
-  sameAs: [
-    "https://www.facebook.com/people/DealHobe/61586803048218/",
-    "https://youtube.com/@dealhobebd",
-  ],
 };
 
 export default function RootLayout({

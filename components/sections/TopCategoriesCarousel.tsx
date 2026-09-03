@@ -2,11 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { motion, useInView } from "framer-motion";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { cn } from "@/lib/utils";
 import SectionHeader from "./SectionHeader";
+import FadeImage from "@/components/ui/FadeImage";
 
 const MOBILE_BREAKPOINT = 768;
 
@@ -66,7 +66,7 @@ function CategoryCard({ cat }: { cat: any }) {
           className="relative w-full aspect-square overflow-hidden rounded-2xl"
           style={{ backgroundColor: "#FFD6E7" }}
         >
-          <Image
+          <FadeImage
             src={cat.imageUrl}
             alt={cat.name}
             fill

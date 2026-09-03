@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import type { FormEvent } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import Image from "next/image";
@@ -139,16 +138,12 @@ export default function Navbar() {
   const [topbarTexts, setTopbarTexts]   = useState<string[]>([]);
   const [topbarIndex, setTopbarIndex]   = useState(0);
   const [isLoggedIn, setIsLoggedIn]     = useState(false);
-  const [searchValue, setSearchValue]   = useState("");
-  const searchInputRef                  = useRef<HTMLInputElement | null>(null);
   const [sidebarOpen, setSidebarOpen]   = useState(false);
   const [searchOpen, setSearchOpen]     = useState(false);
   const [categories, setCategories]     = useState<Array<{ _id: string; name: string }>>([]);
   const [subCategories, setSubCategories] = useState<Array<{ _id: string; name: string; category: string }>>([]);
   const [openSection, setOpenSection]   = useState<"categories" | null>(null);
   const [logoUrl, setLogoUrl]           = useState("/logo/main-logo.png");
-  const [suggestions, setSuggestions]   = useState<Array<{ name: string; slug: string }>>([]);
-  const suggestDebounce                 = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { itemCount, hydrated }         = useCart();
   const cartCount                       = hydrated ? itemCount : 0;
 
@@ -162,18 +157,33 @@ export default function Navbar() {
     { label: "Categories", type: "scroll", targetId: "top-categories",       icon: FiGrid   },
   ];
 
-  /* Hide on scroll-down, reveal on scroll-up */
+  /*
+   * Hide on scroll-down, reveal on scroll-up. Reads are batched to once per
+   * animation frame and direction only flips past a small threshold — firing
+   * setVisible on every raw scroll event (no rAF, no threshold) let tiny
+   * momentum-scroll jitter flip it back and forth rapidly, each flip
+   * restarting the slide animation and re-rendering, which is what made
+   * scrolling feel like it was stuttering/breaking.
+   */
   useEffect(() => {
+    const DIRECTION_THRESHOLD = 8;
+    let ticking = false;
+
     const onScroll = () => {
-      const y = window.scrollY;
-      if (y < 50) {
-        setVisible(true);
-      } else if (y > lastScrollY.current) {
-        setVisible(false);
-      } else {
-        setVisible(true);
-      }
-      lastScrollY.current = y;
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        const y = window.scrollY;
+        if (y < 50) {
+          setVisible(true);
+        } else {
+          const delta = y - lastScrollY.current;
+          if (delta > DIRECTION_THRESHOLD) setVisible(false);
+          else if (delta < -DIRECTION_THRESHOLD) setVisible(true);
+        }
+        lastScrollY.current = y;
+        ticking = false;
+      });
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -200,8 +210,6 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    setSearchValue("");
-    setSuggestions([]);
     setSidebarOpen(false);
     setSearchOpen(false);
   }, [pathname]);
@@ -336,33 +344,6 @@ export default function Navbar() {
 
   if (isAdminRoute) return null;
 
-  const handleSearchSubmit = (event: FormEvent) => {
-    event.preventDefault();
-    const term = searchValue.trim();
-    if (!term) return;
-    setSuggestions([]);
-    router.push(`/products?q=${encodeURIComponent(term)}`);
-    setSidebarOpen(false);
-    setSearchValue("");
-  };
-
-  const handleSearchChange = (value: string) => {
-    setSearchValue(value);
-    if (suggestDebounce.current) clearTimeout(suggestDebounce.current);
-    if (value.trim().length < 2) {
-      setSuggestions([]);
-      return;
-    }
-    suggestDebounce.current = setTimeout(async () => {
-      try {
-        const res = await fetch(`/api/products/search?q=${encodeURIComponent(value.trim())}`);
-        if (res.ok) setSuggestions(await res.json());
-      } catch {
-        setSuggestions([]);
-      }
-    }, 300);
-  };
-
   const handleScrollTo = (targetId: string) => {
     if (pathname !== "/") {
       router.push(`/#${targetId}`);
@@ -407,10 +388,10 @@ export default function Navbar() {
               </AnimatePresence>
             </span>
             <div className="flex items-center gap-3">
-              <a href="https://www.facebook.com/people/DealHobe/61586803048218/?mibextid=wwXIfr&rdid=TgrQrd2ZmYJd8ZO7&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1Gw29e9PZL%2F%3Fmibextid%3DwwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="hover:text-[#A41B15] transition-colors">
+              <a href="#" aria-label="Facebook" className="hover:text-[#A41B15] transition-colors">
                 <FaFacebook size={14} />
               </a>
-              <a href="https://wa.me/8801339562735" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="hover:text-[#A41B15] transition-colors">
+              <a href="#" aria-label="WhatsApp" className="hover:text-[#A41B15] transition-colors">
                 <FaWhatsapp size={14} />
               </a>
             </div>
@@ -539,43 +520,6 @@ export default function Navbar() {
                     <FiX size={16} />
                   </button>
                 </div>
-
-                {/* Search */}
-                <form
-                  onSubmit={handleSearchSubmit}
-                  className="mt-4 flex w-full items-center gap-2.5 rounded-2xl border border-gray-200 bg-soft-bg px-3.5 py-2.5"
-                >
-                  <FiSearch className="shrink-0 text-primary-pink" size={16} />
-                  <input
-                    ref={searchInputRef}
-                    type="text"
-                    value={searchValue}
-                    onChange={(e) => handleSearchChange(e.target.value)}
-                    placeholder="Search products..."
-                    className="w-full bg-transparent text-sm font-poppins text-text-dark outline-none placeholder:text-text-muted"
-                    autoComplete="off"
-                  />
-                </form>
-                {suggestions.length > 0 && (
-                  <div className="mt-1 rounded-2xl border border-gray-100 bg-white shadow-md overflow-hidden">
-                    {suggestions.map((s) => (
-                      <button
-                        key={s.slug}
-                        type="button"
-                        className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm font-poppins text-text-dark hover:bg-gray-50 transition-colors"
-                        onClick={() => {
-                          setSuggestions([]);
-                          router.push(`/products?q=${encodeURIComponent(s.name)}`);
-                          setSidebarOpen(false);
-                          setSearchValue("");
-                        }}
-                      >
-                        <FiSearch size={13} className="text-text-muted shrink-0" />
-                        {s.name}
-                      </button>
-                    ))}
-                  </div>
-                )}
               </div>
 
               {/* Nav items */}
@@ -678,10 +622,10 @@ export default function Navbar() {
                   View All Products
                 </Link>
                 <div className="flex items-center justify-center gap-4 text-text-muted">
-                  <a href="https://www.facebook.com/people/DealHobe/61586803048218/?mibextid=wwXIfr&rdid=TgrQrd2ZmYJd8ZO7&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1Gw29e9PZL%2F%3Fmibextid%3DwwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="transition-colors hover:text-[#1877F2]">
+                  <a href="#" aria-label="Facebook" className="transition-colors hover:text-[#1877F2]">
                     <FaFacebook size={18} />
                   </a>
-                  <a href="https://wa.me/8801339562735" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="transition-colors hover:text-[#25D366]">
+                  <a href="#" aria-label="WhatsApp" className="transition-colors hover:text-[#25D366]">
                     <FaWhatsapp size={18} />
                   </a>
                 </div>
