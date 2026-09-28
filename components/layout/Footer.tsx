@@ -37,7 +37,7 @@ export default function Footer() {
 
   return (
     <footer className="bg-[#0f172a] text-text-light">
-      <div className="mx-auto max-w-7xl px-4 pt-16 pb-8 md:px-8">
+      <div className="mx-auto max-w-7xl px-4 pt-16 pb-24 md:px-8 md:pb-8">
 
         <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-[1.2fr_0.7fr_1fr_1.2fr] lg:gap-8">
 
@@ -144,24 +144,18 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-12 flex flex-col items-center gap-2 border-t border-white/8 pt-6 text-center md:flex-row md:justify-between">
+        <div className="mt-12 flex flex-col-reverse items-center gap-2 border-t border-white/8 pt-6 text-center md:flex-row md:justify-between">
           <p className="font-poppins text-xs text-text-light/40">
             © {new Date().getFullYear()} DealHobe Bangladesh. All rights reserved.
           </p>
-          <div className="flex items-center gap-4">
-            {[
-              { label: "Terms", href: "/terms-and-conditions" },
-              { label: "Returns", href: "/refund-return-policy" },
-            ].map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="font-poppins text-xs text-text-light/40 hover:text-primary-pink transition-colors"
-              >
-                {item.label}
-              </Link>
-            ))}
-          </div>
+          <a
+            href="https://seltiv.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-poppins text-xs text-text-light/40 hover:text-primary-pink transition-colors"
+          >
+            Developed by <span className="font-semibold">SELTIV</span>
+          </a>
         </div>
       </div>
     </footer>
