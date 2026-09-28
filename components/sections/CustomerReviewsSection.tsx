@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion, useInView } from "framer-motion";
-import { fadeUp, staggerContainer } from "@/components/animations/variants";
+import { AnimatePresence, motion, useInView, useReducedMotion } from "framer-motion";
 import { FiUser } from "react-icons/fi";
 import SectionHeader from "./SectionHeader";
+import type { PlainReview } from "@/lib/data";
 
 
 function ReviewCard({ name, text }: { name: string; text: string }) {
@@ -24,8 +24,9 @@ function ReviewCard({ name, text }: { name: string; text: string }) {
   );
 }
 
-export default function CustomerReviewsSection({ reviews = [] }: { reviews?: any[] }) {
+export default function CustomerReviewsSection({ reviews = [] }: { reviews?: PlainReview[] }) {
   const [startIndex, setStartIndex] = useState(0);
+  const reducedMotion = useReducedMotion();
 
   // Imperative ref for CSS transition — avoids a second React re-render per cycle
   const containerRef = useRef<HTMLDivElement>(null);
@@ -33,10 +34,10 @@ export default function CustomerReviewsSection({ reviews = [] }: { reviews?: any
   // Pause the timer when the section is scrolled out of view
   const inView       = useInView(sectionRef, { once: false, margin: "-100px 0px" });
 
-  const validReviews = reviews.length ? reviews : [];
+  const validReviews = reviews;
 
   useEffect(() => {
-    if (!inView || validReviews.length <= 1) return;
+    if (!inView || reducedMotion || validReviews.length <= 1) return;
 
     let snapBackId: ReturnType<typeof setTimeout>;
 
@@ -62,7 +63,7 @@ export default function CustomerReviewsSection({ reviews = [] }: { reviews?: any
       clearInterval(timer);
       clearTimeout(snapBackId);
     };
-  }, [inView, validReviews.length]);
+  }, [inView, reducedMotion, validReviews.length]);
 
   const desktopCards = useMemo(() => {
     return [0, 1, 2, 3].map(
@@ -85,46 +86,40 @@ export default function CustomerReviewsSection({ reviews = [] }: { reviews?: any
 
   return (
     <section ref={sectionRef} className="w-full bg-soft-bg px-section py-section">
-      <motion.div
+      <div
         className="mx-auto max-w-7xl"
-        variants={staggerContainer}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: "-60px 0px" }}
       >
-        <motion.div variants={fadeUp}>
-          <SectionHeader title="Customer Reviews" />
-        </motion.div>
+        <SectionHeader title="Customer Reviews" />
 
         {/* Desktop: imperative CSS slide */}
-        <motion.div variants={fadeUp} className="hidden overflow-hidden md:block">
+        <div className="hidden overflow-hidden md:block">
           <div ref={containerRef} className="flex items-stretch">
             {desktopCards.map((review, index) => (
               <div
-                key={`${review._id || review.id || index}-${index}`}
+                key={`${review._id}-${index}`}
                 className="min-w-0 shrink-0 basis-1/3 px-2.5"
               >
-                <ReviewCard name={review.customerName || review.name} text={review.review || review.text} />
+                <ReviewCard name={review.customerName} text={review.review} />
               </div>
             ))}
           </div>
-        </motion.div>
+        </div>
 
         {/* Mobile: Framer Motion fade-slide */}
-        <motion.div variants={fadeUp} className="md:hidden">
+        <div className="md:hidden">
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
-              key={mobileCard._id || mobileCard.id}
+              key={mobileCard._id}
               initial={{ opacity: 0, x: 80 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -80 }}
               transition={{ duration: 0.42, ease: [0.4, 0, 0.2, 1] }}
             >
-              <ReviewCard name={mobileCard.customerName || mobileCard.name} text={mobileCard.review || mobileCard.text} />
+              <ReviewCard name={mobileCard.customerName} text={mobileCard.review} />
             </motion.div>
           </AnimatePresence>
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     </section>
   );
 }

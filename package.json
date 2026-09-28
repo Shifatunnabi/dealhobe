@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test:scroll": "playwright test",
     "seed": "node scripts/seed.js",
     "seed:reset": "node scripts/seed.js --reset",
     "seed:verify": "node scripts/verify-seed.js"
@@ -40,6 +41,7 @@
     "react-icons": "^5.6.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.6",

@@ -2,9 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    // Cloudinary already serves optimized assets; bypass Next's fetch optimizer
-    // to avoid intermittent TimeoutError failures on /_next/image.
-    unoptimized: true,
+    // Keep the local optimization endpoint enabled. The loader sends Cloudinary
+    // requests directly to its CDN, avoiding remote optimizer fetch timeouts.
+    loaderFile: "./lib/image-loader.ts",
     remotePatterns: [
       { protocol: "https", hostname: "picsum.photos",        pathname: "/**" },
       { protocol: "https", hostname: "images.unsplash.com",  pathname: "/**" },
