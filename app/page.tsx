@@ -10,6 +10,8 @@ import ForYouSection          from "@/components/sections/ForYouSection";
 import PromotionsSection      from "@/components/sections/PromotionsSection";
 import CustomerReviewsSection from "@/components/sections/CustomerReviewsSection";
 import BrandSlider            from "@/components/sections/BrandSlider";
+import HomeContent from "@/components/sections/HomeContent";
+import type { GridProduct } from "@/components/sections/ProductCard";
 
 import {
   getActiveHeroSlides,
@@ -23,6 +25,13 @@ import {
   getOffers,
 } from '@/lib/data';
 import { applyOffersToProducts, isOfferActive } from '@/lib/offers';
+
+// Only serialize the fields and cards rendered by the homepage grids.
+function homepageProducts(products: GridProduct[]): GridProduct[] {
+  return products.slice(0, 8).map(({ _id, slug, name, images, price, salePrice, quantity, offerDiscountType, offerDiscountAmount }) => ({
+    _id, slug, name, images: images?.slice(0, 1), price, salePrice, quantity, offerDiscountType, offerDiscountAmount,
+  }));
+}
 
 export default async function Home() {
   // All 9 queries run in parallel; each is independently cached with its own TTL.
@@ -49,18 +58,18 @@ export default async function Home() {
   const latestOffer = offers[0] ?? null;
 
   return (
-    <>
+    <HomeContent>
       <HeroSection slides={slides} />
       <TopCategoriesCarousel categories={categories} />
-      <TrendingProducts products={pricedTrending} />
+      <TrendingProducts products={homepageProducts(pricedTrending)} />
       <ForYouSection
-        newProducts={pricedNew}
-        featuredProducts={pricedFeatured}
-        topSellingProducts={pricedTopSellers}
+        newProducts={homepageProducts(pricedNew)}
+        featuredProducts={homepageProducts(pricedFeatured)}
+        topSellingProducts={homepageProducts(pricedTopSellers)}
       />
       <PromotionsSection offer={latestOffer} />
       <CustomerReviewsSection reviews={reviews} />
       <BrandSlider brands={brands} />
-    </>
+    </HomeContent>
   );
 }

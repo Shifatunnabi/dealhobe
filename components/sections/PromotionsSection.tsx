@@ -1,12 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { fadeUp } from "@/components/animations/variants";
 import { OfferCard } from "@/components/ui";
 import SectionHeader from "./SectionHeader";
+import type { PlainOffer } from "@/lib/data";
 
-export default function PromotionsSection({ offer }: { offer?: any | null }) {
+export default function PromotionsSection({ offer }: { offer?: PlainOffer | null }) {
   if (!offer) {
     return (
       <section className="w-full bg-soft-bg px-section pb-4 md:pb-6">
@@ -23,12 +22,8 @@ export default function PromotionsSection({ offer }: { offer?: any | null }) {
 
   return (
     <section className="w-full bg-soft-bg px-section pb-6 md:pb-8">
-      <motion.div
+      <div
         className="mx-auto max-w-7xl"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: "-60px 0px" }}
-        variants={fadeUp}
       >
         <SectionHeader title="Offers" />
 
@@ -39,6 +34,7 @@ export default function PromotionsSection({ offer }: { offer?: any | null }) {
             image={offer.thumbnailUrl}
             blurb={offer.details}
             index={0}
+            animateEntrance={false}
             isClosed={Boolean(isClosed)}
           />
         </div>
@@ -51,7 +47,7 @@ export default function PromotionsSection({ offer }: { offer?: any | null }) {
             View All Offers
           </Link>
         </div>
-      </motion.div>
+      </div>
     </section>
   );
 }

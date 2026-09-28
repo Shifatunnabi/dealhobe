@@ -3,8 +3,9 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion, AnimatePresence, type Variants } from "framer-motion";
+import { motion, AnimatePresence, useInView, useReducedMotion, type Variants } from "framer-motion";
 import { FiChevronRight } from "react-icons/fi";
+import type { PlainHeroSlide } from "@/lib/data";
 
 /* ── Framer variants — slide left/right based on direction ────── */
 const bgVariants: Variants = {
@@ -18,13 +19,37 @@ const bgVariants: Variants = {
 };
 
 /* ── Component ────────────────────────────────────────────────── */
-export default function HeroSection({ slides = [] }: { slides?: any[] }) {
+export default function HeroSection({ slides = [] }: { slides?: PlainHeroSlide[] }) {
   const [current,   setCurrent]   = useState(0);
   const [direction, setDirection] = useState(1);
   const intervalRef               = useRef<ReturnType<typeof setInterval> | null>(null);
   const swipeThreshold            = 120;
 
   const validSlides = slides;
+
+  const sectionRef = useRef<HTMLElement>(null);
+  const inView = useInView(sectionRef);
+  const reducedMotion = useReducedMotion();
+
+  const go = useCallback((idx: number) => {
+    setDirection(idx > current ? 1 : -1);
+    setCurrent(idx);
+  }, [current]);
+
+  const next = useCallback(() => go((current + 1) % validSlides.length), [current, go, validSlides.length]);
+  const prev = useCallback(() => go((current - 1 + validSlides.length) % validSlides.length), [current, go, validSlides.length]);
+
+  const resetTimer = useCallback(() => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    if (inView && !reducedMotion && validSlides.length > 1) {
+      intervalRef.current = setInterval(next, 7500);
+    }
+  }, [inView, reducedMotion, validSlides.length, next]);
+
+  useEffect(() => {
+    resetTimer();
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+  }, [resetTimer]);
 
   if (!validSlides.length) {
     return (
@@ -54,33 +79,15 @@ export default function HeroSection({ slides = [] }: { slides?: any[] }) {
     );
   }
 
-  const go = useCallback((idx: number) => {
-    setDirection(idx > current ? 1 : -1);
-    setCurrent(idx);
-  }, [current]);
-
-  const next = useCallback(() => go((current + 1) % validSlides.length), [current, go, validSlides.length]);
-  const prev = useCallback(() => go((current - 1 + validSlides.length) % validSlides.length), [current, go, validSlides.length]);
-
-  const resetTimer = useCallback(() => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
-    intervalRef.current = setInterval(next, 7500);
-  }, [next]);
-
-  useEffect(() => {
-    resetTimer();
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, [resetTimer]);
-
   const slide = validSlides[current];
 
   return (
-    <section className="px-4 pt-4 pb-4">
+    <section ref={sectionRef} className="px-4 pt-4 pb-4">
       {/* ── Carousel image card — 1:1 on mobile, 20:7 on larger screens ── */}
       <div className="relative w-full aspect-square md:aspect-[20/7] overflow-hidden rounded-3xl">
         <AnimatePresence custom={direction} initial={false}>
           <motion.div
-            key={`slide-${slide._id || slide.id}`}
+            key={`slide-${slide._id}`}
             custom={direction}
             variants={bgVariants}
             initial="enter"
@@ -88,6 +95,7 @@ export default function HeroSection({ slides = [] }: { slides?: any[] }) {
             exit="exit"
             className="absolute inset-0"
             drag="x"
+            style={{ touchAction: "pan-y" }}
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={0.15}
             onDragEnd={(_, info) => {
@@ -104,11 +112,11 @@ export default function HeroSection({ slides = [] }: { slides?: any[] }) {
           >
             <div className="absolute inset-0">
               <Image
-                src={slide.imageUrl || slide.image}
+                src={slide.imageUrl}
                 alt={slide.ctaText || "Hero slide"}
                 fill
                 className="object-cover"
-                priority
+                priority={current === 0}
                 sizes="100vw"
               />
             </div>

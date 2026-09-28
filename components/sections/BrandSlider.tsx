@@ -1,22 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
-import { motion, useInView as useFramerInView } from "framer-motion";
+import { useEffect, useState } from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { cn } from "@/lib/utils";
 import SectionHeader from "./SectionHeader";
 import FadeImage from "@/components/ui/FadeImage";
+import type { PlainBrand } from "@/lib/data";
 
 /* ── Brand data ──────────────────────────────────────────────── */
-const BRANDS = [
-  { name: "Barbie",     logo: "/brands/1.png" },
-  { name: "Disney",     logo: "/brands/2.png" },
-  { name: "Hot Wheels", logo: "/brands/3.png" },
-  { name: "Lego",       logo: "/brands/4.png" },
-  { name: "Funko",      logo: "/brands/5.png" },
-];
-
 const MOBILE_BREAKPOINT = 768;
 
 /* ── Brand Card ──────────────────────────────────────────────── */
@@ -80,9 +72,7 @@ function ArrowButton({
 }
 
 /* ── Section ─────────────────────────────────────────────────── */
-export default function BrandSlider({ brands = [] }: { brands?: any[] }) {
-  const ref    = useRef<HTMLElement>(null);
-  const inView = useFramerInView(ref as React.RefObject<Element>, { once: true, margin: "-60px 0px" });
+export default function BrandSlider({ brands = [] }: { brands?: PlainBrand[] }) {
   const [visibleCards, setVisibleCards] = useState(4);
   const [startIndex, setStartIndex] = useState(0);
 
@@ -109,7 +99,7 @@ export default function BrandSlider({ brands = [] }: { brands?: any[] }) {
 
   if (!brands.length) {
     return (
-      <section ref={ref} className="w-full bg-soft-bg px-section py-section">
+      <section className="w-full bg-soft-bg px-section py-section">
         <div className="mx-auto max-w-7xl">
           <SectionHeader title="Brands" />
           <p className="text-sm text-text-muted">No brands are available right now.</p>
@@ -133,20 +123,11 @@ export default function BrandSlider({ brands = [] }: { brands?: any[] }) {
   };
 
   return (
-    <section ref={ref} className="w-full bg-soft-bg px-section py-section">
+    <section className="w-full bg-soft-bg px-section py-section">
       <div className="mx-auto max-w-7xl">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-        >
-          <SectionHeader title="Brands" />
-        </motion.div>
+        <SectionHeader title="Brands" />
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.55, ease: [0.4, 0, 0.2, 1], delay: 0.08 }}
+        <div
           className="relative"
         >
           <ArrowButton direction="prev" onClick={handlePrev} disabled={!canGoPrev} />
@@ -154,25 +135,24 @@ export default function BrandSlider({ brands = [] }: { brands?: any[] }) {
 
           <div className="overflow-hidden">
             <div
-              className="-mx-2 flex transition-transform duration-400 ease-out sm:-mx-2.5"
-              style={{ transform: `translateX(-${(startIndex * 100) / visibleCards}%)` }}
+              className="-mx-2 flex transition-transform duration-400 ease-out sm:-mx-2.5 [--carousel-visible:2] md:[--carousel-visible:4]"
+              style={{ transform: `translateX(calc(-${startIndex} * 100% / var(--carousel-visible)))` }}
             >
               {brands.map((brand, i) => (
                 <div
                   key={`${brand.name}-${i}`}
-                  className="shrink-0"
-                  style={{ flexBasis: `${100 / visibleCards}%` }}
+                  className="shrink-0 basis-1/2 md:basis-1/4"
                 >
                   <BrandCard
                     id={brand._id}
                     name={brand.name}
-                    logo={brand.logoUrl || brand.imageUrl}
+                    logo={brand.logoUrl}
                   />
                 </div>
               ))}
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

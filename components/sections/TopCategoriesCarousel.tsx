@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { motion, useInView } from "framer-motion";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { cn } from "@/lib/utils";
 import SectionHeader from "./SectionHeader";
 import FadeImage from "@/components/ui/FadeImage";
+import type { PlainCategory } from "@/lib/data";
 
 const MOBILE_BREAKPOINT = 768;
 
@@ -54,7 +54,7 @@ function ArrowPill({
   );
 }
 
-function CategoryCard({ cat }: { cat: any }) {
+function CategoryCard({ cat }: { cat: PlainCategory }) {
   return (
     <div className="group flex flex-col items-center gap-3 px-2 text-center">
       <Link
@@ -72,7 +72,7 @@ function CategoryCard({ cat }: { cat: any }) {
             fill
             className="object-cover transition-transform duration-500 group-hover:scale-105"
             sizes="(max-width: 768px) 50vw, 25vw"
-            loading="eager"
+            loading="lazy"
           />
         </div>
       </Link>
@@ -95,13 +95,11 @@ function CategoryCard({ cat }: { cat: any }) {
 }
 
 /* ── Section ─────────────────────────────────────────────────── */
-export default function TopCategoriesCarousel({ categories = [] }: { categories?: any[] }) {
-  const ref = useRef<HTMLElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-60px 0px" });
+export default function TopCategoriesCarousel({ categories = [] }: { categories?: PlainCategory[] }) {
   const [visibleCards, setVisibleCards] = useState(4);
   const [startIndex, setStartIndex] = useState(0);
 
-  const visibleCategories = categories.filter((c: any) => c.showOnHomepage !== false);
+  const visibleCategories = categories.filter((c) => c.showOnHomepage !== false);
 
   useEffect(() => {
     const updateVisibleCards = () => {
@@ -135,7 +133,7 @@ export default function TopCategoriesCarousel({ categories = [] }: { categories?
   const canNext = startIndex < maxIndex;
 
   return (
-    <section id="top-categories" ref={ref} className="w-full py-section px-section bg-soft-bg">
+    <section id="top-categories" className="w-full py-section px-section bg-soft-bg">
       <div className="mx-auto max-w-7xl">
         <SectionHeader
           title="Top Categories"
@@ -151,23 +149,20 @@ export default function TopCategoriesCarousel({ categories = [] }: { categories?
           }
         />
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.55, ease: [0.4, 0, 0.2, 1] }}
+        <div
           className="overflow-hidden"
         >
           <div
-            className="-mx-2 flex transition-transform duration-400 ease-out"
-            style={{ transform: `translateX(-${(startIndex * 100) / visibleCards}%)` }}
+            className="-mx-2 flex transition-transform duration-400 ease-out [--carousel-visible:2] md:[--carousel-visible:4]"
+            style={{ transform: `translateX(calc(-${startIndex} * 100% / var(--carousel-visible)))` }}
           >
-            {visibleCategories.map((cat: any) => (
-              <div key={cat._id} className="shrink-0" style={{ flexBasis: `${100 / visibleCards}%` }}>
+            {visibleCategories.map((cat) => (
+              <div key={cat._id} className="shrink-0 basis-1/2 md:basis-1/4">
                 <CategoryCard cat={cat} />
               </div>
             ))}
           </div>
-        </motion.div>
+        </div>
 
         <div className="mt-10 flex justify-center">
           <button

@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { FiShoppingCart, FiCheck } from "react-icons/fi";
-import { scaleIn } from "@/components/animations/variants";
 import { cn } from "@/lib/utils";
 import { useOptionalCart } from "@/components/cart/CartProvider";
 import FadeImage from "@/components/ui/FadeImage";
@@ -22,7 +21,7 @@ export interface GridProduct {
 }
 
 /** Shared product card used by every homepage product grid (Trending, For You). */
-export default function ProductCard({ product, index }: { product: GridProduct; index: number }) {
+export default function ProductCard({ product }: { product: GridProduct }) {
   const [added, setAdded] = useState(false);
   const cart = useOptionalCart();
   const availableQty = Number(product.quantity ?? 0);
@@ -53,9 +52,7 @@ export default function ProductCard({ product, index }: { product: GridProduct; 
   };
 
   return (
-    <motion.article
-      variants={scaleIn}
-      custom={index}
+    <article
       className="flex flex-col overflow-hidden rounded-2xl bg-white shadow-card transition-shadow hover:shadow-hover"
     >
       <Link href={`/product/${product.slug}`} className="flex flex-1 flex-col">
@@ -126,6 +123,6 @@ export default function ProductCard({ product, index }: { product: GridProduct; 
           />
         </span>
       </motion.button>
-    </motion.article>
+    </article>
   );
 }

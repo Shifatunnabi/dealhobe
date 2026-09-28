@@ -3,9 +3,19 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+import { usePathname } from "next/navigation";
 
 
 export default function Loader() {
+  const pathname = usePathname();
+  const [showStartupLoader] = useState(pathname !== "/");
+  // The server-rendered homepage is ready to use without a timed splash screen.
+  // Keep this decision for the session so navigating away does not start a splash.
+  if (!showStartupLoader) return null;
+  return <StartupLoader />;
+}
+
+function StartupLoader() {
   const [visible, setVisible] = useState(true);
   const [logoUrl, setLogoUrl] = useState("/logo/main-logo.png");
 

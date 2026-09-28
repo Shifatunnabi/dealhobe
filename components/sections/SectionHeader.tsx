@@ -16,7 +16,7 @@ export default function SectionHeader({
   children?: ReactNode;
 }) {
   return (
-    <div className="mb-6 md:mb-8">
+    <div data-home-reveal className="mb-6 md:mb-8">
       <div className="flex items-end justify-between gap-4">
         <div className="flex flex-wrap items-baseline gap-x-6 gap-y-2">
           <h2 className="relative inline-block pb-2 font-poppins text-xl font-extrabold uppercase tracking-wide text-text-dark md:text-3xl">

@@ -12,6 +12,7 @@ export default function OfferCard({
   blurb,
   index,
   isClosed,
+  animateEntrance = true,
 }: {
   title: string;
   slug: string;
@@ -19,11 +20,12 @@ export default function OfferCard({
   blurb: string;
   index: number;
   isClosed: boolean;
+  animateEntrance?: boolean;
 }) {
   return (
     <motion.article
       variants={scaleIn}
-      initial={{ opacity: 0, y: -18 * index, scale: 0.92 }}
+      initial={animateEntrance ? { opacity: 0, y: -18 * index, scale: 0.92 } : false}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{
         delay: 0.16 + index * 0.07,

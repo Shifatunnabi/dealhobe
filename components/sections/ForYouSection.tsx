@@ -1,9 +1,8 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { motion, useInView } from "framer-motion";
-import { staggerContainer } from "@/components/animations/variants";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import SectionHeader from "./SectionHeader";
 import ProductCard, { type GridProduct } from "./ProductCard";
@@ -25,8 +24,6 @@ export default function ForYouSection({
   featuredProducts?: GridProduct[];
   topSellingProducts?: GridProduct[];
 }) {
-  const ref = useRef<HTMLElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-60px 0px" });
   const [activeTab, setActiveTab] = useState<TabKey>("new");
 
   const productsByTab: Record<TabKey, GridProduct[]> = {
@@ -39,7 +36,7 @@ export default function ForYouSection({
   const hasAny = newProducts.length || featuredProducts.length || topSellingProducts.length;
   if (!hasAny) {
     return (
-      <section id="for-you" ref={ref} className="w-full py-section px-section bg-soft-bg">
+      <section id="for-you" className="w-full py-section px-section bg-soft-bg">
         <div className="mx-auto max-w-7xl">
           <SectionHeader title="For You" />
           <p className="text-sm text-text-muted">No products are available right now.</p>
@@ -49,12 +46,9 @@ export default function ForYouSection({
   }
 
   return (
-    <section id="for-you" ref={ref} className="w-full py-section px-section bg-soft-bg">
-      <motion.div
+    <section id="for-you" className="w-full py-section px-section bg-soft-bg">
+      <div
         className="mx-auto max-w-7xl"
-        variants={staggerContainer}
-        initial="hidden"
-        animate={inView ? "visible" : "hidden"}
       >
         <SectionHeader title="For You">
           <div className="flex items-center gap-5">
@@ -83,8 +77,8 @@ export default function ForYouSection({
 
         {activeProducts.length ? (
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-5">
-            {activeProducts.slice(0, 8).map((product, i) => (
-              <ProductCard key={product._id} product={product} index={i} />
+            {activeProducts.slice(0, 8).map((product) => (
+              <ProductCard key={product._id} product={product} />
             ))}
           </div>
         ) : (
@@ -103,7 +97,7 @@ export default function ForYouSection({
             </motion.span>
           </Link>
         </div>
-      </motion.div>
+      </div>
     </section>
   );
 }

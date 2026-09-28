@@ -116,6 +116,18 @@
     -webkit-tap-highlight-color: transparent;
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .homepage *, .homepage *::before, .homepage *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+
+  .homepage section[id] {
+    scroll-margin-top: 7rem;
+  }
+
   body {
     font-family: var(--font-poppins), 'Poppins', system-ui, sans-serif;
     background-color: var(--soft-bg);

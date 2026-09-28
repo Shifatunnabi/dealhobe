@@ -1,38 +1,29 @@
 "use client";
 
-import { useState } from "react";
 import Image, { type ImageProps } from "next/image";
-import { cn } from "@/lib/utils";
 
 /**
- * next/image wrapper for `fill`-mode card images. Shows a pulsing skeleton
- * and fades the image in once it finishes loading, instead of the photo
- * popping in abruptly the instant the network fetch completes — that abrupt
- * pop, happening while the card's own scroll-in animation plays, is what
- * reads as a stutter while scrolling through product/category grids.
+ * next/image wrapper for `fill`-mode card images. Shows a static placeholder
+ * and a short opacity fade after loading, without rerendering every card.
+ * Images remain visible before hydration and if JavaScript is unavailable.
  * Must be placed inside a `position: relative` container (same requirement
  * as `fill` images already have).
  */
-export default function FadeImage({ className, onLoad, ...props }: ImageProps) {
-  const [loaded, setLoaded] = useState(false);
-
+export default function FadeImage({ className, onLoad, alt, ...props }: ImageProps) {
   return (
     <>
-      {!loaded && <div className="absolute inset-0 animate-pulse bg-gray-100" />}
-      {/* Opacity fade lives on this wrapper, not the <Image> itself — the
-          image usually carries its own `transition-transform` (hover scale),
-          and Tailwind's per-property transition utilities can't safely
-          coexist on one element since only one `transition-property` wins. */}
-      <div className={cn("absolute inset-0 transition-opacity duration-500", loaded ? "opacity-100" : "opacity-0")}>
-        <Image
-          {...props}
-          onLoad={(e) => {
-            setLoaded(true);
-            onLoad?.(e);
-          }}
-          className={className}
-        />
-      </div>
+      <div aria-hidden="true" className="absolute inset-0 bg-gray-100" />
+      <Image
+        {...props}
+        alt={alt}
+        onLoad={(e) => {
+          if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            e.currentTarget.animate([{ opacity: 0.6 }, { opacity: 1 }], { duration: 180, easing: "ease-out" });
+          }
+          onLoad?.(e);
+        }}
+        className={className}
+      />
     </>
   );
 }
