@@ -1,10 +1,17 @@
 import type { MetadataRoute } from "next";
+import { INFORMATION_LINKS } from "@/lib/information-pages";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://dealhobe.com.bd";
   const now = new Date();
 
   return [
+    ...INFORMATION_LINKS.map(({ href }) => ({
+      url: `${siteUrl}${href}`,
+      lastModified: now,
+      changeFrequency: "monthly" as const,
+      priority: 0.5,
+    })),
     {
       url: siteUrl,
       lastModified: now,

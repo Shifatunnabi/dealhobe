@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { INFORMATION_LINKS } from "@/lib/information-pages";
 import { FiFacebook, FiYoutube, FiMail, FiPhone, FiMapPin, FiShield } from "react-icons/fi";
 
 const QUICK_LINKS = [
@@ -38,7 +39,7 @@ export default function Footer() {
     <footer className="bg-[#0f172a] text-text-light">
       <div className="mx-auto max-w-7xl px-4 pt-16 pb-8 md:px-8">
 
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-[1.2fr_0.7fr_1fr_1.2fr] lg:gap-8">
 
           {/* ── Brand column ────────────────────────────── */}
           <div className="lg:col-span-1">
@@ -90,30 +91,43 @@ export default function Footer() {
 
           {/* ── Contact ─────────────────────────────────── */}
           <div>
+            <h3 className="font-poppins text-lg font-semibold text-text-light mb-4">Information</h3>
+            <ul className="flex flex-col gap-2.5">
+              {INFORMATION_LINKS.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href} className="font-poppins text-sm text-text-light/60 transition-colors hover:text-primary-pink">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
             <h3 className="font-poppins text-lg font-semibold text-text-light mb-4">Contact Us</h3>
             <ul className="flex flex-col gap-3">
               <li className="flex items-start gap-2.5">
                 <FiMapPin size={15} className="mt-0.5 shrink-0 text-primary-pink" />
                 <span className="font-poppins text-sm text-text-light/60 leading-snug">
-                  H 3, Rd - 19/A, Sector 4, Uttara, Dhaka
+                  House 1/10, Block #A, Road #5, Lalmatia, Dhaka
                 </span>
               </li>
               <li>
                 <a
-                  href="tel:+8801339562735"
+                  href="tel:+8801338886611"
                   className="flex items-center gap-2.5 font-poppins text-sm text-text-light/60 hover:text-primary-pink transition-colors"
                 >
                   <FiPhone size={15} className="shrink-0 text-primary-pink" />
-                  +880 1339-562735
+                  01338886611
                 </a>
               </li>
               <li>
                 <a
-                  href="mailto:bddealhobe@gmail.com"
+                  href="mailto:dealhobe26@gmail.com"
                   className="flex items-center gap-2.5 font-poppins text-sm text-text-light/60 hover:text-primary-pink transition-colors"
                 >
                   <FiMail size={15} className="shrink-0 text-primary-pink" />
-                  bddealhobe@gmail.com
+                  dealhobe26@gmail.com
                 </a>
               </li>
             </ul>
@@ -135,13 +149,16 @@ export default function Footer() {
             © {new Date().getFullYear()} DealHobe Bangladesh. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
-            {["Privacy Policy", "Terms", "Returns"].map((item) => (
+            {[
+              { label: "Terms", href: "/terms-and-conditions" },
+              { label: "Returns", href: "/refund-return-policy" },
+            ].map((item) => (
               <Link
-                key={item}
-                href={`/${item.toLowerCase().replace(/ /g, "-")}`}
+                key={item.href}
+                href={item.href}
                 className="font-poppins text-xs text-text-light/40 hover:text-primary-pink transition-colors"
               >
-                {item}
+                {item.label}
               </Link>
             ))}
           </div>

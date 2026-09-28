@@ -50,8 +50,8 @@ export const buildInvoicePdf = (order: any, logoDataUrl = "") => {
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10);
-  doc.text("H 3, Rd - 19/A, Sector 4, Uttara, Dhaka", margin, cursorY + 38);
-  doc.text("Phone: +8801339562735  |  bddealhobe@gmail.com", margin, cursorY + 52);
+  doc.text("House 1/10, Block #A, Road #5, Lalmatia, Dhaka", margin, cursorY + 38);
+  doc.text("Phone: 01338886611  |  dealhobe26@gmail.com", margin, cursorY + 52);
 
   if (logoDataUrl) {
     doc.addImage(logoDataUrl, "PNG", 460, 30, 60, 60);
