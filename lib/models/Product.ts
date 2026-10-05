@@ -6,6 +6,7 @@ export interface IProduct extends Document {
   slug: string;
   price: number;
   salePrice?: number;
+  costPrice?: number; // admin-only; never selected by default
   quantity: number;
   shortDescription: string;
   brand?: string;
@@ -30,6 +31,9 @@ const ProductSchema = new Schema<IProduct>(
     slug: { type: String, required: true, unique: true },
     price: { type: Number, required: true },
     salePrice: { type: Number },
+    // Admin-only purchase cost. select:false keeps it out of every query (storefront,
+    // search, orders) unless a route explicitly asks for it with .select('+costPrice').
+    costPrice: { type: Number, min: 0, select: false },
     quantity: { type: Number, required: true, default: 0 },
     shortDescription: { type: String, required: true },
     brand: { type: String }, // Store name or ID — optional

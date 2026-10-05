@@ -16,6 +16,7 @@ interface Product {
   slug: string;
   price: number;
   salePrice: number;
+  costPrice?: number;
   quantity: number;
   shortDescription: string;
   brand: string;
@@ -49,7 +50,7 @@ const generateSlug = (name: string) => {
 };
 
 const emptyForm = {
-    sku: '', name: '', slug: '', price: 0, salePrice: 0, quantity: 0, shortDescription: '',
+    sku: '', name: '', slug: '', price: 0, salePrice: 0, costPrice: 0, quantity: 0, shortDescription: '',
     brand: '', category: '', subCategory: '', whyLoveIt: [] as string[], description: '',
     images: [] as string[], imagePublicIds: [] as string[],
     isFeatured: false, isTrending: false, isNewArrival: false, isTopSeller: false,
@@ -289,6 +290,14 @@ export default function ProductsPage() {
                         <label className="admin-label">Sale Price (৳ - Optional)</label>
                         <input type="number" className="admin-input" value={form.salePrice} onChange={e => setForm((f:any) => ({...f, salePrice: +e.target.value}))} />
                     </div>
+                </div>
+
+                <div className="admin-form-row">
+                    <div className="admin-field">
+                        <label className="admin-label">Cost Price (৳ - admin only, used for profit)</label>
+                        <input type="number" min={0} className="admin-input" value={form.costPrice ?? 0} onChange={e => setForm((f:any) => ({...f, costPrice: +e.target.value}))} />
+                    </div>
+                    <div className="admin-field" />
                 </div>
 
                 <div className="admin-form-row">

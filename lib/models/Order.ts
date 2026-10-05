@@ -8,6 +8,7 @@ export interface OrderItem {
   name: string;
   image: string;
   unitPrice: number;
+  costPrice?: number; // per-unit cost snapshot at order time (admin profit reporting)
   qty: number;
   lineTotal: number;
 }
@@ -47,6 +48,7 @@ const OrderItemSchema = new Schema<OrderItem>(
     name: { type: String, required: true },
     image: { type: String, required: true },
     unitPrice: { type: Number, required: true },
+    costPrice: { type: Number },
     qty: { type: Number, required: true },
     lineTotal: { type: Number, required: true },
   },

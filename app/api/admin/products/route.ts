@@ -10,8 +10,12 @@ function generateSku(): string {
 }
 
 export async function GET() {
+  // Includes costPrice, so admin-only.
+  const session = await getServerSession();
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
   await connectDB();
-  const products = await Product.find().sort({ createdAt: -1 });
+  const products = await Product.find().select('+costPrice').sort({ createdAt: -1 });
   return NextResponse.json(products);
 }
 

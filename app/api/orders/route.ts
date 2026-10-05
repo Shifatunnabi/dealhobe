@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
     .map((item: any) => item?.productId)
     .filter((id: any) => typeof id === "string");
 
-  const products = await Product.find({ _id: { $in: productIds } }).lean();
+  const products = await Product.find({ _id: { $in: productIds } }).select('+costPrice').lean();
   const productMap = new Map(products.map((p: any) => [String(p._id), p]));
 
   const orderItems = [] as any[];
@@ -84,6 +84,7 @@ export async function POST(req: NextRequest) {
       name: product.name,
       image: product.images?.[0] || "/placeholder.png",
       unitPrice,
+      ...(typeof product.costPrice === "number" ? { costPrice: product.costPrice } : {}),
       qty,
       lineTotal,
     });

@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { FiBarChart2, FiSearch, FiTrendingUp, FiInbox, FiPackage } from "react-icons/fi";
 
 interface ProductHit {
+  id: string;
   name: string;
   slug: string;
   image: string | null;
@@ -12,22 +13,30 @@ interface ProductHit {
 }
 
 interface ReportRow {
+  productId: string;
   name: string;
   qty: number;
   revenue: number;
+  profit: number;
   orderCount: number;
 }
 
 interface Totals {
   qty: number;
   revenue: number;
+  profit: number;
+}
+
+// Local-time YYYY-MM-DD (toISOString would shift the day for UTC+ timezones).
+function toDateInput(d: Date) {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
 export default function SalesReportPage() {
-  const today = new Date().toISOString().slice(0, 10);
-  const firstOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1)
-    .toISOString()
-    .slice(0, 10);
+  const now = new Date();
+  const today = toDateInput(now);
+  const firstOfMonth = toDateInput(new Date(now.getFullYear(), now.getMonth(), 1));
 
   const [from, setFrom] = useState(firstOfMonth);
   const [to, setTo] = useState(today);
@@ -35,8 +44,9 @@ export default function SalesReportPage() {
   // Modal state
   const [modalOpen, setModalOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [hits, setHits] = useState<ProductHit[]>([]);
+  const [allProducts, setAllProducts] = useState<ProductHit[]>([]);
   const [searching, setSearching] = useState(false);
+  const [productsError, setProductsError] = useState("");
   // Staged selection inside modal (before confirming)
   const [staged, setStaged] = useState<ProductHit[]>([]);
   // Confirmed selection (used for report)
@@ -47,14 +57,18 @@ export default function SalesReportPage() {
   const [totals, setTotals] = useState<Totals | null>(null);
   const [loading, setLoading] = useState(false);
   const [generated, setGenerated] = useState(false);
+  const [error, setError] = useState("");
 
-  const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Products matching the search box (all products when empty)
+  const hits = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return q ? allProducts.filter((p) => p.name.toLowerCase().includes(q)) : allProducts;
+  }, [allProducts, query]);
 
   // Open modal: pre-fill staged with current confirmed selection
   function openModal() {
     setStaged([...selected]);
     setQuery("");
-    setHits([]);
     setModalOpen(true);
   }
 
@@ -69,49 +83,60 @@ export default function SalesReportPage() {
 
   function toggleStaged(hit: ProductHit) {
     setStaged((prev) => {
-      const exists = prev.find((p) => p.slug === hit.slug);
-      return exists ? prev.filter((p) => p.slug !== hit.slug) : [...prev, hit];
+      const exists = prev.find((p) => p.id === hit.id);
+      return exists ? prev.filter((p) => p.id !== hit.id) : [...prev, hit];
     });
   }
 
-  function removeSelected(slug: string) {
-    setSelected((prev) => prev.filter((p) => p.slug !== slug));
+  function removeSelected(id: string) {
+    setSelected((prev) => prev.filter((p) => p.id !== id));
   }
 
-  // Debounced search — empty query shows latest 20 products
+  // Load every product when the modal opens; searching filters client-side
   useEffect(() => {
     if (!modalOpen) return;
-    if (searchTimer.current) clearTimeout(searchTimer.current);
-    const delay = query.length === 0 ? 0 : 300;
+    let cancelled = false;
     setSearching(true);
-    searchTimer.current = setTimeout(async () => {
+    setProductsError("");
+    (async () => {
       try {
-        const res = await fetch(`/api/products/search?q=${encodeURIComponent(query)}`);
+        const res = await fetch("/api/admin/sales-report/products");
+        if (!res.ok) throw new Error();
         const data = await res.json();
-        setHits(data);
+        if (!cancelled) setAllProducts(Array.isArray(data) ? data : []);
+      } catch {
+        if (!cancelled) setProductsError("Failed to load products. Please try again.");
       } finally {
-        setSearching(false);
+        if (!cancelled) setSearching(false);
       }
-    }, delay);
+    })();
     return () => {
-      if (searchTimer.current) clearTimeout(searchTimer.current);
+      cancelled = true;
     };
-  }, [query, modalOpen]);
+  }, [modalOpen]);
 
   async function runReport(overrideProducts?: string[]) {
+    if (from && to && from > to) {
+      setError("'From' date must be on or before 'To' date.");
+      return;
+    }
     setLoading(true);
     setGenerated(false);
+    setError("");
     try {
       const params = new URLSearchParams();
       if (from) params.set("from", from);
       if (to) params.set("to", to);
-      const names = overrideProducts ?? selected.map((p) => p.name);
-      if (names.length) params.set("products", names.join(","));
+      const ids = overrideProducts ?? selected.map((p) => p.id);
+      if (ids.length) params.set("productIds", ids.join(","));
       const res = await fetch(`/api/admin/sales-report?${params}`);
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Failed to generate report");
       setRows(data.rows ?? []);
       setTotals(data.totals ?? null);
       setGenerated(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to generate report");
     } finally {
       setLoading(false);
     }
@@ -200,7 +225,7 @@ export default function SalesReportPage() {
             <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", marginTop: "1rem" }}>
               {selected.map((p) => (
                 <span
-                  key={p.slug}
+                  key={p.id}
                   style={{
                     display: "inline-flex",
                     alignItems: "center",
@@ -215,7 +240,7 @@ export default function SalesReportPage() {
                 >
                   {p.name}
                   <button
-                    onClick={() => removeSelected(p.slug)}
+                    onClick={() => removeSelected(p.id)}
                     style={{
                       background: "none",
                       border: "none",
@@ -250,6 +275,12 @@ export default function SalesReportPage() {
         </div>
       </div>
 
+      {error && (
+        <div style={{ marginBottom: "1rem", padding: "0.75rem 1rem", borderRadius: "10px", background: "rgba(164, 27, 21, 0.08)", color: "#A41B15", fontSize: "0.875rem" }}>
+          {error}
+        </div>
+      )}
+
       {/* Report table */}
       {generated && (
         <div className="admin-card">
@@ -260,7 +291,7 @@ export default function SalesReportPage() {
             {totals && (
               <span style={{ fontSize: "0.85rem", fontWeight: 400, color: "var(--text-muted)" }}>
                 {rows.length} product{rows.length !== 1 ? "s" : ""} · ৳
-                {totals.revenue.toLocaleString()} total revenue
+                {totals.revenue.toLocaleString()} revenue · ৳{totals.profit.toLocaleString()} profit
               </span>
             )}
           </div>
@@ -282,16 +313,20 @@ export default function SalesReportPage() {
                       <th>Orders</th>
                       <th>Qty Sold</th>
                       <th>Revenue (৳)</th>
+                      <th>Profit (৳)</th>
                     </tr>
                   </thead>
                   <tbody>
                     {rows.map((row, i) => (
-                      <tr key={row.name}>
+                      <tr key={row.productId}>
                         <td>{i + 1}</td>
                         <td style={{ fontWeight: 600 }}>{row.name}</td>
                         <td>{row.orderCount}</td>
                         <td>{row.qty}</td>
                         <td>৳{row.revenue.toLocaleString()}</td>
+                        <td style={{ fontWeight: 600, color: row.profit < 0 ? "#A41B15" : "#15803d" }}>
+                          ৳{row.profit.toLocaleString()}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -301,6 +336,9 @@ export default function SalesReportPage() {
                         <td colSpan={3}>Total</td>
                         <td>{totals.qty}</td>
                         <td>৳{totals.revenue.toLocaleString()}</td>
+                        <td style={{ color: totals.profit < 0 ? "#A41B15" : "#15803d" }}>
+                          ৳{totals.profit.toLocaleString()}
+                        </td>
                       </tr>
                     </tfoot>
                   )}
@@ -402,7 +440,7 @@ export default function SalesReportPage() {
               >
                 {staged.map((p) => (
                   <span
-                    key={p.slug}
+                    key={p.id}
                     style={{
                       display: "inline-flex",
                       alignItems: "center",
@@ -444,17 +482,23 @@ export default function SalesReportPage() {
                 </div>
               )}
 
-              {!searching && hits.length === 0 && query.length >= 2 && (
-                <div style={{ textAlign: "center", padding: "2rem", color: "var(--text-muted)", fontSize: "0.9rem" }}>
-                  No products found for &ldquo;{query}&rdquo;
+              {productsError && (
+                <div style={{ textAlign: "center", padding: "2rem", color: "#A41B15", fontSize: "0.9rem" }}>
+                  {productsError}
                 </div>
               )}
 
-              {hits.map((hit) => {
-                const isSelected = staged.some((p) => p.slug === hit.slug);
+              {!searching && !productsError && hits.length === 0 && (
+                <div style={{ textAlign: "center", padding: "2rem", color: "var(--text-muted)", fontSize: "0.9rem" }}>
+                  {query ? <>No products found for &ldquo;{query}&rdquo;</> : "No products yet."}
+                </div>
+              )}
+
+              {!searching && hits.map((hit) => {
+                const isSelected = staged.some((p) => p.id === hit.id);
                 return (
                   <div
-                    key={hit.slug}
+                    key={hit.id}
                     onClick={() => toggleStaged(hit)}
                     style={{
                       display: "flex",

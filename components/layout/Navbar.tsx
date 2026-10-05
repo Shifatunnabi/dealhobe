@@ -51,6 +51,9 @@ function Logo({ logoUrl }: { logoUrl: string }) {
  * that has sub-categories reveals them in a flyout beside it. The flyout is
  * portaled to document.body — the drawer's nav list scrolls (overflow-y-auto),
  * which would otherwise clip anything positioned beside a row via CSS alone.
+ *
+ * On mobile there is no room beside the row (the flyout runs off-screen), so
+ * sub-categories instead expand inline underneath the category.
  */
 function CategoryRowWithFlyout({
   category,
@@ -62,6 +65,8 @@ function CategoryRowWithFlyout({
   onNavigate: () => void;
 }) {
   const [open, setOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const [rect, setRect] = useState<{ top: number; left: number } | null>(null);
   const rowRef = useRef<HTMLDivElement>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -76,6 +81,7 @@ function CategoryRowWithFlyout({
 
   const handleEnter = () => {
     clearCloseTimer();
+    if (isMobile) return;
     if (subs.length === 0 || !rowRef.current) return;
     const r = rowRef.current.getBoundingClientRect();
     setRect({ top: r.top, left: r.right });
@@ -90,6 +96,53 @@ function CategoryRowWithFlyout({
   };
 
   useEffect(() => () => clearCloseTimer(), []);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  if (isMobile && subs.length > 0) {
+    return (
+      <div>
+        <div className="flex items-center border-b border-gray-50">
+          <Link
+            href={`/products?category=${category._id}`}
+            onClick={onNavigate}
+            className="flex-1 py-2.5 pr-3 text-sm text-text-muted transition-colors hover:text-primary-pink"
+          >
+            {category.name}
+          </Link>
+          <button
+            type="button"
+            onClick={() => setExpanded((v) => !v)}
+            aria-expanded={expanded}
+            aria-label={expanded ? `Hide ${category.name} sub-categories` : `Show ${category.name} sub-categories`}
+            className="flex h-9 w-9 shrink-0 items-center justify-center text-text-muted"
+          >
+            <FiChevronDown size={14} className={`transition-transform ${expanded ? "rotate-180" : ""}`} />
+          </button>
+        </div>
+        {expanded && (
+          <div className="ml-3 flex flex-col border-l border-gray-100 pl-3">
+            {subs.map((sub) => (
+              <Link
+                key={sub._id}
+                href={`/products?subcategory=${sub._id}`}
+                onClick={onNavigate}
+                className="border-b border-gray-50 py-2 text-sm text-text-muted transition-colors hover:text-primary-pink"
+              >
+                {sub.name}
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div ref={rowRef} onMouseEnter={handleEnter} onMouseLeave={scheduleClose} className="relative">
