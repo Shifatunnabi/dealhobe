@@ -52,6 +52,18 @@ export type PlainProduct = {
   isTrending: boolean;
   isNewArrival: boolean;
   isTopSeller: boolean;
+  hasVariants?: boolean;
+  variantOptions?: { name: string; values: string[] }[];
+  variants?: {
+    key: string;
+    options: { name: string; value: string }[];
+    price: number;
+    salePrice?: number;
+    sku?: string;
+    quantity: number;
+    useMainImage: boolean;
+    image?: string;
+  }[];
   createdAt: string;
   updatedAt: string;
   // Applied offer fields (added by applyOffersToProduct)

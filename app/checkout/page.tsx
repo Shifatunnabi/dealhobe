@@ -9,7 +9,7 @@ import { FiChevronRight, FiLock, FiCheck, FiAlertCircle, FiMapPin, FiShoppingCar
 import { cn } from "@/lib/utils";
 import { fadeUp } from "@/components/animations/variants";
 import { ColorfulTitle } from "@/components/ui";
-import { useCart } from "@/components/cart/CartProvider";
+import { useCart, cartLineId } from "@/components/cart/CartProvider";
 
 const DELIVERY_CHARGE = {
   inside_dhaka: 95,
@@ -347,6 +347,7 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           items: items.map((item) => ({
             productId: item.productId,
+            variantKey: item.variantKey,
             qty: item.qty,
           })),
           delivery: {
@@ -706,7 +707,7 @@ export default function CheckoutPage() {
 
               <div className="divide-y divide-gray-100">
                 {items.map((item) => (
-                  <div key={item.productId} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
+                  <div key={cartLineId(item)} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
                     <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-gray-50">
                       <Image
                         src={item.image}
@@ -720,6 +721,9 @@ export default function CheckoutPage() {
                       <p className="line-clamp-2 font-poppins text-sm font-semibold leading-snug text-text-dark">
                         {item.name}
                       </p>
+                      {item.variantLabel && (
+                        <p className="mt-0.5 font-poppins text-xs text-text-muted">{item.variantLabel}</p>
+                      )}
                       <p className="mt-0.5 font-poppins text-xs text-text-muted">x{item.qty}</p>
                     </div>
                     <p className="font-poppins text-sm font-bold text-primary-pink shrink-0">

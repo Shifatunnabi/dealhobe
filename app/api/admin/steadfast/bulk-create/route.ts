@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     recipient_phone: order.delivery.phone,
     recipient_address: order.delivery.address,
     cod_amount: order.total,
-    item_description: order.items.map((i) => `${i.name} x${i.qty}`).join(", "),
+    item_description: order.items.map((i) => `${i.name}${i.variantLabel ? ` (${i.variantLabel})` : ""} x${i.qty}`).join(", "),
   }));
 
   const results = await bulkCreateConsignments(payloads);

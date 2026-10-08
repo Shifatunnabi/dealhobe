@@ -28,8 +28,8 @@ import { applyOffersToProducts, isOfferActive } from '@/lib/offers';
 
 // Only serialize the fields and cards rendered by the homepage grids.
 function homepageProducts(products: GridProduct[]): GridProduct[] {
-  return products.slice(0, 8).map(({ _id, slug, name, images, price, salePrice, quantity, offerDiscountType, offerDiscountAmount }) => ({
-    _id, slug, name, images: images?.slice(0, 1), price, salePrice, quantity, offerDiscountType, offerDiscountAmount,
+  return products.slice(0, 8).map(({ _id, slug, name, images, price, salePrice, quantity, hasVariants, offerDiscountType, offerDiscountAmount }) => ({
+    _id, slug, name, images: images?.slice(0, 1), price, salePrice, quantity, hasVariants, offerDiscountType, offerDiscountAmount,
   }));
 }
 

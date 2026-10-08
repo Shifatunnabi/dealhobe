@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import connectDB from "@/lib/mongodb";
 import Order from "@/lib/models/Order";
+import { moveStock } from "@/lib/stock";
 
 export async function POST(
   _req: NextRequest,
@@ -20,7 +21,14 @@ export async function POST(
     return NextResponse.json({ error: "Order is already cancelled." }, { status: 400 });
   }
 
-  await Order.updateOne({ orderNumber: orderId }, { $set: { status: "Cancelled" } });
+  // Atomic flip guards against a double cancel returning stock twice.
+  const flipped = await Order.findOneAndUpdate(
+    { orderNumber: orderId, status: { $ne: "Cancelled" } },
+    { $set: { status: "Cancelled" } },
+  ).lean();
+  if (!flipped) return NextResponse.json({ error: "Order is already cancelled." }, { status: 400 });
+
+  await moveStock(order.items as any[], 1);
 
   return NextResponse.json({ success: true });
 }

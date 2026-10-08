@@ -14,6 +14,7 @@ interface SearchResult {
   image: string | null;
   price: number;
   salePrice: number | null;
+  hasVariants?: boolean;
 }
 
 const MIN_QUERY_LENGTH = 2;
@@ -177,9 +178,10 @@ export default function NavSearchOverlay({ onClose }: { onClose: () => void }) {
                       <p className="truncate font-poppins text-sm font-medium text-text-dark">{product.name}</p>
                       <div className="mt-0.5 flex items-center gap-1.5">
                         <span className="font-poppins text-sm font-semibold text-primary-pink">
-                          ৳{(product.salePrice ?? product.price).toLocaleString()}
+                          {product.hasVariants && <span className="mr-1 text-xs font-medium text-text-muted">From</span>}
+                          ৳{(product.salePrice || product.price).toLocaleString()}
                         </span>
-                        {product.salePrice != null && product.salePrice < product.price && (
+                        {!!product.salePrice && product.salePrice < product.price && (
                           <span className="text-xs text-text-muted line-through">
                             ৳{product.price.toLocaleString()}
                           </span>

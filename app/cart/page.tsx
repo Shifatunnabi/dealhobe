@@ -15,7 +15,7 @@ import {
 import { cn } from "@/lib/utils";
 import { fadeUp } from "@/components/animations/variants";
 import { ColorfulTitle } from "@/components/ui";
-import { useCart } from "@/components/cart/CartProvider";
+import { useCart, cartLineId } from "@/components/cart/CartProvider";
 
 /* ─── Types ─────────────────────────────────────────────────── */
 /* ─── Qty Stepper ────────────────────────────────────────────── */
@@ -131,7 +131,7 @@ export default function CartPage() {
               <AnimatePresence initial={false}>
                 {cartItems.map((item, i) => (
                   <motion.div
-                    key={item.productId}
+                    key={cartLineId(item)}
                     layout
                     initial={{ opacity: 0, y: -12 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -163,6 +163,7 @@ export default function CartPage() {
                               {item.name}
                             </p>
                           </Link>
+                          {item.variantLabel && <p className="font-poppins text-xs text-text-muted">{item.variantLabel}</p>}
                         </div>
                       </div>
 
@@ -174,7 +175,7 @@ export default function CartPage() {
                       {/* Qty stepper */}
                       <QtyStepper
                         value={item.qty}
-                        onChange={(v) => updateQty(item.productId, v)}
+                        onChange={(v) => updateQty(cartLineId(item), v)}
                       />
 
                       {/* Row total */}
@@ -184,7 +185,7 @@ export default function CartPage() {
 
                       {/* Delete */}
                       <button
-                        onClick={() => removeItem(item.productId)}
+                        onClick={() => removeItem(cartLineId(item))}
                         className="rounded-xl p-2 text-gray-300 transition-colors duration-200 hover:bg-red-50 hover:text-red-400"
                         aria-label={`Remove ${item.name} from cart`}
                       >
@@ -212,18 +213,18 @@ export default function CartPage() {
                           </p>
                         </Link>
                         <p className="mt-0.5 font-poppins text-xs text-text-muted">
-                          &nbsp;
+                          {item.variantLabel || " "}
                         </p>
                         <div className="mt-2.5 flex items-center justify-between gap-2">
                           <QtyStepper
                             value={item.qty}
-                            onChange={(v) => updateQty(item.productId, v)}
+                            onChange={(v) => updateQty(cartLineId(item), v)}
                           />
                           <p className="font-poppins text-base font-bold text-primary-pink">
                             ৳{(item.unitPrice * item.qty).toLocaleString()}
                           </p>
                           <button
-                            onClick={() => removeItem(item.productId)}
+                            onClick={() => removeItem(cartLineId(item))}
                             className="rounded-xl p-1.5 text-gray-300 transition-colors hover:bg-red-50 hover:text-red-400"
                             aria-label={`Remove ${item.name}`}
                           >

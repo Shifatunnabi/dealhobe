@@ -33,14 +33,23 @@ const FUZZY_CANDIDATE_CAP = 500;
 
 const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-const toResult = (p: any) => ({
-  _id: String(p._id),
-  name: p.name,
-  slug: p.slug,
-  image: p.images?.[0] ?? null,
-  price: p.price,
-  salePrice: p.salePrice ?? null,
-});
+const toResult = (p: any) => {
+  // Variant products carry per-variant prices; the product-level price/salePrice
+  // can be 0, so surface the lowest effective variant price and flag it for "From".
+  const hasVariants = !!p.hasVariants && Array.isArray(p.variants) && p.variants.length > 0;
+  const lowest = hasVariants
+    ? Math.min(...p.variants.map((v: any) => v.salePrice || v.price))
+    : null;
+  return {
+    _id: String(p._id),
+    name: p.name,
+    slug: p.slug,
+    image: p.images?.[0] ?? null,
+    price: lowest ?? p.price,
+    salePrice: lowest !== null ? null : p.salePrice || null,
+    hasVariants,
+  };
+};
 
 /** Iterative Levenshtein edit distance — small inputs only (typo fallback). */
 function levenshtein(a: string, b: string): number {
@@ -70,7 +79,7 @@ async function fuzzyFallback(query: string, limit: number) {
   if (query.length < 3) return [];
 
   const [candidates, categories, subCategories, brands] = await Promise.all([
-    Product.find({}, { name: 1, slug: 1, images: 1, price: 1, salePrice: 1, sku: 1, brand: 1, category: 1, subCategory: 1 })
+    Product.find({}, { name: 1, slug: 1, images: 1, price: 1, salePrice: 1, hasVariants: 1, "variants.price": 1, "variants.salePrice": 1, sku: 1, brand: 1, category: 1, subCategory: 1 })
       .sort({ updatedAt: -1 })
       .limit(FUZZY_CANDIDATE_CAP)
       .lean(),
@@ -154,6 +163,8 @@ export async function GET(req: NextRequest) {
     const orConditions: Record<string, unknown>[] = [
       { name: regex },
       { sku: regex },
+      { "variants.sku": regex },
+      { "variants.options.value": regex }, // e.g. "Ruby Red", "200ml"
       { shortDescription: regex },
       { description: regex },
       { whyLoveIt: regex },
@@ -173,6 +184,7 @@ export async function GET(req: NextRequest) {
     if (brandIds.length) scoreBranches.push({ case: { $in: ["$brand", brandIds] }, then: 41 });
     scoreBranches.push(
       { case: { $regexMatch: { input: { $ifNull: ["$sku", ""] }, regex } }, then: 35 },
+      { case: { $gt: [{ $size: { $filter: { input: { $ifNull: ["$variants", []] }, as: "v", cond: { $anyElementTrue: { $map: { input: "$$v.options", as: "o", in: { $regexMatch: { input: "$$o.value", regex } } } } } } } }, 0] }, then: 30 },
       { case: { $regexMatch: { input: { $ifNull: ["$shortDescription", ""] }, regex } }, then: 20 },
       { case: { $regexMatch: { input: { $ifNull: ["$description", ""] }, regex } }, then: 10 },
     );
@@ -188,7 +200,7 @@ export async function GET(req: NextRequest) {
           data: [
             { $skip: skip },
             { $limit: limit },
-            { $project: { name: 1, slug: 1, images: 1, price: 1, salePrice: 1, sku: 1 } },
+            { $project: { name: 1, slug: 1, images: 1, price: 1, salePrice: 1, hasVariants: 1, "variants.price": 1, "variants.salePrice": 1, sku: 1 } },
           ],
           totalCount: [{ $count: "count" }],
         },

@@ -7,6 +7,9 @@ export interface OrderItem {
   productId: string;
   name: string;
   image: string;
+  variantKey?: string;
+  variantLabel?: string; // e.g. "Red / M"
+  variantSku?: string;
   unitPrice: number;
   costPrice?: number; // per-unit cost snapshot at order time (admin profit reporting)
   qty: number;
@@ -47,6 +50,9 @@ const OrderItemSchema = new Schema<OrderItem>(
     productId: { type: String, required: true },
     name: { type: String, required: true },
     image: { type: String, required: true },
+    variantKey: { type: String },
+    variantLabel: { type: String },
+    variantSku: { type: String },
     unitPrice: { type: Number, required: true },
     costPrice: { type: Number },
     qty: { type: Number, required: true },

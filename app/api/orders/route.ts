@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 import connectDB from "@/lib/mongodb";
 import Product from "@/lib/models/Product";
 import Order from "@/lib/models/Order";
+import Offer from "@/lib/models/Offer";
+import { applyOffersToProduct, isOfferActive } from "@/lib/offers";
 import Settings from "@/lib/models/Settings";
 import { verifyCustomerToken } from "@/lib/auth";
 import { sendOrderConfirmationEmail } from "@/lib/email";
@@ -56,8 +58,12 @@ export async function POST(req: NextRequest) {
     .map((item: any) => item?.productId)
     .filter((id: any) => typeof id === "string");
 
-  const products = await Product.find({ _id: { $in: productIds } }).select('+costPrice').lean();
-  const productMap = new Map(products.map((p: any) => [String(p._id), p]));
+  const products = await Product.find({ _id: { $in: productIds } }).select('+costPrice +variants.costPrice').lean();
+  // Charge what the storefront showed: active offers are applied here too, not just in the UI.
+  const offers = (await Offer.find().lean()).filter((o: any) => isOfferActive(o));
+  const productMap = new Map(
+    products.map((p: any) => [String(p._id), applyOffersToProduct(p, offers as any[]) as any]),
+  );
 
   const orderItems = [] as any[];
   let subtotal = 0;
@@ -71,20 +77,48 @@ export async function POST(req: NextRequest) {
     if (qty <= 0) {
       return NextResponse.json({ error: "Invalid quantity in cart." }, { status: 400 });
     }
-    if (product.quantity < qty) {
-      return NextResponse.json({ error: `${product.name} is out of stock.` }, { status: 400 });
+
+    // Variant products: price, stock, image and SKU all come from the chosen variant.
+    let variant: any = null;
+    if (product.hasVariants) {
+      variant = item.variantKey ? (product.variants || []).find((v: any) => v.key === item.variantKey) : null;
+      if (!variant) {
+        return NextResponse.json(
+          {
+            error: item.variantKey
+              ? `The selected option of ${product.name} is no longer available. Please remove it from your cart and choose again.`
+              : `Please choose an option for ${product.name}.`,
+          },
+          { status: 400 },
+        );
+      }
+    }
+    const available = variant ? variant.quantity : product.quantity;
+    if (available < qty) {
+      const label = variant ? ` (${variant.options.map((o: any) => o.value).join(" / ")})` : "";
+      return NextResponse.json({ error: `${product.name}${label} is out of stock.` }, { status: 400 });
     }
 
-    const unitPrice = product.salePrice || product.price;
+    const unitPrice = variant ? variant.salePrice || variant.price : product.salePrice || product.price;
     const lineTotal = unitPrice * qty;
     subtotal += lineTotal;
 
     orderItems.push({
       productId: String(product._id),
       name: product.name,
-      image: product.images?.[0] || "/placeholder.png",
+      image: (variant && !variant.useMainImage && variant.image) || product.images?.[0] || "/placeholder.png",
+      ...(variant
+        ? {
+            variantKey: variant.key,
+            variantLabel: variant.options.map((o: any) => o.value).join(" / "),
+            ...(variant.sku ? { variantSku: variant.sku } : {}),
+          }
+        : {}),
       unitPrice,
-      ...(typeof product.costPrice === "number" ? { costPrice: product.costPrice } : {}),
+      ...(() => {
+        const cost = variant && typeof variant.costPrice === "number" ? variant.costPrice : product.costPrice;
+        return typeof cost === "number" ? { costPrice: cost } : {};
+      })(),
       qty,
       lineTotal,
     });
@@ -125,11 +159,17 @@ export async function POST(req: NextRequest) {
     status: "Pending",
   });
 
+  // Variant lines also decrement their own variant's stock (the product total mirrors the sum).
   const bulkOps = orderItems.map((item) => ({
-    updateOne: {
-      filter: { _id: item.productId, quantity: { $gte: item.qty } },
-      update: { $inc: { quantity: -item.qty } },
-    },
+    updateOne: item.variantKey
+      ? {
+          filter: { _id: item.productId, variants: { $elemMatch: { key: item.variantKey, quantity: { $gte: item.qty } } } },
+          update: { $inc: { "variants.$.quantity": -item.qty, quantity: -item.qty } },
+        }
+      : {
+          filter: { _id: item.productId, quantity: { $gte: item.qty } },
+          update: { $inc: { quantity: -item.qty } },
+        },
   }));
 
   const stockResult = await Product.bulkWrite(bulkOps);
@@ -144,7 +184,7 @@ export async function POST(req: NextRequest) {
       to: delivery.email,
       orderNumber,
       trackingUrl: siteUrl ? `${siteUrl}/orders/${orderNumber}` : undefined,
-      items: orderItems.map((i) => ({ name: i.name, qty: i.qty, unitPrice: i.unitPrice })),
+      items: orderItems.map((i) => ({ name: i.variantLabel ? `${i.name} (${i.variantLabel})` : i.name, qty: i.qty, unitPrice: i.unitPrice })),
       subtotal,
       deliveryCharge,
       total,

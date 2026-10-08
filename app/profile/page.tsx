@@ -33,7 +33,7 @@ interface Order {
   orderNumber: string;
   createdAt: string;
   status: OrderStatus;
-  items: { name: string; image: string; qty: number }[];
+  items: { name: string; image: string; qty: number; variantLabel?: string }[];
   total: number;
 }
 
@@ -689,7 +689,7 @@ export default function ProfilePage() {
                               </div>
                             ))}
                             <p className="ml-1 font-poppins text-xs text-text-muted">
-                              {order.items.map((i) => i.name).join(", ")}
+                              {order.items.map((i) => (i.variantLabel ? `${i.name} (${i.variantLabel})` : i.name)).join(", ")}
                             </p>
                           </div>
 

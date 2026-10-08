@@ -65,9 +65,9 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
               </thead>
               <tbody>
                 {order.items.map((item: any, index: number) => (
-                  <tr key={item.productId}>
+                  <tr key={`${item.productId}-${item.variantKey || index}`}>
                     <td>{index + 1}</td>
-                    <td>{item.name}</td>
+                    <td>{item.name}{item.variantLabel ? ` (${item.variantLabel})` : ""}{item.variantSku && <div style={{ fontSize: "0.7rem", color: "var(--text-muted)", fontFamily: "monospace" }}>{item.variantSku}</div>}</td>
                     <td>{item.qty}</td>
                     <td style={{ textAlign: "right" }}>৳{item.unitPrice}</td>
                     <td style={{ textAlign: "right" }}>৳{item.lineTotal}</td>

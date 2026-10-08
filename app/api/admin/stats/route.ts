@@ -32,7 +32,26 @@ export async function GET() {
     Offer.countDocuments()
   ]);
 
+  // Low-stock list is variant-aware: a variant product is flagged per variant, not by its total.
+  const LOW = 10;
+  const stockDocs = await Product.find({}, { name: 1, quantity: 1, hasVariants: 1, 'variants.key': 1, 'variants.options': 1, 'variants.quantity': 1 }).lean();
+  const lowStock: { productId: string; name: string; variant?: string; quantity: number }[] = [];
+  for (const p of stockDocs as any[]) {
+    if (p.hasVariants && p.variants?.length) {
+      for (const v of p.variants) {
+        if (v.quantity < LOW) {
+          lowStock.push({ productId: String(p._id), name: p.name, variant: v.options.map((o: any) => o.value).join(' / '), quantity: v.quantity });
+        }
+      }
+    } else if (p.quantity < LOW) {
+      lowStock.push({ productId: String(p._id), name: p.name, quantity: p.quantity });
+    }
+  }
+  lowStock.sort((a, b) => a.quantity - b.quantity);
+
   return NextResponse.json({
+    lowStockCount: lowStock.length,
+    lowStock: lowStock.slice(0, 10),
     totalBrands,
     totalCategories,
     totalBlogs,

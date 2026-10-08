@@ -10,7 +10,13 @@ export interface CartItem {
   unitPrice: number;
   qty: number;
   maxQty?: number;
+  variantKey?: string;
+  variantLabel?: string;
 }
+
+/** Unique id of a cart line: a product, or one specific variant of it. */
+export const cartLineId = (item: { productId: string; variantKey?: string }) =>
+  item.variantKey ? `${item.productId}::${item.variantKey}` : item.productId;
 
 interface CartContextValue {
   items: CartItem[];
@@ -21,8 +27,8 @@ interface CartContextValue {
   openSidebar: () => void;
   closeSidebar: () => void;
   addItem: (item: CartItem, qty?: number) => void;
-  updateQty: (productId: string, qty: number) => void;
-  removeItem: (productId: string) => void;
+  updateQty: (lineId: string, qty: number) => void;
+  removeItem: (lineId: string) => void;
   clearCart: () => void;
 }
 
@@ -83,7 +89,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const addItem = useCallback((item: CartItem, qty = 1) => {
     if (item.maxQty !== undefined && item.maxQty <= 0) return;
     setItems((prev) => {
-      const existing = prev.find((p) => p.productId === item.productId);
+      const existing = prev.find((p) => cartLineId(p) === cartLineId(item));
       if (!existing) {
         const nextQty = clampQty(qty, item.maxQty);
         if (nextQty <= 0) return prev;
@@ -92,9 +98,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
       const maxQty = typeof item.maxQty === "number" ? item.maxQty : existing.maxQty;
       const nextQty = clampQty(existing.qty + qty, maxQty);
-      if (nextQty <= 0) return prev.filter((p) => p.productId !== item.productId);
+      if (nextQty <= 0) return prev.filter((p) => cartLineId(p) !== cartLineId(item));
       return prev.map((p) =>
-        p.productId === item.productId ? { ...p, maxQty, qty: nextQty } : p,
+        cartLineId(p) === cartLineId(item) ? { ...p, maxQty, qty: nextQty } : p,
       );
     });
     // Open sidebar on desktop only
@@ -103,11 +109,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const updateQty = useCallback((productId: string, qty: number) => {
+  const updateQty = useCallback((lineId: string, qty: number) => {
     setItems((prev) =>
       prev
         .map((item) => {
-          if (item.productId !== productId) return item;
+          if (cartLineId(item) !== lineId) return item;
           const nextQty = clampQty(qty, item.maxQty);
           return { ...item, qty: nextQty };
         })
@@ -115,8 +121,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     );
   }, []);
 
-  const removeItem = useCallback((productId: string) => {
-    setItems((prev) => prev.filter((item) => item.productId !== productId));
+  const removeItem = useCallback((lineId: string) => {
+    setItems((prev) => prev.filter((item) => cartLineId(item) !== lineId));
   }, []);
 
   const clearCart = useCallback(() => {

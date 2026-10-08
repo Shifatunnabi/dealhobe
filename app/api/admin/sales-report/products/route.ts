@@ -19,7 +19,7 @@ export async function GET() {
       name: p.name,
       slug: p.slug,
       image: p.images?.[0] ?? null,
-      price: p.salePrice ?? p.price,
+      price: p.salePrice || p.price,
     })),
     { headers: { "Cache-Control": "no-store" } },
   );

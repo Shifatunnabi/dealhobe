@@ -38,15 +38,17 @@ export function applyOffersToProduct<T extends { _id: any; price: number; salePr
     return { ...product };
   }
 
+  const discount = (offer: OfferLike, price: number) =>
+    Math.max(
+      0,
+      offer.discountType === "percentage" ? price * (1 - offer.discountAmount / 100) : price - offer.discountAmount,
+    );
+
   let bestOffer = eligibleOffers[0];
   let bestPrice = product.price;
 
   for (const offer of eligibleOffers) {
-    const discounted =
-      offer.discountType === "percentage"
-        ? product.price * (1 - offer.discountAmount / 100)
-        : product.price - offer.discountAmount;
-    const finalPrice = Math.max(0, discounted);
+    const finalPrice = discount(offer, product.price);
     if (finalPrice < bestPrice) {
       bestPrice = finalPrice;
       bestOffer = offer;
@@ -57,8 +59,21 @@ export function applyOffersToProduct<T extends { _id: any; price: number; salePr
     return { ...product };
   }
 
+  // Variants carry their own prices: discount each one with the winning offer.
+  const variants = (product as any).variants;
+  const pricedVariants = Array.isArray(variants)
+    ? {
+        variants: variants.map((v: any) => {
+          const offered = Math.round(discount(bestOffer, v.price));
+          const current = v.salePrice || v.price;
+          return offered < current ? { ...v, salePrice: offered } : v;
+        }),
+      }
+    : {};
+
   return {
     ...product,
+    ...pricedVariants,
     salePrice: Math.round(bestPrice),
     offerId: bestOffer._id ? String(bestOffer._id) : undefined,
     offerDiscountType: bestOffer.discountType,

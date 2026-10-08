@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { FiShoppingCart, FiCheck } from "react-icons/fi";
 import { cn } from "@/lib/utils";
@@ -18,6 +19,7 @@ export interface GridProduct {
   offerDiscountType?: "percentage" | "flat";
   offerDiscountAmount?: number;
   quantity?: number;
+  hasVariants?: boolean;
 }
 
 /** Shared product card used by every homepage product grid (Trending, For You). */
@@ -27,6 +29,8 @@ export default function ProductCard({ product }: { product: GridProduct }) {
   const availableQty = Number(product.quantity ?? 0);
   const outOfStock = availableQty <= 0;
   const unitPrice = product.salePrice || product.price;
+  const hasVariants = !!product.hasVariants;
+  const router = useRouter();
   const offerBadgeText = product.offerDiscountType
     ? product.offerDiscountType === "percentage"
       ? `-${product.offerDiscountAmount}%`
@@ -35,6 +39,11 @@ export default function ProductCard({ product }: { product: GridProduct }) {
 
   const handleAdd = () => {
     if (outOfStock) return;
+    // Variant products need an option chosen first — send the shopper to the product page.
+    if (hasVariants) {
+      router.push(`/product/${product.slug}`);
+      return;
+    }
     cart?.addItem(
       {
         productId: product._id,
@@ -80,6 +89,7 @@ export default function ProductCard({ product }: { product: GridProduct }) {
           </h3>
           <div className="mt-auto flex items-baseline justify-start gap-1.5 whitespace-nowrap">
             <p className="font-poppins text-lg font-bold text-primary-pink">
+              {hasVariants && <span className="mr-1 text-xs font-medium text-text-muted">From</span>}
               ৳{unitPrice.toLocaleString()}.00
             </p>
             {product.salePrice && product.price > product.salePrice && (

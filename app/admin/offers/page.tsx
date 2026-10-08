@@ -258,7 +258,7 @@ export default function OffersPage() {
                                  <label key={p._id} style={{display:'flex', alignItems:'center', justifyContent: 'space-between', padding: '0.5rem', borderBottom: '1px solid #f0f0f0', cursor:'pointer', background: form.selectedProducts.includes(p._id) ? '#f0f9ff' : 'transparent'}}>
                                      <div style={{display:'flex', alignItems:'center', gap:'0.5rem'}}>
                                          {p.images && p.images[0] && <Image src={p.images[0]} alt={p.name} width={30} height={30} style={{objectFit:'cover', borderRadius:4}}/>}
-                                         <span style={{fontSize:'0.9rem'}}>{p.name} - ৳{p.salePrice || p.price}</span>
+                                         <span style={{fontSize:'0.9rem'}}>{p.name} - {p.hasVariants ? 'from ' : ''}৳{p.salePrice || p.price}</span>
                                      </div>
                                      <input type="checkbox" checked={form.selectedProducts.includes(p._id)} onChange={() => toggleProduct(p._id)} />
                                  </label>

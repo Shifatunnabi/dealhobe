@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { FiTag, FiFolder, FiFileText, FiStar, FiBell, FiImage, FiZap } from 'react-icons/fi';
+import { FiTag, FiFolder, FiFileText, FiStar, FiBell, FiImage, FiZap, FiAlertTriangle } from 'react-icons/fi';
 import type { IconType } from 'react-icons';
 
 interface Stats {
@@ -10,6 +10,8 @@ interface Stats {
   totalBlogs:      number;
   totalReviews:    number;
   pendingReviews:  number;
+  lowStockCount?:  number;
+  lowStock?:       { productId: string; name: string; variant?: string; quantity: number }[];
 }
 
 const statCards = (s: Stats) => [
@@ -18,6 +20,7 @@ const statCards = (s: Stats) => [
   { icon: FiFileText, label: 'Blog Posts',       value: s.totalBlogs,      color: 'purple', href: '/admin/blogs' },
   { icon: FiStar,     label: 'Total Reviews',    value: s.totalReviews,    color: 'green',  href: '/admin/reviews' },
   { icon: FiBell,     label: 'Pending Reviews',  value: s.pendingReviews,  color: 'yellow', href: '/admin/reviews' },
+  { icon: FiAlertTriangle, label: 'Low / Out of Stock', value: s.lowStockCount ?? 0, color: 'yellow', href: '/admin/products' },
 ];
 
 const quickLinks: { href: string; icon: IconType; label: string; desc: string }[] = [
@@ -68,6 +71,29 @@ export default function AdminDashboard() {
           })}
         </div>
       ) : null}
+
+      {/* Low stock (variant-aware) */}
+      {stats?.lowStock && stats.lowStock.length > 0 && (
+        <div className="admin-card" style={{ marginTop: '1rem' }}>
+          <div className="admin-card-header" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <FiAlertTriangle size={16} /> Low Stock
+          </div>
+          <div className="admin-card-body">
+            <table className="admin-table">
+              <thead><tr><th>Product</th><th>Variant</th><th>Left</th></tr></thead>
+              <tbody>
+                {stats.lowStock.map((r, i) => (
+                  <tr key={`${r.productId}-${i}`}>
+                    <td>{r.name}</td>
+                    <td>{r.variant || '—'}</td>
+                    <td>{r.quantity === 0 ? <span className="badge badge-red">Out of stock</span> : <span className="badge badge-yellow">{r.quantity}</span>}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       {/* Quick action shortcuts */}
       <div className="admin-card" style={{ marginTop: '1rem' }}>

@@ -1,6 +1,27 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
 
+export interface IVariantOption {
+  name: string;
+  values: string[];
+}
+
+export interface IVariant {
+  key: string; // option values joined by '|', e.g. "Red|M"
+  options: { name: string; value: string }[];
+  price: number;
+  salePrice?: number;
+  costPrice?: number; // admin-only; never selected by default
+  sku?: string;
+  quantity: number;
+  useMainImage: boolean;
+  image?: string;
+  imagePublicId?: string;
+}
+
 export interface IProduct extends Document {
+  hasVariants: boolean;
+  variantOptions: IVariantOption[];
+  variants: IVariant[];
   sku: string;
   name: string;
   slug: string;
@@ -24,8 +45,32 @@ export interface IProduct extends Document {
   updatedAt: Date;
 }
 
+const VariantOptionSchema = new Schema(
+  { name: { type: String, required: true }, values: [{ type: String }] },
+  { _id: false }
+);
+
+const VariantSchema = new Schema(
+  {
+    key: { type: String, required: true },
+    options: [{ name: String, value: String, _id: false }],
+    price: { type: Number, required: true, min: 0 },
+    salePrice: { type: Number, min: 0 },
+    costPrice: { type: Number, min: 0, select: false }, // admin-only, like product.costPrice
+    sku: { type: String },
+    quantity: { type: Number, default: 0, min: 0 },
+    useMainImage: { type: Boolean, default: true },
+    image: { type: String },
+    imagePublicId: { type: String },
+  },
+  { _id: false }
+);
+
 const ProductSchema = new Schema<IProduct>(
   {
+    hasVariants: { type: Boolean, default: false },
+    variantOptions: { type: [VariantOptionSchema], default: [] },
+    variants: { type: [VariantSchema], default: [] },
     sku: { type: String, unique: true, sparse: true },
     name: { type: String, required: true },
     slug: { type: String, required: true, unique: true },

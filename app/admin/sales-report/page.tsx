@@ -19,6 +19,7 @@ interface ReportRow {
   revenue: number;
   profit: number;
   orderCount: number;
+  variants?: { label: string; orderCount: number; qty: number; revenue: number; profit: number }[];
 }
 
 interface Totals {
@@ -310,6 +311,7 @@ export default function SalesReportPage() {
                     <tr>
                       <th>#</th>
                       <th>Product</th>
+                      <th>Variant</th>
                       <th>Orders</th>
                       <th>Qty Sold</th>
                       <th>Revenue (৳)</th>
@@ -317,23 +319,33 @@ export default function SalesReportPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {rows.map((row, i) => (
-                      <tr key={row.productId}>
-                        <td>{i + 1}</td>
-                        <td style={{ fontWeight: 600 }}>{row.name}</td>
-                        <td>{row.orderCount}</td>
-                        <td>{row.qty}</td>
-                        <td>৳{row.revenue.toLocaleString()}</td>
-                        <td style={{ fontWeight: 600, color: row.profit < 0 ? "#A41B15" : "#15803d" }}>
-                          ৳{row.profit.toLocaleString()}
-                        </td>
-                      </tr>
-                    ))}
+                    {rows.map((row, i) => {
+                      // One table row per variant, kept together under the product; plain products get one row.
+                      const lines = row.variants && row.variants.length > 0
+                        ? row.variants
+                        : [{ label: "", orderCount: row.orderCount, qty: row.qty, revenue: row.revenue, profit: row.profit }];
+                      return lines.map((v, j) => (
+                        <tr
+                          key={row.productId + "|" + v.label}
+                          style={j === 0 && i > 0 ? { borderTop: "2px solid rgba(0,0,0,0.08)" } : undefined}
+                        >
+                          {j === 0 && <td rowSpan={lines.length} style={{ verticalAlign: "top" }}>{i + 1}</td>}
+                          {j === 0 && <td rowSpan={lines.length} style={{ fontWeight: 600, verticalAlign: "top" }}>{row.name}</td>}
+                          <td style={{ color: v.label ? undefined : "var(--text-muted)" }}>{v.label || "—"}</td>
+                          <td>{v.orderCount}</td>
+                          <td>{v.qty}</td>
+                          <td>৳{v.revenue.toLocaleString()}</td>
+                          <td style={{ fontWeight: 600, color: v.profit < 0 ? "#A41B15" : "#15803d" }}>
+                            ৳{v.profit.toLocaleString()}
+                          </td>
+                        </tr>
+                      ));
+                    })}
                   </tbody>
                   {totals && (
                     <tfoot>
                       <tr style={{ fontWeight: 700, background: "rgba(164, 27, 21, 0.04)" }}>
-                        <td colSpan={3}>Total</td>
+                        <td colSpan={4}>Total</td>
                         <td>{totals.qty}</td>
                         <td>৳{totals.revenue.toLocaleString()}</td>
                         <td style={{ color: totals.profit < 0 ? "#A41B15" : "#15803d" }}>

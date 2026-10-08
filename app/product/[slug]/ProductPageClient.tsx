@@ -11,15 +11,9 @@ import {
   FiCheck,
   FiPlus,
   FiMinus,
-  FiShare2,
-  FiCopy,
-  FiX,
   FiUser,
-  FiFacebook,
-  FiInstagram,
   FiAlertCircle,
 } from "react-icons/fi";
-import { FaWhatsapp } from "react-icons/fa";
 
 import { cn } from "@/lib/utils";
 import {
@@ -82,6 +76,8 @@ function RelatedCard({ product }: { product: any }) {
     : null;
   const availableQty = Number(product.quantity ?? product.qty ?? 0);
   const outOfStock = availableQty <= 0;
+  const hasVariants = !!product.hasVariants;
+  const router = useRouter();
 
   return (
     <motion.article
@@ -117,6 +113,7 @@ function RelatedCard({ product }: { product: any }) {
           </h3>
           <div className="mt-1.5 flex items-baseline gap-1.5">
             <p className="font-poppins text-lg font-bold text-primary-pink">
+              {hasVariants && <span className="mr-1 text-xs font-medium text-text-muted">From</span>}
               ৳{(product.salePrice || product.price).toLocaleString()}.00
             </p>
             {product.salePrice && product.price > product.salePrice && (
@@ -131,6 +128,10 @@ function RelatedCard({ product }: { product: any }) {
         whileTap={{ scale: 0.97 }}
         onClick={() => {
           if (outOfStock) return;
+          if (hasVariants) {
+            router.push(`/product/${product.slug}`);
+            return;
+          }
           addItem(
             {
               productId: product._id,
@@ -195,11 +196,15 @@ export default function ProductDetailPageClient({
 }) {
   const router = useRouter();
   const [added, setAdded] = useState(false);
-  const [shareOpen, setShareOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
   const [activeThumb, setActiveThumb] = useState(0);
   const [featuresOpen, setFeaturesOpen] = useState(true);
   const [selectedQty, setSelectedQty] = useState(1);
+  // Variant selection: option name → chosen value. Starts on the first in-stock variant.
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>(() => {
+    const variants: any[] = product?.hasVariants ? product.variants || [] : [];
+    const first = variants.find((v) => v.quantity > 0) || variants[0];
+    return first ? Object.fromEntries(first.options.map((o: any) => [o.name, o.value])) : {};
+  });
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
   const { addItem, clearCart, closeSidebar } = useCart();
   const [reviewList, setReviewList] = useState<any[]>(reviews || []);
@@ -275,13 +280,39 @@ export default function ProductDetailPageClient({
     : null;
 
   const thumbImages: string[] = product.images?.length > 0 ? product.images : ["/placeholder.png"];
-  const shareUrl = typeof window !== "undefined" ? window.location.href : "";
   const brandLabel = product.brandDisplay || product.brand?.name || product.brand;
   const categoryLabel = product.categoryDisplay || product.category?.name || product.category;
   const subCategoryLabel = product.subCategoryDisplay || product.subCategory?.name || product.subCategory;
   const categoryPathLabel = subCategoryLabel ? `${categoryLabel} / ${subCategoryLabel}` : categoryLabel;
 
-  const availableQty = Number(product.quantity ?? product.qty ?? 0);
+  const hasVariants = !!product.hasVariants && (product.variants?.length ?? 0) > 0;
+  const variantOptions: { name: string; values: string[] }[] = hasVariants ? product.variantOptions || [] : [];
+  const selectedVariant: any = hasVariants
+    ? (product.variants as any[]).find((v) =>
+        v.options.every((o: any) => selectedOptions[o.name] === o.value),
+      )
+    : null;
+  // A value is selectable only if some in-stock variant has it together with the other current picks.
+  const isValueAvailable = (optName: string, value: string) =>
+    (product.variants as any[]).some(
+      (v) =>
+        v.quantity > 0 &&
+        v.options.some((o: any) => o.name === optName && o.value === value) &&
+        v.options.every((o: any) => o.name === optName || selectedOptions[o.name] === o.value),
+    );
+  const variantImage: string | null =
+    selectedVariant && !selectedVariant.useMainImage && selectedVariant.image ? selectedVariant.image : null;
+  const variantLabel: string = selectedVariant ? selectedVariant.options.map((o: any) => o.value).join(" / ") : "";
+  const displayPrice: number = selectedVariant
+    ? selectedVariant.salePrice || selectedVariant.price
+    : product.salePrice || product.price;
+  const displayOriginal: number | null = selectedVariant
+    ? selectedVariant.salePrice && selectedVariant.price > selectedVariant.salePrice ? selectedVariant.price : null
+    : product.salePrice && product.price > product.salePrice ? product.price : null;
+
+  const availableQty = hasVariants
+    ? Number(selectedVariant?.quantity ?? 0)
+    : Number(product.quantity ?? product.qty ?? 0);
   const outOfStock = availableQty <= 0;
   const canExpandDescription = useMemo(() => {
     const plainText = String(product?.description || "")
@@ -299,20 +330,25 @@ export default function ProductDetailPageClient({
     setSelectedQty((prev) => Math.min(Math.max(1, prev), availableQty));
   }, [availableQty, outOfStock]);
 
+  // Show the variant's own photo when selected; fall back to the main gallery otherwise.
+  useEffect(() => {
+    setActiveThumb(variantImage ? -1 : 0);
+  }, [variantImage]);
+
+  const cartLine = (qty: number) => ({
+    productId: product._id,
+    slug: product.slug,
+    name: product.name,
+    image: variantImage || product.images?.[0] || "/placeholder.png",
+    unitPrice: displayPrice,
+    qty,
+    maxQty: availableQty,
+    ...(selectedVariant ? { variantKey: selectedVariant.key, variantLabel } : {}),
+  });
+
   const handleAddToCart = () => {
     if (outOfStock) return;
-    addItem(
-      {
-        productId: product._id,
-        slug: product.slug,
-        name: product.name,
-        image: product.images?.[0] || "/placeholder.png",
-        unitPrice: product.salePrice || product.price,
-        qty: selectedQty,
-        maxQty: availableQty,
-      },
-      selectedQty,
-    );
+    addItem(cartLine(selectedQty), selectedQty);
     setAdded(true);
     setTimeout(() => setAdded(false), 1800);
   };
@@ -321,18 +357,7 @@ export default function ProductDetailPageClient({
     if (outOfStock) return;
 
     clearCart();
-    addItem(
-      {
-        productId: product._id,
-        slug: product.slug,
-        name: product.name,
-        image: product.images?.[0] || "/placeholder.png",
-        unitPrice: product.salePrice || product.price,
-        qty: selectedQty,
-        maxQty: availableQty,
-      },
-      selectedQty,
-    );
+    addItem(cartLine(selectedQty), selectedQty);
     closeSidebar();
     router.push("/checkout");
   };
@@ -386,53 +411,6 @@ export default function ProductDetailPageClient({
     }
   };
 
-  const handleCopyLink = async () => {
-    if (!shareUrl) return;
-    try {
-      await navigator.clipboard.writeText(shareUrl);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1800);
-    } catch {
-      setCopied(false);
-    }
-  };
-
-  const openShare = (type: "facebook" | "whatsapp" | "instagram") => {
-    if (!shareUrl) return;
-
-    if (type === "facebook") {
-      window.open(
-        `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
-        "_blank",
-        "noopener,noreferrer",
-      );
-      return;
-    }
-
-    if (type === "whatsapp") {
-      window.open(
-        `https://wa.me/?text=${encodeURIComponent(`Check this out: ${shareUrl}`)}`,
-        "_blank",
-        "noopener,noreferrer",
-      );
-      return;
-    }
-
-    window.open("https://www.instagram.com/", "_blank", "noopener,noreferrer");
-  };
-
-  const handleOrderWhatsApp = () => {
-    const message = shareUrl
-      ? `Hi! I want to order: ${product.name} - ${shareUrl}`
-      : `Hi! I want to order: ${product.name}`;
-
-    window.open(
-      `https://wa.me/?text=${encodeURIComponent(message)}`,
-      "_blank",
-      "noopener,noreferrer",
-    );
-  };
-
   return (
     <div className="min-h-screen bg-soft-bg pt-26">
       {/* ─── Breadcrumb ─── */}
@@ -471,7 +449,7 @@ export default function ProductDetailPageClient({
             {/* Main image card */}
             <div className="relative aspect-square w-full overflow-hidden rounded-3xl bg-white shadow-card">
               <Image
-                src={thumbImages[activeThumb]}
+                src={activeThumb === -1 && variantImage ? variantImage : thumbImages[Math.max(0, activeThumb)]}
                 alt={product.name}
                 fill
                 className="object-cover"
@@ -542,14 +520,55 @@ export default function ProductDetailPageClient({
             {/* Price */}
             <motion.div variants={fadeUp} className="flex items-baseline gap-3">
               <span className="font-poppins text-4xl font-bold text-primary-pink">
-                ৳{(product.salePrice || product.price).toLocaleString()}.00
+                ৳{displayPrice.toLocaleString()}.00
               </span>
-              {product.salePrice && product.price > product.salePrice && (
+              {displayOriginal && (
                 <span className="font-poppins text-lg text-text-muted line-through">
-                  ৳{product.price.toLocaleString()}.00
+                  ৳{displayOriginal.toLocaleString()}.00
                 </span>
               )}
             </motion.div>
+
+            {/* Variant selectors */}
+            {variantOptions.length > 0 && (
+              <motion.div variants={fadeUp} className="space-y-4">
+                {variantOptions.map((opt) => (
+                  <div key={opt.name}>
+                    <p className="mb-2 font-poppins text-sm font-semibold text-text-dark">
+                      {opt.name}
+                      {selectedOptions[opt.name] && (
+                        <span className="ml-2 font-normal text-text-muted">{selectedOptions[opt.name]}</span>
+                      )}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {opt.values.map((val) => {
+                        const active = selectedOptions[opt.name] === val;
+                        const available = isValueAvailable(opt.name, val);
+                        return (
+                          <button
+                            key={val}
+                            type="button"
+                            onClick={() => setSelectedOptions((prev) => ({ ...prev, [opt.name]: val }))}
+                            className={cn(
+                              "rounded-xl border-2 px-4 py-2 font-poppins text-sm font-medium transition-all",
+                              active
+                                ? "border-primary-pink bg-primary-pink/5 text-primary-pink"
+                                : "border-gray-200 text-text-dark hover:border-primary-pink",
+                              !available && "opacity-40 line-through",
+                            )}
+                          >
+                            {val}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+                {!selectedVariant && (
+                  <p className="font-poppins text-sm text-red-500">This combination is not available.</p>
+                )}
+              </motion.div>
+            )}
 
             {/* Short description */}
             <motion.p
@@ -638,106 +657,10 @@ export default function ProductDetailPageClient({
                   Buy Now
                 </motion.button>
               </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                {/* Order on WhatsApp */}
-                <motion.button
-                  whileHover={{ y: -2 }}
-                  whileTap={{ scale: 0.96 }}
-                  onClick={handleOrderWhatsApp}
-                  className="flex items-center justify-center gap-2.5 rounded-2xl border-2 border-green-500 px-4 py-3 font-poppins text-base font-semibold text-green-600 transition-all hover:bg-green-500 hover:text-white"
-                >
-                  <FaWhatsapp size={18} />
-                  Order on WhatsApp
-                </motion.button>
-
-                {/* Share */}
-                <motion.button
-                  whileHover={{ y: -2 }}
-                  whileTap={{ scale: 0.96 }}
-                  onClick={() => setShareOpen(true)}
-                  className="flex items-center justify-center gap-2 rounded-2xl border-2 border-accent-blue px-4 py-3 font-poppins text-sm font-semibold text-accent-blue transition-all hover:bg-accent-blue hover:text-white md:text-base"
-                >
-                  <FiShare2 size={18} />
-                  Share
-                </motion.button>
-              </div>
             </motion.div>
           </motion.div>
         </div>
       </section>
-
-      {/* Share Modal */}
-      <AnimatePresence>
-        {shareOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 px-4"
-            onClick={() => setShareOpen(false)}
-          >
-            <motion.div
-              initial={{ y: 20, opacity: 0, scale: 0.98 }}
-              animate={{ y: 0, opacity: 1, scale: 1 }}
-              exit={{ y: 14, opacity: 0, scale: 0.98 }}
-              transition={{ duration: 0.2 }}
-              className="w-full max-w-md rounded-3xl bg-white p-5 shadow-hover"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="mb-4 flex items-center justify-between">
-                <h3 className="font-poppins text-lg font-semibold text-text-dark">Share Product</h3>
-                <button
-                  onClick={() => setShareOpen(false)}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-text-muted transition-colors hover:border-primary-pink hover:text-primary-pink"
-                  aria-label="Close share dialog"
-                >
-                  <FiX size={18} />
-                </button>
-              </div>
-
-              <div className="border-b border-gray-100 pb-4">
-                <p className="mb-3 font-poppins text-sm font-semibold text-text-dark">Share via</p>
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => openShare("facebook")}
-                    aria-label="Share on Facebook"
-                    className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-blue-200 bg-blue-50 text-blue-700 transition-colors hover:bg-blue-100"
-                  >
-                    <FiFacebook size={20} />
-                  </button>
-                  <button
-                    onClick={() => openShare("whatsapp")}
-                    aria-label="Share on WhatsApp"
-                    className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-green-200 bg-green-50 text-green-700 transition-colors hover:bg-green-100"
-                  >
-                    <FaWhatsapp size={20} />
-                  </button>
-                  <button
-                    onClick={() => openShare("instagram")}
-                    aria-label="Share on Instagram"
-                    className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-pink-200 bg-pink-50 text-pink-700 transition-colors hover:bg-pink-100"
-                  >
-                    <FiInstagram size={20} />
-                  </button>
-                  <button
-                    onClick={handleCopyLink}
-                    aria-label="Copy link"
-                    className={cn(
-                      "inline-flex h-12 w-12 items-center justify-center rounded-full border transition-colors",
-                      copied
-                        ? "border-green-200 bg-green-50 text-green-700"
-                        : "border-gray-200 bg-soft-bg text-text-muted hover:bg-gray-100",
-                    )}
-                  >
-                    {copied ? <FiCheck size={20} /> : <FiCopy size={20} />}
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* ─── Description ─── */}
       <section className="bg-soft-bg px-section py-section">

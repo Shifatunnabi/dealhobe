@@ -95,7 +95,7 @@ export const buildInvoicePdf = (order: any, logoDataUrl = "") => {
   doc.setFont("helvetica", "normal");
   order.items.forEach((item: any, index: number) => {
     doc.text(String(index + 1), margin, cursorY);
-    doc.text(item.name, margin + 24, cursorY, { maxWidth: 270 });
+    doc.text(item.variantLabel ? `${item.name} (${item.variantLabel})` : item.name, margin + 24, cursorY, { maxWidth: 270 });
     doc.text(String(item.qty), 320, cursorY);
     doc.text(`${item.unitPrice} BDT`, 360, cursorY);
     doc.text(`${item.lineTotal} BDT`, 460, cursorY);

@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FiFilter,
@@ -286,10 +286,17 @@ function ShopProductCard({
     : null;
   const availableQty = Number(product.quantity ?? product.qty ?? 0);
   const outOfStock = availableQty <= 0;
+  const hasVariants = !!product.hasVariants;
+  const router = useRouter();
 
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault();
     if (outOfStock) return;
+    // Variant products need an option chosen first — send the shopper to the product page.
+    if (hasVariants) {
+      router.push(`/product/${product.slug}`);
+      return;
+    }
     addItem(
       {
         productId: product._id,
@@ -340,6 +347,7 @@ function ShopProductCard({
           </h3>
           <div className="mt-auto flex items-baseline gap-1.5 whitespace-nowrap">
             <p className="font-poppins text-lg font-bold text-primary-pink">
+              {hasVariants && <span className="mr-1 text-xs font-medium text-text-muted">From</span>}
               ৳{(product.salePrice || product.price).toLocaleString()}.00
             </p>
             {product.salePrice && product.price > product.salePrice && (

@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiX, FiTrash2, FiMinus, FiPlus, FiArrowRight, FiShoppingBag } from "react-icons/fi";
-import { useCart } from "./CartProvider";
+import { useCart, cartLineId } from "./CartProvider";
 
 export default function CartSidebar() {
   const { items, sidebarOpen, closeSidebar, updateQty, removeItem, subtotal } = useCart();
@@ -59,7 +59,7 @@ export default function CartSidebar() {
                       const rowTotal = item.unitPrice * item.qty;
                       return (
                         <motion.div
-                          key={item.productId}
+                          key={cartLineId(item)}
                           layout
                           initial={{ opacity: 0, y: -10 }}
                           animate={{ opacity: 1, y: 0 }}
@@ -69,7 +69,7 @@ export default function CartSidebar() {
                         >
                           {/* Delete button — top right */}
                           <button
-                            onClick={() => removeItem(item.productId)}
+                            onClick={() => removeItem(cartLineId(item))}
                             aria-label={`Remove ${item.name}`}
                             className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-300 transition-colors hover:border-red-300 hover:text-red-400"
                           >
@@ -97,6 +97,9 @@ export default function CartSidebar() {
                                   {item.name}
                                 </p>
                               </Link>
+                              {item.variantLabel && (
+                                <p className="mt-0.5 font-poppins text-xs text-text-muted">{item.variantLabel}</p>
+                              )}
                               <p className="mt-0.5 font-poppins text-xs text-text-muted">
                                 ৳{item.unitPrice.toLocaleString()} each
                               </p>
@@ -107,7 +110,7 @@ export default function CartSidebar() {
                           <div className="mt-2.5 flex items-center justify-between">
                             <div className="inline-flex items-center overflow-hidden rounded-xl border border-gray-200 bg-white">
                               <button
-                                onClick={() => updateQty(item.productId, item.qty - 1)}
+                                onClick={() => updateQty(cartLineId(item), item.qty - 1)}
                                 className="flex h-7 w-7 items-center justify-center text-text-muted transition-colors hover:text-primary-pink"
                                 aria-label="Decrease"
                               >
@@ -117,7 +120,7 @@ export default function CartSidebar() {
                                 {item.qty}
                               </span>
                               <button
-                                onClick={() => updateQty(item.productId, item.qty + 1)}
+                                onClick={() => updateQty(cartLineId(item), item.qty + 1)}
                                 disabled={item.maxQty !== undefined && item.qty >= item.maxQty}
                                 className="flex h-7 w-7 items-center justify-center text-text-muted transition-colors hover:text-primary-pink disabled:opacity-40"
                                 aria-label="Increase"

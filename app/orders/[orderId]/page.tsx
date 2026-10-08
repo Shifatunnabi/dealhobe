@@ -52,10 +52,11 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ or
               </thead>
               <tbody>
                 {order.items.map((item: any, index: number) => (
-                  <tr key={item.productId} className="border-b border-gray-100 last:border-b-0">
+                  <tr key={`${item.productId}-${item.variantKey || index}`} className="border-b border-gray-100 last:border-b-0">
                     <td className="py-3 pr-2 text-sm text-text-muted">{index + 1}</td>
                     <td className="py-3 pr-2 font-poppins text-sm font-semibold text-text-dark">
                       {item.name}
+                      {item.variantLabel && <span className="block text-xs font-normal text-text-muted">{item.variantLabel}</span>}
                     </td>
                     <td className="py-3 pr-2 text-sm text-text-muted">{item.qty}</td>
                     <td className="py-3 pr-2 text-sm text-text-muted text-right">৳{item.unitPrice}</td>
