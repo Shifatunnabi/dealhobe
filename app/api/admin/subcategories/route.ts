@@ -3,11 +3,21 @@ import { getServerSession } from 'next-auth';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import connectDB from '@/lib/mongodb';
 import SubCategory from '@/lib/models/SubCategory';
+import Category from '@/lib/models/Category';
 
 export async function GET(req: NextRequest) {
   await connectDB();
   const categoryId = req.nextUrl.searchParams.get('category');
-  const query = categoryId ? { category: categoryId } : {};
+  const query: Record<string, unknown> = categoryId ? { category: categoryId } : {};
+  // ?visible=1 (storefront): drop sub-categories whose parent category is hidden.
+  if (req.nextUrl.searchParams.get('visible') === '1') {
+    const hidden = await Category.find({ isHidden: true }, { _id: 1 }).lean();
+    if (hidden.length) {
+      query.category = categoryId
+        ? { $eq: categoryId, $nin: hidden.map((c: any) => String(c._id)) }
+        : { $nin: hidden.map((c: any) => String(c._id)) };
+    }
+  }
   const subCategories = await SubCategory.find(query).sort({ order: 1, createdAt: -1 });
   return NextResponse.json(subCategories);
 }

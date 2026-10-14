@@ -25,6 +25,11 @@ export default async function ProductsPage(props: {
     getOffers(),
   ]);
 
+  // Hidden categories (and their sub-categories) don't appear in storefront filters.
+  const hiddenCategoryIds = new Set(categories.filter((c) => c.isHidden).map((c) => c._id));
+  const visibleCategories = categories.filter((c) => !c.isHidden);
+  const visibleSubCategories = subCategories.filter((s) => !hiddenCategoryIds.has(s.category));
+
   const activeOffers   = offers.filter((o) => isOfferActive(o));
   const pricedProducts = applyOffersToProducts(products, activeOffers);
 
@@ -38,8 +43,8 @@ export default async function ProductsPage(props: {
     >
       <ProductsPageClient
         products={pricedProducts}
-        categories={categories}
-        subCategories={subCategories}
+        categories={visibleCategories}
+        subCategories={visibleSubCategories}
         brands={brands}
         offers={activeOffers}
         offerParam={offerParam}

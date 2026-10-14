@@ -82,6 +82,7 @@ export type PlainCategory = {
   imageUrl: string;
   imagePublicId: string;
   order: number;
+  isHidden?: boolean;
   showOnHomepage?: boolean;
   createdAt: string;
   updatedAt: string;

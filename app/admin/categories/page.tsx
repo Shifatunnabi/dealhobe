@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import Image from 'next/image';
 import { Reorder, useDragControls } from 'framer-motion';
-import { FiFolder, FiEdit2, FiTrash2, FiPlus, FiX, FiZap } from 'react-icons/fi';
+import { FiFolder, FiEdit2, FiTrash2, FiPlus, FiX, FiZap, FiEye, FiEyeOff } from 'react-icons/fi';
 import ImageUpload from '@/components/admin/ImageUpload';
 import DragHandle from '@/components/admin/DragHandle';
 import { renumbered, nextOrder, useReorderPersist } from '@/components/admin/reorderUtils';
@@ -16,18 +16,20 @@ interface Category {
   imageUrl:     string;
   imagePublicId:string;
   order:        number;
+  isHidden?:    boolean;
 }
 
 const emptyForm = { name: '', imageUrl: '', imagePublicId: '', order: 0 };
 
 function CategoryCard({
-  category, isHomepage, onNavigate, onEdit, onDelete,
+  category, isHomepage, onNavigate, onEdit, onDelete, onToggleHidden,
 }: {
   category: Category;
   isHomepage: boolean;
   onNavigate: () => void;
   onEdit: () => void;
   onDelete: () => void;
+  onToggleHidden: () => void;
 }) {
   const dragControls = useDragControls();
   return (
@@ -38,12 +40,19 @@ function CategoryCard({
       dragControls={dragControls}
       className="admin-item-card"
       onClick={onNavigate}
-      style={{ cursor: 'pointer' }}
+      style={{ cursor: 'pointer', opacity: category.isHidden ? 0.6 : 1 }}
       title="Manage sub-categories"
     >
       <div className="admin-item-image" style={{ position: 'relative', height: 140 }}>
         <Image src={category.imageUrl} alt={category.name} fill style={{ objectFit: 'cover' }} />
-        {isHomepage && (
+        {category.isHidden && (
+          <span style={{
+            position: 'absolute', bottom: 8, left: 8,
+            background: 'rgba(15,8,32,0.8)', color: '#fff', fontSize: '0.65rem', fontWeight: 700,
+            padding: '0.2rem 0.5rem', borderRadius: '20px',
+          }}>Hidden from website</span>
+        )}
+        {isHomepage && !category.isHidden && (
           <span style={{
             position: 'absolute', top: 8, right: 8,
             background: 'var(--primary-pink)',
@@ -59,8 +68,16 @@ function CategoryCard({
         <div className="admin-item-title">{category.name}</div>
         <div className="admin-item-meta">Order: {category.order} · Click to manage sub-categories</div>
         <div className="admin-item-actions">
-          <button className="btn-admin-edit"   onClick={(e) => { e.stopPropagation(); onEdit(); }}><FiEdit2 size={13} /> Edit</button>
-          <button className="btn-admin-danger" onClick={(e) => { e.stopPropagation(); onDelete(); }}><FiTrash2 size={13} /> Delete</button>
+          <button
+            className="btn-admin-secondary"
+            title={category.isHidden ? 'Show on website' : 'Hide from website'}
+            aria-label={category.isHidden ? 'Show on website' : 'Hide from website'}
+            onClick={(e) => { e.stopPropagation(); onToggleHidden(); }}
+          >
+            {category.isHidden ? <FiEye size={14} /> : <FiEyeOff size={14} />}
+          </button>
+          <button className="btn-admin-edit" title="Edit" aria-label="Edit category" onClick={(e) => { e.stopPropagation(); onEdit(); }}><FiEdit2 size={14} /></button>
+          <button className="btn-admin-danger" title="Delete" aria-label="Delete category" onClick={(e) => { e.stopPropagation(); onDelete(); }}><FiTrash2 size={14} /></button>
         </div>
       </div>
     </Reorder.Item>
@@ -117,6 +134,18 @@ export default function CategoriesPage() {
     load();
   };
 
+  const toggleHidden = async (c: Category) => {
+    const next = !c.isHidden;
+    setCategories(list => list.map(x => (x._id === c._id ? { ...x, isHidden: next } : x)));
+    const res = await fetch('/api/admin/categories', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: c._id, isHidden: next }) });
+    if (!res.ok) {
+      setCategories(list => list.map(x => (x._id === c._id ? { ...x, isHidden: !next } : x)));
+      toast.error('Could not update category');
+      return;
+    }
+    toast.success(next ? `${c.name} hidden from website` : `${c.name} is visible again`);
+  };
+
   const handleReorder = (newOrder: Category[]) => {
     const renumberedList = renumbered(newOrder);
     reorderPersist(categories, renumberedList);
@@ -165,10 +194,11 @@ export default function CategoriesPage() {
             <CategoryCard
               key={c._id}
               category={c}
-              isHomepage={i < 4}
+              isHomepage={categories.filter(x => !x.isHidden).findIndex(x => x._id === c._id) < 4 && !c.isHidden}
               onNavigate={() => router.push(`/admin/categories/${c._id}`)}
               onEdit={() => openEdit(c)}
               onDelete={() => handleDelete(c._id)}
+              onToggleHidden={() => toggleHidden(c)}
             />
           ))}
         </Reorder.Group>

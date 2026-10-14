@@ -38,7 +38,7 @@ export default async function Home() {
   const [slides, categories, brands, trendingProducts, newProducts, featuredProducts, topSellerProducts, reviews, offers] =
     await Promise.all([
       getActiveHeroSlides(),
-      getCategories(),
+      getCategories().then((list) => list.filter((c) => !c.isHidden)),
       getBrands(),
       getTrendingProducts(),
       getNewProducts(),

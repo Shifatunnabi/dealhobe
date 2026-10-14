@@ -6,9 +6,11 @@ import Category from '@/lib/models/Category';
 import SubCategory from '@/lib/models/SubCategory';
 import { deleteImage } from '@/lib/cloudinary';
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   await connectDB();
-  const categories = await Category.find().sort({ order: 1, createdAt: -1 });
+  // ?visible=1 is what the storefront uses: hidden categories are left out.
+  const visibleOnly = req.nextUrl.searchParams.get('visible') === '1';
+  const categories = await Category.find(visibleOnly ? { isHidden: { $ne: true } } : {}).sort({ order: 1, createdAt: -1 });
   return NextResponse.json(categories);
 }
 

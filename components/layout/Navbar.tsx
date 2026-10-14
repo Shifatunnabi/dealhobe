@@ -298,7 +298,7 @@ export default function Navbar() {
     let alive = true;
     const loadCategories = async () => {
       try {
-        const res = await fetch("/api/admin/categories");
+        const res = await fetch("/api/admin/categories?visible=1");
         if (!res.ok) return;
         const data = await res.json();
         if (alive) setCategories(Array.isArray(data) ? data : []);
@@ -314,7 +314,7 @@ export default function Navbar() {
     let alive = true;
     const loadSubCategories = async () => {
       try {
-        const res = await fetch("/api/admin/subcategories");
+        const res = await fetch("/api/admin/subcategories?visible=1");
         if (!res.ok) return;
         const data = await res.json();
         if (alive) setSubCategories(Array.isArray(data) ? data : []);
