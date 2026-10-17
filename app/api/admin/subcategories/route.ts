@@ -4,6 +4,7 @@ import { revalidatePath, revalidateTag } from 'next/cache';
 import connectDB from '@/lib/mongodb';
 import SubCategory from '@/lib/models/SubCategory';
 import Category from '@/lib/models/Category';
+import { notifyLiveSite } from '@/lib/revalidate-live';
 
 export async function GET(req: NextRequest) {
   await connectDB();
@@ -33,6 +34,7 @@ export async function POST(req: NextRequest) {
   }
   const subCategory = await SubCategory.create(body);
   revalidateTag('categories', { expire: 0 });
+  void notifyLiveSite('categories');
   revalidatePath('/products');
   revalidatePath('/admin/categories/[id]', 'page');
   return NextResponse.json(subCategory, { status: 201 });
@@ -46,6 +48,7 @@ export async function PUT(req: NextRequest) {
   const { id, ...data } = await req.json();
   const updated = await SubCategory.findByIdAndUpdate(id, data, { new: true });
   revalidateTag('categories', { expire: 0 });
+  void notifyLiveSite('categories');
   revalidatePath('/products');
   revalidatePath('/admin/categories/[id]', 'page');
   return NextResponse.json(updated);
@@ -59,6 +62,7 @@ export async function DELETE(req: NextRequest) {
   const { id } = await req.json();
   await SubCategory.findByIdAndDelete(id);
   revalidateTag('categories', { expire: 0 });
+  void notifyLiveSite('categories');
   revalidatePath('/products');
   revalidatePath('/admin/categories/[id]', 'page');
   return NextResponse.json({ success: true });

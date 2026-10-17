@@ -181,14 +181,25 @@ export default function HeroPage() {
       return;
     }
     setSavingSlide(true);
-    if (editingSlide) {
-      await fetch('/api/admin/hero/slides', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: editingSlide._id, ...slideForm }) });
-    } else {
-      await fetch('/api/admin/hero/slides', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(slideForm) });
+    try {
+      const res = editingSlide
+        ? await fetch('/api/admin/hero/slides', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: editingSlide._id, ...slideForm }) })
+        : await fetch('/api/admin/hero/slides', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(slideForm) });
+      if (!res.ok) throw new Error('Could not save the slide');
+      const saved = await res.json();
+      // The server echoes what it stored; if the mobile photo didn't make it, say so instead of pretending it saved.
+      if (slideForm.mobileImageUrl && saved.mobileImageUrl !== slideForm.mobileImageUrl) {
+        toast.error('Slide saved, but the mobile photo was not stored. Restart the dev server and upload it again.');
+      } else {
+        toast.success(editingSlide ? 'Slide updated' : 'Slide added');
+      }
+      setSlideModal(false);
+      loadSlides();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Could not save the slide');
+    } finally {
+      setSavingSlide(false);
     }
-    setSavingSlide(false); setSlideModal(false);
-    toast.success(editingSlide ? 'Slide updated' : 'Slide added');
-    loadSlides();
   };
   const deleteSlide = async (id: string) => {
     if (!confirm('Delete this slide?')) return;

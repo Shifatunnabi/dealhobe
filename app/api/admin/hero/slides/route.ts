@@ -4,6 +4,7 @@ import { revalidatePath, revalidateTag } from 'next/cache';
 import connectDB from '@/lib/mongodb';
 import HeroSlide from '@/lib/models/HeroSlide';
 import { deleteImage } from '@/lib/cloudinary';
+import { notifyLiveSite } from '@/lib/revalidate-live';
 
 export async function GET() {
   await connectDB();
@@ -19,6 +20,7 @@ export async function POST(req: NextRequest) {
   const body  = await req.json();
   const slide = await HeroSlide.create(body);
   revalidateTag('hero', { expire: 0 });
+  void notifyLiveSite('hero');
   revalidatePath('/');
   return NextResponse.json(slide, { status: 201 });
 }
@@ -35,6 +37,7 @@ export async function PUT(req: NextRequest) {
   const oldMobileId = before?.mobileImagePublicId;
   if (oldMobileId && 'mobileImagePublicId' in data && data.mobileImagePublicId !== oldMobileId) await deleteImage(oldMobileId);
   revalidateTag('hero', { expire: 0 });
+  void notifyLiveSite('hero');
   revalidatePath('/');
   return NextResponse.json(updated);
 }
@@ -49,6 +52,7 @@ export async function DELETE(req: NextRequest) {
   if (slide?.imagePublicId) await deleteImage(slide.imagePublicId);
   if (slide?.mobileImagePublicId) await deleteImage(slide.mobileImagePublicId);
   revalidateTag('hero', { expire: 0 });
+  void notifyLiveSite('hero');
   revalidatePath('/');
   return NextResponse.json({ success: true });
 }

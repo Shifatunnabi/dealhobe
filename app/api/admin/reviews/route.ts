@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import connectDB from '@/lib/mongodb';
 import Review from '@/lib/models/Review';
+import { notifyLiveSite } from '@/lib/revalidate-live';
 
 export async function GET() {
   const session = await getServerSession();
@@ -29,6 +30,7 @@ export async function PUT(req: NextRequest) {
   const { id, ...data } = await req.json();
   const updated = await Review.findByIdAndUpdate(id, data, { new: true });
   revalidateTag('reviews', { expire: 0 });
+  void notifyLiveSite('reviews');
   revalidatePath('/');
   revalidatePath('/product/[slug]', 'page');
   return NextResponse.json(updated);
@@ -42,6 +44,7 @@ export async function DELETE(req: NextRequest) {
   const { id } = await req.json();
   await Review.findByIdAndDelete(id);
   revalidateTag('reviews', { expire: 0 });
+  void notifyLiveSite('reviews');
   revalidatePath('/');
   revalidatePath('/product/[slug]', 'page');
   return NextResponse.json({ success: true });

@@ -4,6 +4,7 @@ import { revalidatePath, revalidateTag } from 'next/cache';
 import connectDB from '@/lib/mongodb';
 import Brand from '@/lib/models/Brand';
 import { deleteImage } from '@/lib/cloudinary';
+import { notifyLiveSite } from '@/lib/revalidate-live';
 
 export async function GET() {
   await connectDB();
@@ -19,6 +20,7 @@ export async function POST(req: NextRequest) {
   const body  = await req.json();
   const brand = await Brand.create(body);
   revalidateTag('brands', { expire: 0 });
+  void notifyLiveSite('brands');
   revalidatePath('/');
   return NextResponse.json(brand, { status: 201 });
 }
@@ -31,6 +33,7 @@ export async function PUT(req: NextRequest) {
   const { id, ...data } = await req.json();
   const updated = await Brand.findByIdAndUpdate(id, data, { new: true });
   revalidateTag('brands', { expire: 0 });
+  void notifyLiveSite('brands');
   revalidatePath('/');
   return NextResponse.json(updated);
 }
@@ -44,6 +47,7 @@ export async function DELETE(req: NextRequest) {
   const brand   = await Brand.findByIdAndDelete(id);
   if (brand?.logoPublicId) await deleteImage(brand.logoPublicId);
   revalidateTag('brands', { expire: 0 });
+  void notifyLiveSite('brands');
   revalidatePath('/');
   return NextResponse.json({ success: true });
 }

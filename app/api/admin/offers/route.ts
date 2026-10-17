@@ -4,6 +4,7 @@ import { revalidatePath, revalidateTag } from 'next/cache';
 import connectDB from '@/lib/mongodb';
 import Offer from '@/lib/models/Offer';
 import { deleteImage } from '@/lib/cloudinary';
+import { notifyLiveSite } from '@/lib/revalidate-live';
 
 export async function GET() {
   await connectDB();
@@ -20,6 +21,7 @@ export async function POST(req: NextRequest) {
   try {
       const offer = await Offer.create(body);
       revalidateTag('offers', { expire: 0 });
+      void notifyLiveSite('offers');
       revalidateTag('products', { expire: 0 });
       revalidatePath('/');
       revalidatePath('/products');
@@ -39,6 +41,7 @@ export async function PUT(req: NextRequest) {
   const { id, ...data } = await req.json();
   const updated = await Offer.findByIdAndUpdate(id, data, { new: true });
   revalidateTag('offers', { expire: 0 });
+  void notifyLiveSite('offers');
   revalidateTag('products', { expire: 0 });
   revalidatePath('/');
   revalidatePath('/products');
@@ -55,6 +58,7 @@ export async function DELETE(req: NextRequest) {
   const offer = await Offer.findByIdAndDelete(id);
   if (offer && offer.thumbnailPublicId) await deleteImage(offer.thumbnailPublicId);
   revalidateTag('offers', { expire: 0 });
+  void notifyLiveSite('offers');
   revalidateTag('products', { expire: 0 });
   revalidatePath('/');
   revalidatePath('/products');

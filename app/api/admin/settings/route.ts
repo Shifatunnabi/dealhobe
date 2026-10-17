@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import connectDB from "@/lib/mongodb";
 import Settings from "@/lib/models/Settings";
 import { deleteImage } from "@/lib/cloudinary";
+import { notifyLiveSite } from '@/lib/revalidate-live';
 
 const SETTINGS_KEY = "global";
 
@@ -52,6 +53,7 @@ export async function PUT(req: NextRequest) {
   }
 
   revalidatePath('/');
+  void notifyLiveSite('all');
   return NextResponse.json({
     freeDeliveryThreshold: updated?.freeDeliveryThreshold || 0,
     logoUrl: updated?.logoUrl || "",

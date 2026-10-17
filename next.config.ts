@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
     // Keep the local optimization endpoint enabled. The loader sends Cloudinary
     // requests directly to its CDN, avoiding remote optimizer fetch timeouts.
     loaderFile: "./lib/image-loader.ts",
+    qualities: [75, 100], // 100 = hero banners (see lib/image-loader.ts)
     remotePatterns: [
       { protocol: "https", hostname: "picsum.photos",        pathname: "/**" },
       { protocol: "https", hostname: "images.unsplash.com",  pathname: "/**" },

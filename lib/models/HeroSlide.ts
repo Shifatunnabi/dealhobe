@@ -31,6 +31,10 @@ const HeroSlideSchema = new Schema<IHeroSlide>(
   { timestamps: true }
 );
 
+// In dev, hot reload keeps the first compiled model, so schema changes (like the mobile image fields) would be
+// silently ignored and saves would drop the new fields. Re-register the model on every evaluation.
+if (process.env.NODE_ENV !== 'production') delete mongoose.models.HeroSlide;
+
 const HeroSlide: Model<IHeroSlide> =
   mongoose.models.HeroSlide || mongoose.model<IHeroSlide>('HeroSlide', HeroSlideSchema);
 

@@ -5,6 +5,7 @@ import connectDB from '@/lib/mongodb';
 import Category from '@/lib/models/Category';
 import SubCategory from '@/lib/models/SubCategory';
 import { deleteImage } from '@/lib/cloudinary';
+import { notifyLiveSite } from '@/lib/revalidate-live';
 
 export async function GET(req: NextRequest) {
   await connectDB();
@@ -22,6 +23,7 @@ export async function POST(req: NextRequest) {
   const body     = await req.json();
   const category = await Category.create(body);
   revalidateTag('categories', { expire: 0 });
+  void notifyLiveSite('categories');
   revalidatePath('/');
   revalidatePath('/products');
   return NextResponse.json(category, { status: 201 });
@@ -35,6 +37,7 @@ export async function PUT(req: NextRequest) {
   const { id, ...data } = await req.json();
   const updated = await Category.findByIdAndUpdate(id, data, { new: true });
   revalidateTag('categories', { expire: 0 });
+  void notifyLiveSite('categories');
   revalidatePath('/');
   revalidatePath('/products');
   return NextResponse.json(updated);
@@ -50,6 +53,7 @@ export async function DELETE(req: NextRequest) {
   if (category?.imagePublicId) await deleteImage(category.imagePublicId);
   await SubCategory.deleteMany({ category: id });
   revalidateTag('categories', { expire: 0 });
+  void notifyLiveSite('categories');
   revalidatePath('/');
   revalidatePath('/products');
   return NextResponse.json({ success: true });

@@ -4,6 +4,7 @@ import { revalidatePath, revalidateTag } from 'next/cache';
 import connectDB from '@/lib/mongodb';
 import Product from '@/lib/models/Product';
 import { deleteImage } from '@/lib/cloudinary';
+import { notifyLiveSite } from '@/lib/revalidate-live';
 
 function generateSku(): string {
   return 'JT-' + Math.random().toString(36).substring(2, 10).toUpperCase();
@@ -46,6 +47,7 @@ export async function POST(req: NextRequest) {
   try {
     const product = await Product.create(body);
     revalidateTag('products', { expire: 0 });
+    void notifyLiveSite('product');
     revalidatePath('/');
     revalidatePath('/products');
     revalidatePath('/product/[slug]', 'page');
@@ -74,6 +76,7 @@ export async function PUT(req: NextRequest) {
   }
   const updated = await Product.findByIdAndUpdate(id, data, { new: true });
   revalidateTag('products', { expire: 0 });
+  void notifyLiveSite('product');
   revalidatePath('/');
   revalidatePath('/products');
   revalidatePath('/product/[slug]', 'page');
@@ -93,6 +96,7 @@ export async function DELETE(req: NextRequest) {
     }
   }
   revalidateTag('products', { expire: 0 });
+  void notifyLiveSite('product');
   revalidatePath('/');
   revalidatePath('/products');
   revalidatePath('/product/[slug]', 'page');

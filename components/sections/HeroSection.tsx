@@ -20,14 +20,17 @@ const bgVariants: Variants = {
 
 /* ── Desktop/mobile photo pair (md breakpoint matches the card's aspect-ratio switch) ── */
 function HeroPicture({ desktopSrc, mobileSrc, alt, priority }: { desktopSrc: string; mobileSrc: string; alt: string; priority: boolean }) {
-  const common = { alt, fill: true, sizes: "100vw", priority };
+  // unoptimized: serve the uploaded file byte-for-byte (no resize, no re-encode, no format change).
+  const common = { alt, fill: true, sizes: "100vw", priority, unoptimized: true };
   const { props: desktop } = getImageProps({ ...common, src: desktopSrc });
   const { props: { srcSet: mobileSrcSet, ...mobile } } = getImageProps({ ...common, src: mobileSrc });
+  // With unoptimized there is no srcSet, so the <source> tags point straight at the original files.
   return (
     <picture>
-      <source media="(min-width: 768px)" srcSet={desktop.srcSet} />
-      <source media="(max-width: 767px)" srcSet={mobileSrcSet} />
-      <img {...mobile} alt={alt} className="object-cover" />
+      <source media="(min-width: 768px)" srcSet={desktop.srcSet ?? desktop.src} />
+      <source media="(max-width: 767px)" srcSet={mobileSrcSet ?? mobileSrc} />
+      {/* Phones show the mobile photo whole (no crop, no stretch); wider screens fill the banner. */}
+      <img {...mobile} alt={alt} className="object-contain md:object-cover" />
     </picture>
   );
 }
@@ -141,6 +144,7 @@ export default function HeroSection({ slides = [] }: { slides?: PlainHeroSlide[]
                   className="object-cover"
                   priority={current === 0}
                   sizes="100vw"
+                  unoptimized
                 />
               )}
             </div>
