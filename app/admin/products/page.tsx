@@ -6,6 +6,7 @@ import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import { FiEdit2, FiTrash2, FiRefreshCw, FiPackage, FiPlus, FiX } from 'react-icons/fi';
 import MultiImageUpload from '@/components/admin/MultiImageUpload';
+import { getProductCoverImage } from '@/lib/product-images';
 import VariantsEditor, { VariantOption, Variant } from '@/components/admin/VariantsEditor';
 
 const RichTextEditor = dynamic(() => import('@/components/admin/RichTextEditor'), { ssr: false });
@@ -53,6 +54,8 @@ const generateSlug = (name: string) => {
   return (base ? `${base}-` : '') + randomDigits(7);
 };
 
+const PAGE_SIZE = 20;
+
 const emptyForm = {
     sku: '', name: '', slug: '', price: 0, salePrice: 0, costPrice: 0, quantity: 0, shortDescription: '',
     brand: '', category: '', subCategory: '', whyLoveIt: [] as string[], description: '',
@@ -68,6 +71,11 @@ export default function ProductsPage() {
   const [editing, setEditing] = useState<Product | null>(null);
   const [form, setForm] = useState<any>({ ...emptyForm });
   const [saving, setSaving] = useState(false);
+
+  // Listing filters + pagination
+  const [search, setSearch] = useState('');
+  const [brandFilter, setBrandFilter] = useState(''); // '' = all, 'none' = products without a brand, else brand _id
+  const [page, setPage] = useState(1);
 
   // Reference data
   const [brands, setBrands] = useState([] as any[]);
@@ -172,6 +180,28 @@ export default function ProductsPage() {
 
   const categorySubCategories = subCategories.filter((s) => s.category === form.category);
 
+  // A product matches when every word typed appears somewhere in its name (so one word is enough).
+  const searchWords = search.toLowerCase().split(/\s+/).filter(Boolean);
+  const filteredProducts = products.filter((p) => {
+    const name = (p.name || '').toLowerCase();
+    if (!searchWords.every((w) => name.includes(w))) return false;
+    if (brandFilter === 'none') return !p.brand;
+    if (brandFilter) return p.brand === brandFilter;
+    return true;
+  });
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const pageStart = (currentPage - 1) * PAGE_SIZE;
+  const pagedProducts = filteredProducts.slice(pageStart, pageStart + PAGE_SIZE);
+
+  // 1 … 4 5 [6] 7 8 … 20
+  const pageButtons: (number | 'gap-left' | 'gap-right')[] = [];
+  for (let n = 1; n <= totalPages; n++) {
+    if (n === 1 || n === totalPages || Math.abs(n - currentPage) <= 2) pageButtons.push(n);
+    else if (n < currentPage && pageButtons[pageButtons.length - 1] !== 'gap-left') pageButtons.push('gap-left');
+    else if (n > currentPage && pageButtons[pageButtons.length - 1] !== 'gap-right') pageButtons.push('gap-right');
+  }
+
   return (
     <div>
       <div className="admin-page-header">
@@ -191,6 +221,45 @@ export default function ProductsPage() {
           <p>Click &quot;Add New Product&quot; to populate your store inventory.</p>
         </div>
       ) : (
+        <>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center', marginBottom: '1rem' }}>
+          <input
+            className="admin-input"
+            style={{ flex: '1 1 260px', maxWidth: 420 }}
+            type="search"
+            placeholder="Search products by name…"
+            value={search}
+            onChange={e => { setSearch(e.target.value); setPage(1); }}
+          />
+          <select
+            className="admin-select"
+            style={{ flex: '0 1 220px' }}
+            value={brandFilter}
+            onChange={e => { setBrandFilter(e.target.value); setPage(1); }}
+            aria-label="Filter by brand"
+          >
+            <option value="">All brands</option>
+            {brands.map(b => <option key={b._id} value={b._id}>{b.name}</option>)}
+            <option value="none">No brand</option>
+          </select>
+          {(search || brandFilter) && (
+            <button type="button" className="btn-admin-secondary" onClick={() => { setSearch(''); setBrandFilter(''); setPage(1); }}>
+              Clear
+            </button>
+          )}
+          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginLeft: 'auto' }}>
+            {filteredProducts.length === products.length
+              ? `${products.length} products`
+              : `${filteredProducts.length} of ${products.length} products`}
+          </span>
+        </div>
+        {filteredProducts.length === 0 ? (
+          <div className="admin-empty">
+            <div className="empty-icon"><FiPackage size={40} /></div>
+            <h3>No matching products</h3>
+            <p>Try a different word or brand.</p>
+          </div>
+        ) : (
         <div className="admin-table-wrap">
           <table className="admin-table">
             <thead>
@@ -203,15 +272,15 @@ export default function ProductsPage() {
               </tr>
             </thead>
             <tbody>
-              {products.map(p => {
+              {pagedProducts.map(p => {
                   const cat = categories.find(c => c._id === p.category)?.name || 'Unknown';
                   const subCat = subCategories.find(s => s._id === p.subCategory)?.name;
                   return (
                       <tr key={p._id}>
                         <td style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                            {p.images && p.images.length > 0 && (
+                            {getProductCoverImage(p) && (
                                 <div style={{width: 40, height: 40, position: 'relative', borderRadius: 4, overflow: 'hidden'}}>
-                                    <Image src={p.images[0]} alt={p.name} fill style={{objectFit:'cover'}} />
+                                    <Image src={getProductCoverImage(p) as string} alt={p.name} fill style={{objectFit:'cover'}} />
                                 </div>
                             )}
                             <div>
@@ -269,6 +338,39 @@ export default function ProductsPage() {
             </tbody>
           </table>
         </div>
+        )}
+        {totalPages > 1 && (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.6rem', marginTop: '1.25rem' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem', alignItems: 'center', justifyContent: 'center' }}>
+              <button type="button" className="btn-admin-secondary" disabled={currentPage === 1} onClick={() => setPage(currentPage - 1)}>
+                ‹ Prev
+              </button>
+              {pageButtons.map((n, i) =>
+                typeof n === 'number' ? (
+                  <button
+                    key={n}
+                    type="button"
+                    className={n === currentPage ? 'btn-admin-primary' : 'btn-admin-secondary'}
+                    style={{ minWidth: 36 }}
+                    aria-current={n === currentPage ? 'page' : undefined}
+                    onClick={() => setPage(n)}
+                  >
+                    {n}
+                  </button>
+                ) : (
+                  <span key={`${n}-${i}`} style={{ padding: '0 0.25rem', color: 'var(--text-muted)' }}>…</span>
+                )
+              )}
+              <button type="button" className="btn-admin-secondary" disabled={currentPage === totalPages} onClick={() => setPage(currentPage + 1)}>
+                Next ›
+              </button>
+            </div>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+              Showing {pageStart + 1}–{Math.min(pageStart + PAGE_SIZE, filteredProducts.length)} of {filteredProducts.length}
+            </span>
+          </div>
+        )}
+        </>
       )}
 
       {/* Modal */}
@@ -316,18 +418,16 @@ export default function ProductsPage() {
                     <div className="admin-field" />
                 </div>
 
-                {!form.hasVariants && (
                 <div className="admin-form-row">
                     <div className="admin-field">
-                        <label className="admin-label">Price (৳)</label>
+                        <label className="admin-label">Price (৳){form.hasVariants ? ' - default for new variants' : ''}</label>
                         <input type="number" className="admin-input" value={form.price} onChange={e => setForm((f:any) => ({...f, price: +e.target.value}))} />
                     </div>
                     <div className="admin-field">
-                        <label className="admin-label">Sale Price (৳ - Optional)</label>
+                        <label className="admin-label">Sale Price (৳ - Optional){form.hasVariants ? ' - default for new variants' : ''}</label>
                         <input type="number" className="admin-input" value={form.salePrice} onChange={e => setForm((f:any) => ({...f, salePrice: +e.target.value}))} />
                     </div>
                 </div>
-                )}
 
                 <div className="admin-form-row">
                     <div className="admin-field">
@@ -421,8 +521,7 @@ export default function ProductsPage() {
                     <VariantsEditor
                         options={form.variantOptions}
                         variants={form.variants}
-                        basePrice={form.price}
-                        baseCost={form.costPrice}
+                        defaults={{ price: form.price, salePrice: form.salePrice, costPrice: form.costPrice, sku: form.sku }}
                         mainImage={form.images[0]}
                         onChange={(variantOptions, variants) => setForm((f:any) => ({ ...f, variantOptions, variants }))}
                     />

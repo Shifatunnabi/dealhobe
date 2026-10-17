@@ -25,12 +25,16 @@ import {
   getOffers,
 } from '@/lib/data';
 import { applyOffersToProducts, isOfferActive } from '@/lib/offers';
+import { getProductCoverImage } from '@/lib/product-images';
 
-// Only serialize the fields and cards rendered by the homepage grids.
+// Only serialize the fields and cards rendered by the homepage grids. Variants are dropped to keep the
+// payload small, so the card photo (main photo, else the first variant photo) is resolved here.
 function homepageProducts(products: GridProduct[]): GridProduct[] {
-  return products.slice(0, 8).map(({ _id, slug, name, images, price, salePrice, quantity, hasVariants, offerDiscountType, offerDiscountAmount }) => ({
-    _id, slug, name, images: images?.slice(0, 1), price, salePrice, quantity, hasVariants, offerDiscountType, offerDiscountAmount,
-  }));
+  return products.slice(0, 8).map((p) => {
+    const { _id, slug, name, price, salePrice, quantity, hasVariants, offerDiscountType, offerDiscountAmount } = p;
+    const cover = getProductCoverImage(p as Parameters<typeof getProductCoverImage>[0]);
+    return { _id, slug, name, images: cover ? [cover] : [], price, salePrice, quantity, hasVariants, offerDiscountType, offerDiscountAmount };
+  });
 }
 
 export default async function Home() {

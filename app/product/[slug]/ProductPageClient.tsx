@@ -25,6 +25,7 @@ import {
 } from "@/components/animations/variants";
 import ColorfulTitle from "@/components/ui/ColorfulTitle";
 import { useCart } from "@/components/cart/CartProvider";
+import { getProductCoverImage, getProductImages } from "@/lib/product-images";
 
 /* ─── Stock Badge ────────────────────────────────────────────── */
 function StockBadge({ stockStr, qty }: { stockStr?: string, qty?: number }) {
@@ -88,7 +89,7 @@ function RelatedCard({ product }: { product: any }) {
         <div className="p-3 pb-0">
           <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-gray-50">
             <Image
-              src={product.images?.[0] || '/placeholder.png'}
+              src={getProductCoverImage(product) || '/placeholder.png'}
               alt={product.name}
               fill
               className="object-cover transition-transform duration-500 hover:scale-105"
@@ -116,7 +117,7 @@ function RelatedCard({ product }: { product: any }) {
               {hasVariants && <span className="mr-1 text-xs font-medium text-text-muted">From</span>}
               ৳{(product.salePrice || product.price).toLocaleString()}.00
             </p>
-            {product.salePrice && product.price > product.salePrice && (
+            {!!product.salePrice && product.price > product.salePrice && (
               <span className="text-xs text-text-muted line-through">
                 ৳{product.price.toLocaleString()}
               </span>
@@ -137,7 +138,7 @@ function RelatedCard({ product }: { product: any }) {
               productId: product._id,
               slug: product.slug,
               name: product.name,
-              image: product.images?.[0] || "/placeholder.png",
+              image: getProductCoverImage(product) || "/placeholder.png",
               unitPrice: product.salePrice || product.price,
               qty: 1,
               maxQty: availableQty,
@@ -279,7 +280,8 @@ export default function ProductDetailPageClient({
       : `-৳${product.offerDiscountAmount}`
     : null;
 
-  const thumbImages: string[] = product.images?.length > 0 ? product.images : ["/placeholder.png"];
+  const galleryImages = getProductImages(product);
+  const thumbImages: string[] = galleryImages.length > 0 ? galleryImages : ["/placeholder.png"];
   const brandLabel = product.brandDisplay || product.brand?.name || product.brand;
   const categoryLabel = product.categoryDisplay || product.category?.name || product.category;
   const subCategoryLabel = product.subCategoryDisplay || product.subCategory?.name || product.subCategory;
@@ -330,16 +332,17 @@ export default function ProductDetailPageClient({
     setSelectedQty((prev) => Math.min(Math.max(1, prev), availableQty));
   }, [availableQty, outOfStock]);
 
-  // Show the variant's own photo when selected; fall back to the main gallery otherwise.
+  // Jump to the selected variant's photo in the gallery; back to the first photo otherwise.
+  const variantThumbIndex = variantImage ? thumbImages.indexOf(variantImage) : -1;
   useEffect(() => {
-    setActiveThumb(variantImage ? -1 : 0);
-  }, [variantImage]);
+    setActiveThumb(Math.max(0, variantThumbIndex));
+  }, [variantThumbIndex]);
 
   const cartLine = (qty: number) => ({
     productId: product._id,
     slug: product.slug,
     name: product.name,
-    image: variantImage || product.images?.[0] || "/placeholder.png",
+    image: variantImage || getProductCoverImage(product) || "/placeholder.png",
     unitPrice: displayPrice,
     qty,
     maxQty: availableQty,
@@ -449,7 +452,7 @@ export default function ProductDetailPageClient({
             {/* Main image card */}
             <div className="relative aspect-square w-full overflow-hidden rounded-3xl bg-white shadow-card">
               <Image
-                src={activeThumb === -1 && variantImage ? variantImage : thumbImages[Math.max(0, activeThumb)]}
+                src={thumbImages[Math.max(0, activeThumb)] ?? thumbImages[0]}
                 alt={product.name}
                 fill
                 className="object-cover"
@@ -470,7 +473,7 @@ export default function ProductDetailPageClient({
             </div>
 
             {/* Thumbnails */}
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               {thumbImages.map((img: string, i: number) => (
                 <button
                   key={i}
@@ -565,7 +568,7 @@ export default function ProductDetailPageClient({
                   </div>
                 ))}
                 {!selectedVariant && (
-                  <p className="font-poppins text-sm text-red-500">This combination is not available.</p>
+                  <p className="font-poppins text-sm text-red-500">No product exists for this combination.</p>
                 )}
               </motion.div>
             )}

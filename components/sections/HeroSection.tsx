@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import Image, { getImageProps } from "next/image";
 import { motion, AnimatePresence, useInView, useReducedMotion, type Variants } from "framer-motion";
 import { FiChevronRight } from "react-icons/fi";
 import type { PlainHeroSlide } from "@/lib/data";
@@ -17,6 +17,20 @@ const bgVariants: Variants = {
     transition: { duration: 0.5, ease: [0.4, 0, 0.2, 1] },
   }),
 };
+
+/* ── Desktop/mobile photo pair (md breakpoint matches the card's aspect-ratio switch) ── */
+function HeroPicture({ desktopSrc, mobileSrc, alt, priority }: { desktopSrc: string; mobileSrc: string; alt: string; priority: boolean }) {
+  const common = { alt, fill: true, sizes: "100vw", priority };
+  const { props: desktop } = getImageProps({ ...common, src: desktopSrc });
+  const { props: { srcSet: mobileSrcSet, ...mobile } } = getImageProps({ ...common, src: mobileSrc });
+  return (
+    <picture>
+      <source media="(min-width: 768px)" srcSet={desktop.srcSet} />
+      <source media="(max-width: 767px)" srcSet={mobileSrcSet} />
+      <img {...mobile} alt={alt} className="object-cover" />
+    </picture>
+  );
+}
 
 /* ── Component ────────────────────────────────────────────────── */
 export default function HeroSection({ slides = [] }: { slides?: PlainHeroSlide[] }) {
@@ -111,14 +125,24 @@ export default function HeroSection({ slides = [] }: { slides?: PlainHeroSlide[]
             }}
           >
             <div className="absolute inset-0">
-              <Image
-                src={slide.imageUrl}
-                alt={slide.ctaText || "Hero slide"}
-                fill
-                className="object-cover"
-                priority={current === 0}
-                sizes="100vw"
-              />
+              {slide.mobileImageUrl ? (
+                // Different photo per device: the browser downloads only the one that matches the screen.
+                <HeroPicture
+                  desktopSrc={slide.imageUrl}
+                  mobileSrc={slide.mobileImageUrl}
+                  alt={slide.ctaText || "Hero slide"}
+                  priority={current === 0}
+                />
+              ) : (
+                <Image
+                  src={slide.imageUrl}
+                  alt={slide.ctaText || "Hero slide"}
+                  fill
+                  className="object-cover"
+                  priority={current === 0}
+                  sizes="100vw"
+                />
+              )}
             </div>
           </motion.div>
         </AnimatePresence>

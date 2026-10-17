@@ -128,6 +128,8 @@ export type PlainHeroSlide = {
   _id: string;
   imageUrl: string;
   imagePublicId: string;
+  mobileImageUrl?: string;
+  mobileImagePublicId?: string;
   ctaText: string;
   ctaLink: string;
   ctaColor: string;

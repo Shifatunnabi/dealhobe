@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { staggerContainer, scaleIn, fadeUp } from "@/components/animations/variants";
 import { useCart } from "@/components/cart/CartProvider";
 import FadeImage from "@/components/ui/FadeImage";
+import { getProductCoverImage } from "@/lib/product-images";
 
 /* ─── Filter Constants ───────────────────────────────────────── */
 const PRICE_MIN = 0;
@@ -302,7 +303,7 @@ function ShopProductCard({
         productId: product._id,
         slug: product.slug,
         name: product.name,
-        image: product.images?.[0] || "/placeholder.png",
+        image: getProductCoverImage(product) || "/placeholder.png",
         unitPrice: product.salePrice || product.price,
         qty: 1,
         maxQty: availableQty,
@@ -324,7 +325,7 @@ function ShopProductCard({
         <div className="p-3 pb-0">
           <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-gray-50">
             <FadeImage
-              src={product.images?.[0] || '/placeholder.png'}
+              src={getProductCoverImage(product) || '/placeholder.png'}
               alt={product.name}
               fill
               className="object-cover transition-transform duration-500 hover:scale-105"
@@ -350,7 +351,7 @@ function ShopProductCard({
               {hasVariants && <span className="mr-1 text-xs font-medium text-text-muted">From</span>}
               ৳{(product.salePrice || product.price).toLocaleString()}.00
             </p>
-            {product.salePrice && product.price > product.salePrice && (
+            {!!product.salePrice && product.price > product.salePrice && (
               <span className="text-xs text-text-muted line-through">
                 ৳{product.price.toLocaleString()}
               </span>

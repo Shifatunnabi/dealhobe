@@ -3,6 +3,8 @@ import mongoose, { Schema, Document, Model } from 'mongoose';
 export interface IHeroSlide extends Document {
   imageUrl:      string;
   imagePublicId: string;
+  mobileImageUrl?:      string; // optional phone-only photo; empty = use the desktop image
+  mobileImagePublicId?: string;
   ctaText:       string;
   ctaLink:       string;
   ctaColor:      string;
@@ -17,6 +19,8 @@ const HeroSlideSchema = new Schema<IHeroSlide>(
   {
     imageUrl:      { type: String, required: true },
     imagePublicId: { type: String, required: true },
+    mobileImageUrl:      { type: String, default: '' },
+    mobileImagePublicId: { type: String, default: '' },
     ctaText:       { type: String, default: 'Shop Now' },
     ctaLink:       { type: String, default: '/products' },
     ctaColor:      { type: String, default: '#A41B15' },

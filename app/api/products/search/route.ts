@@ -4,6 +4,7 @@ import Product from "@/lib/models/Product";
 import Category from "@/lib/models/Category";
 import SubCategory from "@/lib/models/SubCategory";
 import Brand from "@/lib/models/Brand";
+import { getProductCoverImage } from "@/lib/product-images";
 
 /*
  * Generic, category-agnostic product search — works the same whether the
@@ -44,7 +45,7 @@ const toResult = (p: any) => {
     _id: String(p._id),
     name: p.name,
     slug: p.slug,
-    image: p.images?.[0] ?? null,
+    image: getProductCoverImage(p),
     price: lowest ?? p.price,
     salePrice: lowest !== null ? null : p.salePrice || null,
     hasVariants,
@@ -79,7 +80,7 @@ async function fuzzyFallback(query: string, limit: number) {
   if (query.length < 3) return [];
 
   const [candidates, categories, subCategories, brands] = await Promise.all([
-    Product.find({}, { name: 1, slug: 1, images: 1, price: 1, salePrice: 1, hasVariants: 1, "variants.price": 1, "variants.salePrice": 1, sku: 1, brand: 1, category: 1, subCategory: 1 })
+    Product.find({}, { name: 1, slug: 1, images: 1, price: 1, salePrice: 1, hasVariants: 1, "variants.price": 1, "variants.salePrice": 1, "variants.image": 1, "variants.useMainImage": 1, sku: 1, brand: 1, category: 1, subCategory: 1 })
       .sort({ updatedAt: -1 })
       .limit(FUZZY_CANDIDATE_CAP)
       .lean(),

@@ -8,6 +8,7 @@ import { FiShoppingCart, FiCheck } from "react-icons/fi";
 import { cn } from "@/lib/utils";
 import { useOptionalCart } from "@/components/cart/CartProvider";
 import FadeImage from "@/components/ui/FadeImage";
+import { getProductCoverImage } from "@/lib/product-images";
 
 export interface GridProduct {
   _id: string;
@@ -49,7 +50,7 @@ export default function ProductCard({ product }: { product: GridProduct }) {
         productId: product._id,
         slug: product.slug,
         name: product.name,
-        image: product.images?.[0] || "/placeholder.png",
+        image: getProductCoverImage(product) || "/placeholder.png",
         unitPrice,
         qty: 1,
         maxQty: availableQty,
@@ -68,7 +69,7 @@ export default function ProductCard({ product }: { product: GridProduct }) {
         <div className="p-3 pb-0">
           <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-gray-50">
             <FadeImage
-              src={product.images?.[0] || "/placeholder.png"}
+              src={getProductCoverImage(product) || "/placeholder.png"}
               alt={product.name}
               fill
               className="object-cover transition-transform duration-500 hover:scale-105"
@@ -92,7 +93,7 @@ export default function ProductCard({ product }: { product: GridProduct }) {
               {hasVariants && <span className="mr-1 text-xs font-medium text-text-muted">From</span>}
               ৳{unitPrice.toLocaleString()}.00
             </p>
-            {product.salePrice && product.price > product.salePrice && (
+            {!!product.salePrice && product.price > product.salePrice && (
               <span className="text-xs text-text-muted line-through">
                 ৳{product.price.toLocaleString()}
               </span>

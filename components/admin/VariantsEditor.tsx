@@ -1,8 +1,9 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { FiPlus, FiTrash2, FiX } from 'react-icons/fi';
+import toast from 'react-hot-toast';
 
 export interface VariantOption { name: string; values: string[] }
 export interface Variant {
@@ -18,11 +19,20 @@ export interface Variant {
   imagePublicId?: string;
 }
 
+/** Product-level values that every newly generated variant starts from. */
+export interface VariantDefaults {
+  price: number;
+  salePrice?: number;
+  costPrice?: number;
+  sku?: string;
+}
+
+export const DEFAULT_VARIANT_STOCK = 100;
+
 interface Props {
   options: VariantOption[];
   variants: Variant[];
-  basePrice: number;
-  baseCost?: number;
+  defaults: VariantDefaults;
   mainImage?: string;
   onChange: (options: VariantOption[], variants: Variant[]) => void;
 }
@@ -30,7 +40,7 @@ interface Props {
 const SUGGESTIONS = ['Shade', 'Color', 'Size', 'Volume', 'Pack Size', 'Fragrance'];
 
 /** Cartesian product of all option values → one variant per combination. */
-export function buildVariants(options: VariantOption[], existing: Variant[], basePrice: number, baseCost = 0): Variant[] {
+export function buildVariants(options: VariantOption[], existing: Variant[], defaults: VariantDefaults): Variant[] {
   const usable = options.filter(o => o.name.trim() && o.values.length > 0);
   if (usable.length === 0) return [];
   let combos: { name: string; value: string }[][] = [[]];
@@ -38,23 +48,81 @@ export function buildVariants(options: VariantOption[], existing: Variant[], bas
     combos = combos.flatMap(c => o.values.map(v => [...c, { name: o.name.trim(), value: v }]));
   }
   const byKey = new Map(existing.map(v => [v.key, v]));
-  return combos.map(opts => {
-    const key = opts.map(o => o.value).join('|');
-    const prev = byKey.get(key);
-    return prev
-      ? { ...prev, options: opts }
-      : { key, options: opts, price: basePrice, salePrice: 0, costPrice: baseCost, sku: '', quantity: 0, useMainImage: true };
+  // Variant SKUs are always "<product SKU>-<n>", numbered 1..N in table order. A SKU the admin typed
+  // by hand (one that doesn't end in "-<number>") is left alone; blank or "...-<n>" ones follow the product SKU.
+  const baseSku = (defaults.sku || '').trim();
+  const skuFor = (current: string | undefined, position: number) => {
+    if (!baseSku) return current || '';
+    const isAuto = !current || /-\d+$/.test(current) || current.startsWith('DHV-');
+    return isAuto ? `${baseSku}-${position + 1}` : current!;
+  };
+  type Opt = { name: string; value: string };
+  const hasAll = (haystack: Opt[], needles: Opt[]) =>
+    needles.length > 0 && needles.every(n => haystack.some(h => h.name === n.name && h.value === n.value));
+  const keyOf = (opts: Opt[]) => opts.map(o => o.value).join('|');
+
+  // Pass 1: a combination whose key already exists keeps that variant untouched.
+  const matched: (Variant | undefined)[] = combos.map(opts => byKey.get(keyOf(opts)));
+  const claimed = new Set(matched.filter((v): v is Variant => !!v));
+
+  // Pass 2: adding/removing an option changes every key ("Red" -> "Red|M"). Hand each
+  // leftover variant to the first free combination that contains (or is contained in) its options,
+  // so it keeps its own price, stock, SKU and image instead of resetting to the defaults.
+  existing.forEach(prev => {
+    if (claimed.has(prev)) return;
+    const idx = combos.findIndex((opts, i) => !matched[i] && (hasAll(opts, prev.options) || hasAll(prev.options, opts)));
+    if (idx !== -1) { matched[idx] = prev; claimed.add(prev); }
+  });
+
+  // Combinations that are still new (e.g. "Red|L" next to an existing "Red|M") copy the pricing of
+  // the closest existing variant rather than the product-level defaults.
+  const pricingTemplate = (opts: Opt[]): Variant | undefined => {
+    let best: Variant | undefined;
+    let bestScore = 0;
+    for (const prev of existing) {
+      const shared = prev.options.filter(p => opts.some(o => o.name === p.name && o.value === p.value)).length;
+      if (shared > bestScore) { best = prev; bestScore = shared; }
+    }
+    return best;
+  };
+
+  return combos.map((opts, i) => {
+    const key = keyOf(opts);
+    const prev = matched[i];
+    if (prev) return { ...prev, key, options: opts, sku: skuFor(prev.sku, i) };
+    const tpl = pricingTemplate(opts);
+    return {
+      key,
+      options: opts,
+      price: tpl ? tpl.price : defaults.price,
+      salePrice: tpl ? tpl.salePrice ?? 0 : defaults.salePrice ?? 0,
+      costPrice: tpl ? tpl.costPrice ?? 0 : defaults.costPrice ?? 0,
+      sku: skuFor('', i),
+      quantity: DEFAULT_VARIANT_STOCK,
+      useMainImage: true,
+    };
   });
 }
 
-export default function VariantsEditor({ options, variants, basePrice, baseCost, mainImage, onChange }: Props) {
+export default function VariantsEditor({ options, variants, defaults, mainImage, onChange }: Props) {
   const [drafts, setDrafts] = useState<Record<number, string>>({});
-  const [uploadingKey, setUploadingKey] = useState<string | null>(null);
+  const [uploadingKeys, setUploadingKeys] = useState<Set<string>>(new Set());
+  const [dragKey, setDragKey] = useState<string | null>(null);
+  // Uploads finish after the render that started them; keep the latest values for their callbacks.
+  const latest = useRef({ options, variants, onChange });
+  useEffect(() => { latest.current = { options, variants, onChange }; }, [options, variants, onChange]);
   const fileRef = useRef<HTMLInputElement>(null);
   const uploadTarget = useRef<string>('');
 
   const update = (next: VariantOption[], existing: Variant[] = variants) =>
-    onChange(next, buildVariants(next, existing, basePrice, baseCost));
+    onChange(next, buildVariants(next, existing, defaults));
+  // When the product SKU itself changes, bring the auto-numbered variant SKUs along with it.
+  useEffect(() => {
+    if (variants.length === 0) return;
+    const next = buildVariants(options, variants, defaults);
+    if (next.length === variants.length && next.some((v, i) => v.sku !== variants[i].sku)) onChange(options, next);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defaults.sku]);
   const [bulk, setBulk] = useState({ price: '', salePrice: '', costPrice: '', quantity: '' });
   const [editing, setEditing] = useState<{ i: number; value: string; text: string } | null>(null);
 
@@ -103,26 +171,56 @@ export default function VariantsEditor({ options, variants, basePrice, baseCost,
   const removeValue = (i: number, value: string) =>
     update(options.map((o, idx) => (idx === i ? { ...o, values: o.values.filter(v => v !== value) } : o)));
 
-  const upload = async (file: File) => {
-    const key = uploadTarget.current;
-    if (!file.type.startsWith('image/')) return;
-    setUploadingKey(key);
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      try {
-        const res = await fetch('/api/upload', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ data: reader.result, folder: 'dealhobe/products' }),
-        });
-        const data = await res.json();
-        if (data.url) patchVariant(key, { image: data.url, imagePublicId: data.publicId, useMainImage: false });
-      } finally {
-        setUploadingKey(null);
-      }
-    };
-    reader.readAsDataURL(file);
+  const readAsDataUrl = (file: File) =>
+    new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(file);
+    });
+
+  /** Upload one image for a variant (from the file picker or a drop) and switch it to its own photo. */
+  const uploadVariantImage = async (key: string, file: File) => {
+    if (!file.type.startsWith('image/')) { toast.error('Only image files can be uploaded'); return; }
+    setUploadingKeys(prev => new Set(prev).add(key));
+    try {
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: await readAsDataUrl(file), folder: 'dealhobe/products' }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.url) throw new Error(data.error || 'Upload failed');
+      const cur = latest.current;
+      const next = cur.variants.map(v => (v.key === key ? { ...v, image: data.url, imagePublicId: data.publicId, useMainImage: false } : v));
+      latest.current = { ...cur, variants: next }; // several drops can finish before the next render
+      cur.onChange(cur.options, next);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Upload failed');
+    } finally {
+      setUploadingKeys(prev => { const n = new Set(prev); n.delete(key); return n; });
+    }
   };
+
+  const dropHandlers = (key: string) => ({
+    onDragOver: (e: React.DragEvent) => {
+      if (!Array.from(e.dataTransfer.types).includes('Files')) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'copy';
+      if (dragKey !== key) setDragKey(key);
+    },
+    onDragLeave: (e: React.DragEvent) => {
+      if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setDragKey(k => (k === key ? null : k));
+    },
+    onDrop: (e: React.DragEvent) => {
+      if (!Array.from(e.dataTransfer.types).includes('Files')) return;
+      e.preventDefault();
+      setDragKey(null);
+      const file = Array.from(e.dataTransfer.files).find(f => f.type.startsWith('image/'));
+      if (file) uploadVariantImage(key, file);
+      else toast.error('Only image files can be uploaded');
+    },
+  });
 
   const unused = SUGGESTIONS.filter(s => !options.some(o => o.name.toLowerCase() === s.toLowerCase()));
 
@@ -225,14 +323,23 @@ export default function VariantsEditor({ options, variants, basePrice, baseCost,
                     <td><input type="number" min={0} className="admin-input" style={{ width: 80 }} value={v.quantity}
                       onChange={e => patchVariant(v.key, { quantity: Math.max(0, +e.target.value) })} /></td>
                     <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <div
+                        {...dropHandlers(v.key)}
+                        title="Drop an image here to upload it for this variant"
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: '0.5rem', padding: 4, borderRadius: 8,
+                          border: `2px dashed ${dragKey === v.key ? '#2563eb' : 'transparent'}`,
+                          background: dragKey === v.key ? 'rgba(37, 99, 235, 0.08)' : 'transparent',
+                          transition: 'background 0.15s, border-color 0.15s',
+                        }}
+                      >
                         <div
                           onClick={() => { if (!v.useMainImage) { uploadTarget.current = v.key; fileRef.current?.click(); } }}
                           style={{ width: 40, height: 40, position: 'relative', border: '1px dashed #ccc', borderRadius: 4, overflow: 'hidden',
                             cursor: v.useMainImage ? 'default' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#aaa' }}
                           title={v.useMainImage ? 'Using main image' : 'Click to upload'}
                         >
-                          {uploadingKey === v.key ? <div className="spinner" style={{ width: 14, height: 14 }} />
+                          {uploadingKeys.has(v.key) ? <div className="spinner" style={{ width: 14, height: 14 }} />
                             : img ? <Image src={img} alt="" fill style={{ objectFit: 'cover' }} /> : '+'}
                         </div>
                         <label className="admin-checkbox-row" style={{ whiteSpace: 'nowrap' }}>
@@ -256,7 +363,7 @@ export default function VariantsEditor({ options, variants, basePrice, baseCost,
       )}
 
       <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }}
-        onChange={e => { const f = e.target.files?.[0]; if (f) upload(f); e.target.value = ''; }} />
+        onChange={e => { const f = e.target.files?.[0]; if (f) uploadVariantImage(uploadTarget.current, f); e.target.value = ''; }} />
     </div>
   );
 }

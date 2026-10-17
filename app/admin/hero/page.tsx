@@ -4,18 +4,18 @@ import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import Image from 'next/image';
 import { Reorder, useDragControls } from 'framer-motion';
-import { FiImage, FiVolume2, FiEdit2, FiTrash2, FiPlus, FiX } from 'react-icons/fi';
+import { FiImage, FiVolume2, FiEdit2, FiTrash2, FiPlus, FiX, FiSmartphone } from 'react-icons/fi';
 import ImageUpload from '@/components/admin/ImageUpload';
 import DragHandle from '@/components/admin/DragHandle';
 import { renumbered, nextOrder, useReorderPersist } from '@/components/admin/reorderUtils';
 
 /* ── Types ─────────────────────────────────────────────────── */
-interface HeroSlide { _id: string; imageUrl: string; imagePublicId: string; ctaText: string; ctaLink: string; ctaColor: string; ctaTextColor: string; order: number; isActive: boolean; }
+interface HeroSlide { _id: string; imageUrl: string; imagePublicId: string; mobileImageUrl?: string; mobileImagePublicId?: string; ctaText: string; ctaLink: string; ctaColor: string; ctaTextColor: string; order: number; isActive: boolean; }
 interface TopBarText { _id: string; text: string; isActive: boolean; order: number; }
 
 const DEFAULT_CTA_COLOR = '#A41B15';
 const DEFAULT_CTA_TEXT_COLOR = '#FFFFFF';
-const emptySlide = { ctaText: 'Shop Now', ctaLink: '/products', ctaColor: DEFAULT_CTA_COLOR, ctaTextColor: DEFAULT_CTA_TEXT_COLOR, imageUrl: '', imagePublicId: '', order: 0, isActive: true };
+const emptySlide = { ctaText: 'Shop Now', ctaLink: '/products', ctaColor: DEFAULT_CTA_COLOR, ctaTextColor: DEFAULT_CTA_TEXT_COLOR, imageUrl: '', imagePublicId: '', mobileImageUrl: '', mobileImagePublicId: '', order: 0, isActive: true };
 const emptyTbText = { text: '', isActive: true, order: 0 };
 
 /* A half-typed hex ("#A9") must not be handed to a swatch or preview. */
@@ -64,6 +64,11 @@ function HeroSlideCard({
         <span className={`badge ${slide.isActive ? 'badge-green' : 'badge-red'}`} style={{ position: 'absolute', top: 8, right: 8 }}>
           {slide.isActive ? 'Active' : 'Hidden'}
         </span>
+        {slide.mobileImageUrl && (
+          <span className="badge badge-green" style={{ position: 'absolute', bottom: 8, left: 8, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+            <FiSmartphone size={11} /> Own mobile photo
+          </span>
+        )}
         <div style={{ position: 'absolute', top: 8, left: 8, background: 'rgba(255,255,255,0.9)', borderRadius: 8, padding: '0.25rem' }}>
           <DragHandle dragControls={dragControls} />
         </div>
@@ -133,6 +138,7 @@ export default function HeroPage() {
   const [editingSlide, setEditingSlide] = useState<HeroSlide | null>(null);
   const [slideForm,    setSlideForm]    = useState({ ...emptySlide });
   const [savingSlide,  setSavingSlide]  = useState(false);
+  const [mobileOpen,   setMobileOpen]   = useState(false); // mobile-photo uploader visible in the modal
 
   // Topbar modal
   const [tbModal,   setTbModal]   = useState(false);
@@ -162,10 +168,11 @@ export default function HeroPage() {
   };
 
   /* Slides CRUD */
-  const openAddSlide  = () => { setEditingSlide(null); setSlideForm({ ...emptySlide, order: nextOrder(slides) }); setSlideModal(true); };
+  const openAddSlide  = () => { setEditingSlide(null); setSlideForm({ ...emptySlide, order: nextOrder(slides) }); setMobileOpen(false); setSlideModal(true); };
   const openEditSlide = (s: HeroSlide) => {
     setEditingSlide(s);
-    setSlideForm({ ctaText: s.ctaText, ctaLink: s.ctaLink, ctaColor: s.ctaColor || DEFAULT_CTA_COLOR, ctaTextColor: s.ctaTextColor || DEFAULT_CTA_TEXT_COLOR, imageUrl: s.imageUrl, imagePublicId: s.imagePublicId, order: s.order, isActive: s.isActive });
+    setSlideForm({ ctaText: s.ctaText, ctaLink: s.ctaLink, ctaColor: s.ctaColor || DEFAULT_CTA_COLOR, ctaTextColor: s.ctaTextColor || DEFAULT_CTA_TEXT_COLOR, imageUrl: s.imageUrl, imagePublicId: s.imagePublicId, mobileImageUrl: s.mobileImageUrl || '', mobileImagePublicId: s.mobileImagePublicId || '', order: s.order, isActive: s.isActive });
+    setMobileOpen(!!s.mobileImageUrl);
     setSlideModal(true);
   };
   const saveSlide = async () => {
@@ -306,7 +313,24 @@ export default function HeroPage() {
             </div>
             <div className="modal-body">
               <div className="admin-form">
-                <ImageUpload label="Slide Image" value={slideForm.imageUrl} folder="dealhobe/hero" onChange={(url, pid) => setSlideForm(f => ({ ...f, imageUrl: url, imagePublicId: pid }))} />
+                <ImageUpload label="Slide Image (desktop)" value={slideForm.imageUrl} folder="dealhobe/hero" onChange={(url, pid) => setSlideForm(f => ({ ...f, imageUrl: url, imagePublicId: pid }))} />
+                {!mobileOpen ? (
+                  <div>
+                    <button type="button" className="btn-admin-secondary" onClick={() => setMobileOpen(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <FiSmartphone size={14} /> Add a different photo for mobile
+                    </button>
+                    <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '0.4rem 0 0' }}>
+                      Without one, phones show the desktop photo above.
+                    </p>
+                  </div>
+                ) : (
+                  <div>
+                    <ImageUpload label="Mobile Image (phones only, square 1:1 works best)" value={slideForm.mobileImageUrl} folder="dealhobe/hero" onChange={(url, pid) => setSlideForm(f => ({ ...f, mobileImageUrl: url, mobileImagePublicId: pid }))} />
+                    <button type="button" className="btn-admin-secondary" style={{ marginTop: '0.5rem' }} onClick={() => { setSlideForm(f => ({ ...f, mobileImageUrl: '', mobileImagePublicId: '' })); setMobileOpen(false); }}>
+                      Remove mobile photo (use the desktop photo)
+                    </button>
+                  </div>
+                )}
                 <div className="admin-form-row">
                   <div className="admin-field"><label className="admin-label">Button Text</label><input className="admin-input" value={slideForm.ctaText} onChange={e => setSlideForm(f => ({ ...f, ctaText: e.target.value }))} placeholder="Shop Now" /></div>
                   <div className="admin-field"><label className="admin-label">Button Link</label><input className="admin-input" value={slideForm.ctaLink} onChange={e => setSlideForm(f => ({ ...f, ctaLink: e.target.value }))} placeholder="/products" /></div>

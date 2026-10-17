@@ -29,7 +29,11 @@ export async function PUT(req: NextRequest) {
 
   await connectDB();
   const { id, ...data } = await req.json();
+  // Replacing or removing the mobile photo: clean up the old Cloudinary asset.
+  const before = await HeroSlide.findById(id).select('mobileImagePublicId');
   const updated = await HeroSlide.findByIdAndUpdate(id, data, { new: true });
+  const oldMobileId = before?.mobileImagePublicId;
+  if (oldMobileId && 'mobileImagePublicId' in data && data.mobileImagePublicId !== oldMobileId) await deleteImage(oldMobileId);
   revalidateTag('hero', { expire: 0 });
   revalidatePath('/');
   return NextResponse.json(updated);
@@ -43,6 +47,7 @@ export async function DELETE(req: NextRequest) {
   const { id }   = await req.json();
   const slide    = await HeroSlide.findByIdAndDelete(id);
   if (slide?.imagePublicId) await deleteImage(slide.imagePublicId);
+  if (slide?.mobileImagePublicId) await deleteImage(slide.mobileImagePublicId);
   revalidateTag('hero', { expire: 0 });
   revalidatePath('/');
   return NextResponse.json({ success: true });

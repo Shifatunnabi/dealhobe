@@ -8,6 +8,7 @@ import { applyOffersToProduct, isOfferActive } from "@/lib/offers";
 import Settings from "@/lib/models/Settings";
 import { verifyCustomerToken } from "@/lib/auth";
 import { sendOrderConfirmationEmail } from "@/lib/email";
+import { getProductCoverImage } from "@/lib/product-images";
 
 const DELIVERY_CHARGE = {
   inside_dhaka: 95,
@@ -106,7 +107,7 @@ export async function POST(req: NextRequest) {
     orderItems.push({
       productId: String(product._id),
       name: product.name,
-      image: (variant && !variant.useMainImage && variant.image) || product.images?.[0] || "/placeholder.png",
+      image: (variant && !variant.useMainImage && variant.image) || getProductCoverImage(product) || "/placeholder.png",
       ...(variant
         ? {
             variantKey: variant.key,
