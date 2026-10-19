@@ -5,9 +5,9 @@ import { useParams, useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import Image from 'next/image';
 import { FiArrowLeft, FiEdit2, FiTrash2, FiPlus, FiX, FiFolder, FiTag } from 'react-icons/fi';
-import { Reorder, useDragControls } from 'framer-motion';
 import DragHandle from '@/components/admin/DragHandle';
-import { renumbered, nextOrder, useReorderPersist } from '@/components/admin/reorderUtils';
+import { SortableList, useSortableItem } from '@/components/admin/SortableList';
+import { renumbered, nextOrder, saveOrder } from '@/components/admin/reorderUtils';
 
 interface Category { _id: string; name: string; imageUrl: string; }
 interface SubCategory { _id: string; name: string; category: string; order: number; }
@@ -21,10 +21,10 @@ function SubCategoryRow({
   onEdit: () => void;
   onDelete: () => void;
 }) {
-  const dragControls = useDragControls();
+  const { setNodeRef, style, isDragging, handle } = useSortableItem(subCategory._id);
   return (
-    <Reorder.Item as="tr" value={subCategory} dragListener={false} dragControls={dragControls}>
-      <td style={{ width: 32 }}><DragHandle dragControls={dragControls} /></td>
+    <tr ref={setNodeRef} style={style} className={isDragging ? 'is-dragging' : undefined}>
+      <td style={{ width: 32 }}><DragHandle handle={handle} /></td>
       <td style={{ fontWeight: 600 }}>{subCategory.name}</td>
       <td>{subCategory.order}</td>
       <td>
@@ -37,7 +37,7 @@ function SubCategoryRow({
           </button>
         </div>
       </td>
-    </Reorder.Item>
+    </tr>
   );
 }
 
@@ -53,7 +53,6 @@ export default function CategorySubCategoriesPage() {
   const [editing,       setEditing]       = useState<SubCategory | null>(null);
   const [form,          setForm]          = useState({ ...emptyForm });
   const [saving,        setSaving]        = useState(false);
-  const reorderPersist = useReorderPersist('/api/admin/subcategories');
 
   const load = async () => {
     setLoading(true);
@@ -73,9 +72,13 @@ export default function CategorySubCategoriesPage() {
   const openEdit = (s: SubCategory) => { setEditing(s); setForm({ name: s.name, order: s.order }); setModal(true); };
 
   const handleReorder = (newOrder: SubCategory[]) => {
-    const renumberedList = renumbered(newOrder);
-    reorderPersist(subCategories, renumberedList);
-    setSubCategories(renumberedList);
+    const prev = subCategories;
+    const next = renumbered(newOrder);
+    setSubCategories(next);
+    saveOrder('/api/admin/subcategories', next).catch(() => {
+      setSubCategories(prev);
+      toast.error('Could not save the new order');
+    });
   };
 
   const handleSave = async () => {
@@ -164,7 +167,7 @@ export default function CategorySubCategoriesPage() {
                 <th>Actions</th>
               </tr>
             </thead>
-            <Reorder.Group as="tbody" axis="y" values={subCategories} onReorder={handleReorder}>
+            <SortableList items={subCategories} onReorder={handleReorder} as="tbody">
               {subCategories.map((s) => (
                 <SubCategoryRow
                   key={s._id}
@@ -173,7 +176,7 @@ export default function CategorySubCategoriesPage() {
                   onDelete={() => handleDelete(s._id)}
                 />
               ))}
-            </Reorder.Group>
+            </SortableList>
           </table>
         </div>
       )}

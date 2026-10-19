@@ -72,14 +72,7 @@ const SUBCATEGORY_PRODUCTS = {
   'Premium Fragrance': ['Signature Oud Perfume', 'Luxury Amber Eau de Parfum', 'Velvet Rose Attar'],
 };
 
-/** One shared "why you'll love it" list and description template — every product only swaps its name in. */
-const WHY_LOVE_IT = [
-  'Made with skin-friendly, dermatologically tested ingredients',
-  'Lightweight formula that blends and absorbs easily',
-  'Free from harsh parabens and sulphates',
-  'Suitable for daily use on all skin types',
-  'Cruelty-free and never tested on animals',
-];
+/** One shared description template — every product only swaps its name in. */
 
 function shortDescription(name) {
   return `${name} is a premium cosmetic essential crafted for everyday beauty routines, offering gentle care, a delightful finish, and long-lasting comfort.`;
@@ -90,8 +83,7 @@ function descriptionHtml(name) {
     `${name} is thoughtfully formulated to fit seamlessly into your daily beauty routine, combining nourishing ingredients with a lightweight, comfortable feel.`,
     `Designed for everyday confidence, it delivers consistent results use after use, without compromising on quality or care.`,
   ];
-  const items = WHY_LOVE_IT.map((w) => `<li>${w}</li>`).join('');
-  return paras.map((p) => `<p>${p}</p>`).join('') + `<h3>Why you'll love it</h3><ul>${items}</ul>`;
+  return paras.map((p) => `<p>${p}</p>`).join('');
 }
 
 (async () => {
@@ -139,7 +131,6 @@ function descriptionHtml(name) {
         shortDescription: shortDescription(name),
         category: String(sub.category),
         subCategory: String(sub._id),
-        whyLoveIt: WHY_LOVE_IT,
         description: descriptionHtml(name),
         images: images.map((i) => i.url),
         imagePublicIds: images.map((i) => i.publicId),

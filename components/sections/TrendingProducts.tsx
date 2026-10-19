@@ -4,8 +4,9 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import SectionHeader from "./SectionHeader";
 import ProductCard, { type GridProduct } from "./ProductCard";
+import { HOMEPAGE_GRID_CLASS, HOMEPAGE_GRID_ITEMS } from "@/lib/homepage-grid";
 
-/* ── Section — 2 rows x 4 columns, then a View All CTA ─────────── */
+/* ── Section — 3 rows of products, then a View All CTA ─────────── */
 export default function TrendingProducts({ products = [] }: { products?: GridProduct[] }) {
 
   if (!products.length) {
@@ -26,9 +27,9 @@ export default function TrendingProducts({ products = [] }: { products?: GridPro
       >
         <SectionHeader title="Trending Products" />
 
-        {/* Grid — 2 cols mobile, 4 cols desktop = 2 rows of 4 on desktop */}
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-5">
-          {products.slice(0, 8).map((product) => (
+        {/* Grid — 3 rows: 3 × 2 on mobile, 3 × 4 from md up */}
+        <div className={HOMEPAGE_GRID_CLASS}>
+          {products.slice(0, HOMEPAGE_GRID_ITEMS).map((product) => (
             <ProductCard key={product._id} product={product} />
           ))}
         </div>

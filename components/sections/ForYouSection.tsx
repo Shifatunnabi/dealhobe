@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import SectionHeader from "./SectionHeader";
 import ProductCard, { type GridProduct } from "./ProductCard";
+import { HOMEPAGE_GRID_CLASS, HOMEPAGE_GRID_ITEMS } from "@/lib/homepage-grid";
 
 type TabKey = "new" | "featured" | "topSellers";
 
@@ -76,8 +77,8 @@ export default function ForYouSection({
         </SectionHeader>
 
         {activeProducts.length ? (
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-5">
-            {activeProducts.slice(0, 8).map((product) => (
+          <div className={HOMEPAGE_GRID_CLASS}>
+            {activeProducts.slice(0, HOMEPAGE_GRID_ITEMS).map((product) => (
               <ProductCard key={product._id} product={product} />
             ))}
           </div>

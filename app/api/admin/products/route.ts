@@ -6,8 +6,9 @@ import Product from '@/lib/models/Product';
 import { deleteImage } from '@/lib/cloudinary';
 import { notifyLiveSite } from '@/lib/revalidate-live';
 
+/** Same DH-xxxxxxxx format the admin form generates. */
 function generateSku(): string {
-  return 'JT-' + Math.random().toString(36).substring(2, 10).toUpperCase();
+  return 'DH-' + Array.from({ length: 8 }, () => Math.floor(Math.random() * 10)).join('');
 }
 
 /** Variant SKUs must be unique within the product and across the catalog (product + variant SKUs). */
@@ -69,7 +70,8 @@ export async function PUT(req: NextRequest) {
 
   await connectDB();
   const { id, ...data } = await req.json();
-  if (!data.sku) data.sku = generateSku();
+  // Only fill a blank SKU from the full edit form; partial updates (e.g. tag toggles) don't send one.
+  if ('sku' in data && !data.sku) data.sku = generateSku();
   if (data.variants) {
     const conflict = await findVariantSkuConflict(data.hasVariants === false ? [] : data.variants, id);
     if (conflict) return NextResponse.json({ error: conflict }, { status: 400 });

@@ -44,7 +44,6 @@ export type PlainProduct = {
   brand?: string;
   category: string;
   subCategory?: string;
-  whyLoveIt: string[];
   description: string;
   images: string[];
   imagePublicIds: string[];

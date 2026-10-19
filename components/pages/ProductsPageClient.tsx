@@ -19,8 +19,8 @@ import {
 import { cn } from "@/lib/utils";
 import { staggerContainer, scaleIn, fadeUp } from "@/components/animations/variants";
 import { useCart } from "@/components/cart/CartProvider";
-import FadeImage from "@/components/ui/FadeImage";
 import { getProductCoverImage } from "@/lib/product-images";
+import ProductPhoto from "@/components/ui/ProductPhoto";
 
 /* ─── Filter Constants ───────────────────────────────────────── */
 const PRICE_MIN = 0;
@@ -323,14 +323,12 @@ function ShopProductCard({
       {/* ── Image area ── */}
       <Link href={`/product/${product.slug}`} className="flex flex-1 flex-col">
         <div className="p-3 pb-0">
-          <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-gray-50">
-            <FadeImage
+          <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-white">
+            <ProductPhoto
               src={getProductCoverImage(product) || '/placeholder.png'}
               alt={product.name}
-              fill
-              className="object-cover transition-transform duration-500 hover:scale-105"
-              sizes="(max-width: 640px) 50vw, 25vw"
-              loading="lazy"
+              requestWidth={600}
+              imgClassName="transition-transform duration-500 hover:scale-105"
             />
             {/* Offer badge (shown only when product is in an active offer) */}
             {offerBadgeText && (

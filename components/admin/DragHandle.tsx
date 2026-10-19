@@ -1,12 +1,14 @@
 import { FiMove } from 'react-icons/fi';
-import type { DragControls } from 'framer-motion';
+import type { SortableHandle } from './SortableList';
 
-/** Grip icon that starts a framer-motion Reorder.Item drag — keeps the rest
- *  of the card/row (edit, delete, click-through links) free of drag gestures. */
-export default function DragHandle({ dragControls }: { dragControls: DragControls }) {
+/** Grip icon that starts a sortable drag — keeps the rest of the card/row
+ *  (edit, delete, click-through links) free of drag gestures. */
+export default function DragHandle({ handle: { setActivator, attributes, listeners } }: { handle: SortableHandle }) {
   return (
     <div
-      onPointerDown={(e) => dragControls.start(e)}
+      ref={setActivator}
+      {...attributes}
+      {...listeners}
       onClick={(e) => e.stopPropagation()}
       className="drag-handle"
       style={{

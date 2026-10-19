@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import connectDB from '@/lib/mongodb';
+import { parseOrders, applyOrders } from '@/lib/reorder';
 import SubCategory from '@/lib/models/SubCategory';
 import Category from '@/lib/models/Category';
 import { notifyLiveSite } from '@/lib/revalidate-live';
@@ -52,6 +53,23 @@ export async function PUT(req: NextRequest) {
   revalidatePath('/products');
   revalidatePath('/admin/categories/[id]', 'page');
   return NextResponse.json(updated);
+}
+
+/** Drag-to-reorder: saves the whole new order in one request. */
+export async function PATCH(req: NextRequest) {
+  const session = await getServerSession();
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const orders = parseOrders(await req.json().catch(() => null));
+  if (!orders) return NextResponse.json({ error: 'Invalid order payload' }, { status: 400 });
+
+  await connectDB();
+  await applyOrders(SubCategory, orders);
+  revalidateTag('categories', { expire: 0 });
+  void notifyLiveSite('categories');
+  revalidatePath('/products');
+  revalidatePath('/admin/categories/[id]', 'page');
+  return NextResponse.json({ success: true });
 }
 
 export async function DELETE(req: NextRequest) {

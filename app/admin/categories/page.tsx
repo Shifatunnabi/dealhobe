@@ -4,11 +4,11 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import Image from 'next/image';
-import { Reorder, useDragControls } from 'framer-motion';
 import { FiFolder, FiEdit2, FiTrash2, FiPlus, FiX, FiZap, FiEye, FiEyeOff } from 'react-icons/fi';
 import ImageUpload from '@/components/admin/ImageUpload';
 import DragHandle from '@/components/admin/DragHandle';
-import { renumbered, nextOrder, useReorderPersist } from '@/components/admin/reorderUtils';
+import { SortableList, useSortableItem } from '@/components/admin/SortableList';
+import { renumbered, nextOrder, saveOrder } from '@/components/admin/reorderUtils';
 
 interface Category {
   _id:          string;
@@ -31,16 +31,13 @@ function CategoryCard({
   onDelete: () => void;
   onToggleHidden: () => void;
 }) {
-  const dragControls = useDragControls();
+  const { setNodeRef, style, isDragging, handle } = useSortableItem(category._id);
   return (
-    <Reorder.Item
-      as="div"
-      value={category}
-      dragListener={false}
-      dragControls={dragControls}
-      className="admin-item-card"
+    <div
+      ref={setNodeRef}
+      className={`admin-item-card${isDragging ? ' is-dragging' : ''}`}
       onClick={onNavigate}
-      style={{ cursor: 'pointer', opacity: category.isHidden ? 0.6 : 1 }}
+      style={{ ...style, cursor: 'pointer', opacity: category.isHidden ? 0.6 : 1 }}
       title="Manage sub-categories"
     >
       <div className="admin-item-image" style={{ position: 'relative', height: 140 }}>
@@ -61,7 +58,7 @@ function CategoryCard({
           }}>Homepage</span>
         )}
         <div style={{ position: 'absolute', top: 8, left: 8, background: 'rgba(255,255,255,0.9)', borderRadius: 8, padding: '0.25rem' }}>
-          <DragHandle dragControls={dragControls} />
+          <DragHandle handle={handle} />
         </div>
       </div>
       <div className="admin-item-body">
@@ -80,7 +77,7 @@ function CategoryCard({
           <button className="btn-admin-danger" title="Delete" aria-label="Delete category" onClick={(e) => { e.stopPropagation(); onDelete(); }}><FiTrash2 size={14} /></button>
         </div>
       </div>
-    </Reorder.Item>
+    </div>
   );
 }
 
@@ -92,7 +89,6 @@ export default function CategoriesPage() {
   const [editing,    setEditing]    = useState<Category | null>(null);
   const [form,       setForm]       = useState({ ...emptyForm });
   const [saving,     setSaving]     = useState(false);
-  const reorderPersist = useReorderPersist('/api/admin/categories');
 
   const load = async () => {
     setLoading(true);
@@ -147,9 +143,13 @@ export default function CategoriesPage() {
   };
 
   const handleReorder = (newOrder: Category[]) => {
-    const renumberedList = renumbered(newOrder);
-    reorderPersist(categories, renumberedList);
-    setCategories(renumberedList);
+    const prev = categories;
+    const next = renumbered(newOrder);
+    setCategories(next);
+    saveOrder('/api/admin/categories', next).catch(() => {
+      setCategories(prev);
+      toast.error('Could not save the new order');
+    });
   };
 
   return (
@@ -189,7 +189,7 @@ export default function CategoriesPage() {
           <p>Add your first category to populate the homepage.</p>
         </div>
       ) : (
-        <Reorder.Group as="div" axis="y" values={categories} onReorder={handleReorder} className="admin-grid">
+        <SortableList items={categories} onReorder={handleReorder} layout="grid" className="admin-grid">
           {categories.map((c, i) => (
             <CategoryCard
               key={c._id}
@@ -201,7 +201,7 @@ export default function CategoriesPage() {
               onToggleHidden={() => toggleHidden(c)}
             />
           ))}
-        </Reorder.Group>
+        </SortableList>
       )}
 
       {modal && (

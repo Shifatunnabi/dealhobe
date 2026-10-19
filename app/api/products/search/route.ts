@@ -10,7 +10,7 @@ import { getProductCoverImage } from "@/lib/product-images";
  * Generic, category-agnostic product search — works the same whether the
  * catalog is cosmetics, fashion, electronics, groceries, etc. Only searches
  * fields that actually exist on the Product schema (name, sku, description,
- * shortDescription, whyLoveIt, plus category/subCategory/brand resolved via
+ * shortDescription, plus category/subCategory/brand resolved via
  * their own name fields since Product stores those as id references).
  *
  * Ranking (simple, no external search engine):
@@ -20,7 +20,7 @@ import { getProductCoverImage } from "@/lib/product-images";
  *   4. name contains query
  *   5. category / sub-category / brand name match
  *   6. SKU contains query
- *   7. short description / description / whyLoveIt contains query
+ *   7. short description / description contains query
  *
  * If that yields zero results, a bounded (capped candidate pool) Levenshtein
  * fallback catches simple typos (e.g. "iphnoe" -> "iphone") without pulling
@@ -168,7 +168,6 @@ export async function GET(req: NextRequest) {
       { "variants.options.value": regex }, // e.g. "Ruby Red", "200ml"
       { shortDescription: regex },
       { description: regex },
-      { whyLoveIt: regex },
     ];
     if (categoryIds.length) orConditions.push({ category: { $in: categoryIds } });
     if (subCategoryIds.length) orConditions.push({ subCategory: { $in: subCategoryIds } });

@@ -3,11 +3,11 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import Image from 'next/image';
-import { Reorder, useDragControls } from 'framer-motion';
 import { FiImage, FiVolume2, FiEdit2, FiTrash2, FiPlus, FiX, FiSmartphone } from 'react-icons/fi';
 import ImageUpload from '@/components/admin/ImageUpload';
 import DragHandle from '@/components/admin/DragHandle';
-import { renumbered, nextOrder, useReorderPersist } from '@/components/admin/reorderUtils';
+import { SortableList, useSortableItem } from '@/components/admin/SortableList';
+import { renumbered, nextOrder, saveOrder } from '@/components/admin/reorderUtils';
 
 /* ── Types ─────────────────────────────────────────────────── */
 interface HeroSlide { _id: string; imageUrl: string; imagePublicId: string; mobileImageUrl?: string; mobileImagePublicId?: string; ctaText: string; ctaLink: string; ctaColor: string; ctaTextColor: string; order: number; isActive: boolean; }
@@ -56,9 +56,9 @@ function HeroSlideCard({
   onEdit: () => void;
   onDelete: () => void;
 }) {
-  const dragControls = useDragControls();
+  const { setNodeRef, style, isDragging, handle } = useSortableItem(slide._id);
   return (
-    <Reorder.Item as="div" value={slide} dragListener={false} dragControls={dragControls} className="admin-item-card">
+    <div ref={setNodeRef} style={style} className={`admin-item-card${isDragging ? ' is-dragging' : ''}`}>
       <div style={{ position: 'relative', height: 160 }}>
         <Image src={slide.imageUrl} alt={slide.ctaText || 'Hero slide'} fill style={{ objectFit: 'cover' }} />
         <span className={`badge ${slide.isActive ? 'badge-green' : 'badge-red'}`} style={{ position: 'absolute', top: 8, right: 8 }}>
@@ -70,7 +70,7 @@ function HeroSlideCard({
           </span>
         )}
         <div style={{ position: 'absolute', top: 8, left: 8, background: 'rgba(255,255,255,0.9)', borderRadius: 8, padding: '0.25rem' }}>
-          <DragHandle dragControls={dragControls} />
+          <DragHandle handle={handle} />
         </div>
       </div>
       <div className="admin-item-body">
@@ -95,7 +95,7 @@ function HeroSlideCard({
           <button className="btn-admin-danger" onClick={onDelete}><FiTrash2 size={13} /> Delete</button>
         </div>
       </div>
-    </Reorder.Item>
+    </div>
   );
 }
 
@@ -107,12 +107,12 @@ function TopBarRow({
   onEdit: () => void;
   onDelete: () => void;
 }) {
-  const dragControls = useDragControls();
+  const { setNodeRef, style, isDragging, handle } = useSortableItem(text._id);
   return (
-    <Reorder.Item as="div" value={text} dragListener={false} dragControls={dragControls} className="admin-card">
+    <div ref={setNodeRef} style={style} className={`admin-card${isDragging ? ' is-dragging' : ''}`}>
       <div className="admin-card-body" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', padding: '1rem 1.25rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1 }}>
-          <DragHandle dragControls={dragControls} />
+          <DragHandle handle={handle} />
           <span style={{ fontWeight: 700, color: 'var(--text-muted)', fontSize: '0.8rem', minWidth: 20 }}>#{index + 1}</span>
           <span style={{ flex: 1 }}>{text.text}</span>
           <span className={`badge ${text.isActive ? 'badge-green' : 'badge-red'}`}>{text.isActive ? 'Active' : 'Hidden'}</span>
@@ -122,7 +122,7 @@ function TopBarRow({
           <button className="btn-admin-danger" aria-label="Delete" onClick={onDelete}><FiTrash2 size={13} /></button>
         </div>
       </div>
-    </Reorder.Item>
+    </div>
   );
 }
 
@@ -146,8 +146,6 @@ export default function HeroPage() {
   const [tbForm,    setTbForm]    = useState({ ...emptyTbText });
   const [savingTb,  setSavingTb]  = useState(false);
 
-  const reorderPersistSlides = useReorderPersist('/api/admin/hero/slides');
-  const reorderPersistTopbar = useReorderPersist('/api/admin/hero/topbar');
 
   const loadSlides = async () => { const r = await fetch('/api/admin/hero/slides'); setSlides(await r.json()); };
   const loadTopbar = async () => { const r = await fetch('/api/admin/hero/topbar');  setTopbar(await r.json()); };
@@ -157,14 +155,22 @@ export default function HeroPage() {
   }, []);
 
   const handleReorderSlides = (newOrder: HeroSlide[]) => {
-    const renumberedList = renumbered(newOrder);
-    reorderPersistSlides(slides, renumberedList);
-    setSlides(renumberedList);
+    const prev = slides;
+    const next = renumbered(newOrder);
+    setSlides(next);
+    saveOrder('/api/admin/hero/slides', next).catch(() => {
+      setSlides(prev);
+      toast.error('Could not save the new order');
+    });
   };
   const handleReorderTopbar = (newOrder: TopBarText[]) => {
-    const renumberedList = renumbered(newOrder);
-    reorderPersistTopbar(topbar, renumberedList);
-    setTopbar(renumberedList);
+    const prev = topbar;
+    const next = renumbered(newOrder);
+    setTopbar(next);
+    saveOrder('/api/admin/hero/topbar', next).catch(() => {
+      setTopbar(prev);
+      toast.error('Could not save the new order');
+    });
   };
 
   /* Slides CRUD */
@@ -274,18 +280,17 @@ export default function HeroPage() {
             <p>Add your first hero slide to update the homepage banner.</p>
           </div>
         ) : (
-          <Reorder.Group
-            as="div"
-            axis="y"
-            values={slides}
+          <SortableList
+            items={slides}
             onReorder={handleReorderSlides}
+            layout="grid"
             className="admin-grid"
             style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}
           >
             {slides.map(s => (
               <HeroSlideCard key={s._id} slide={s} onEdit={() => openEditSlide(s)} onDelete={() => deleteSlide(s._id)} />
             ))}
-          </Reorder.Group>
+          </SortableList>
         )
       )}
 
@@ -298,17 +303,15 @@ export default function HeroPage() {
             <p>One text = static, multiple = auto-slides every 10s.</p>
           </div>
         ) : (
-          <Reorder.Group
-            as="div"
-            axis="y"
-            values={topbar}
+          <SortableList
+            items={topbar}
             onReorder={handleReorderTopbar}
             style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}
           >
             {topbar.map((t, i) => (
               <TopBarRow key={t._id} text={t} index={i} onEdit={() => openEditTb(t)} onDelete={() => deleteTb(t._id)} />
             ))}
-          </Reorder.Group>
+          </SortableList>
         )
       )}
 

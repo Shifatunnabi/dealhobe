@@ -24,7 +24,6 @@ interface Product {
   brand: string;
   category: string;
   subCategory: string;
-  whyLoveIt: string[];
   description: string;
   images: string[];
   imagePublicIds: string[];
@@ -58,7 +57,7 @@ const PAGE_SIZE = 20;
 
 const emptyForm = {
     sku: '', name: '', slug: '', price: 0, salePrice: 0, costPrice: 0, quantity: 0, shortDescription: '',
-    brand: '', category: '', subCategory: '', whyLoveIt: [] as string[], description: '',
+    brand: '', category: '', subCategory: '', description: '',
     images: [] as string[], imagePublicIds: [] as string[],
     isFeatured: false, isTrending: false, isNewArrival: false, isTopSeller: false,
     hasVariants: false, variantOptions: [] as VariantOption[], variants: [] as Variant[],
@@ -111,7 +110,7 @@ export default function ProductsPage() {
 
   const openEdit = (p: Product) => {
     setEditing(p);
-    setForm({ ...emptyForm, ...p, whyLoveIt: p.whyLoveIt || [], variantOptions: p.variantOptions || [], variants: p.variants || [] });
+    setForm({ ...emptyForm, ...p, variantOptions: p.variantOptions || [], variants: p.variants || [] });
     setModal(true);
   };
 

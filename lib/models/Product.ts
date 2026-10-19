@@ -33,7 +33,6 @@ export interface IProduct extends Document {
   brand?: string;
   category: string;
   subCategory?: string;
-  whyLoveIt: string[];
   description: string;
   images: string[];
   imagePublicIds: string[];
@@ -84,7 +83,6 @@ const ProductSchema = new Schema<IProduct>(
     brand: { type: String }, // Store name or ID — optional
     category: { type: String, required: true }, // Store name or ID
     subCategory: { type: String }, // Store name or ID — optional, scoped under category
-    whyLoveIt: [{ type: String }],
     description: { type: String, required: true }, // HTML
     images: [{ type: String }],
     imagePublicIds: [{ type: String }],

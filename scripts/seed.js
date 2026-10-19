@@ -163,7 +163,6 @@ async function seedProducts({ categories, subCategories, brands }) {
       brand: String(brandId),
       category: String(categoryId),
       ...(subCategoryId ? { subCategory: String(subCategoryId) } : {}),
-      whyLoveIt: p.why,
       description: toHtml(p),
       images: [p.image],
       imagePublicIds: [`seed/product/${p.slug}`],

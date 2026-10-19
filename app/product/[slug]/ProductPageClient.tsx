@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FiShoppingCart,
+  FiChevronLeft,
   FiChevronRight,
   FiCheck,
   FiPlus,
@@ -26,6 +27,7 @@ import {
 import ColorfulTitle from "@/components/ui/ColorfulTitle";
 import { useCart } from "@/components/cart/CartProvider";
 import { getProductCoverImage, getProductImages } from "@/lib/product-images";
+import ProductPhoto from "@/components/ui/ProductPhoto";
 
 /* ─── Stock Badge ────────────────────────────────────────────── */
 function StockBadge({ stockStr, qty }: { stockStr?: string, qty?: number }) {
@@ -87,14 +89,12 @@ function RelatedCard({ product }: { product: any }) {
     >
       <Link href={`/product/${product.slug}`} className="block">
         <div className="p-3 pb-0">
-          <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-gray-50">
-            <Image
+          <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-white">
+            <ProductPhoto
               src={getProductCoverImage(product) || '/placeholder.png'}
               alt={product.name}
-              fill
-              className="object-cover transition-transform duration-500 hover:scale-105"
-              sizes="(max-width: 640px) 50vw, 25vw"
-              loading="lazy"
+              requestWidth={600}
+              imgClassName="transition-transform duration-500 hover:scale-105"
             />
             {product.badge && (
               <span className="absolute left-2 top-2 z-10 rounded-full bg-gradient-primary px-2.5 py-0.5 text-xs font-poppins font-semibold text-white">
@@ -198,14 +198,15 @@ export default function ProductDetailPageClient({
   const router = useRouter();
   const [added, setAdded] = useState(false);
   const [activeThumb, setActiveThumb] = useState(0);
+  const thumbStripRef = useRef<HTMLDivElement>(null);
   const [featuresOpen, setFeaturesOpen] = useState(true);
   const [selectedQty, setSelectedQty] = useState(1);
-  // Variant selection: option name → chosen value. Starts on the first in-stock variant.
-  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>(() => {
-    const variants: any[] = product?.hasVariants ? product.variants || [] : [];
-    const first = variants.find((v) => v.quantity > 0) || variants[0];
-    return first ? Object.fromEntries(first.options.map((o: any) => [o.name, o.value])) : {};
-  });
+  // Variant selection: option name → chosen value. Nothing is preselected — the shopper picks
+  // every option before adding to cart, and the main product photo shows until they do.
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
+  // Set when Add to Cart / Buy Now is pressed before every option is chosen.
+  const [selectionPrompt, setSelectionPrompt] = useState(false);
+  const variantSelectorRef = useRef<HTMLDivElement>(null);
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
   const { addItem, clearCart, closeSidebar } = useCart();
   const [reviewList, setReviewList] = useState<any[]>(reviews || []);
@@ -289,31 +290,46 @@ export default function ProductDetailPageClient({
 
   const hasVariants = !!product.hasVariants && (product.variants?.length ?? 0) > 0;
   const variantOptions: { name: string; values: string[] }[] = hasVariants ? product.variantOptions || [] : [];
-  const selectedVariant: any = hasVariants
+  const allOptionsChosen = variantOptions.every((o) => !!selectedOptions[o.name]);
+  const selectedVariant: any = hasVariants && allOptionsChosen
     ? (product.variants as any[]).find((v) =>
         v.options.every((o: any) => selectedOptions[o.name] === o.value),
       )
     : null;
-  // A value is selectable only if some in-stock variant has it together with the other current picks.
+  const needsSelection = hasVariants && !selectedVariant;
+  // A value is selectable only if some in-stock variant has it together with the other picks made so far
+  // (options not chosen yet match anything).
   const isValueAvailable = (optName: string, value: string) =>
     (product.variants as any[]).some(
       (v) =>
         v.quantity > 0 &&
         v.options.some((o: any) => o.name === optName && o.value === value) &&
-        v.options.every((o: any) => o.name === optName || selectedOptions[o.name] === o.value),
+        v.options.every((o: any) => o.name === optName || !selectedOptions[o.name] || selectedOptions[o.name] === o.value),
     );
+  // Before a variant is chosen, show the cheapest option's price ("From" only when prices differ).
+  const variantList: any[] = hasVariants ? product.variants : [];
+  const effectivePrice = (v: any) => v.salePrice || v.price;
+  const cheapestVariant = variantList.reduce(
+    (best: any, v: any) => (!best || effectivePrice(v) < effectivePrice(best) ? v : best),
+    null,
+  );
+  const pricesVary = new Set(variantList.map(effectivePrice)).size > 1;
   const variantImage: string | null =
     selectedVariant && !selectedVariant.useMainImage && selectedVariant.image ? selectedVariant.image : null;
   const variantLabel: string = selectedVariant ? selectedVariant.options.map((o: any) => o.value).join(" / ") : "";
-  const displayPrice: number = selectedVariant
-    ? selectedVariant.salePrice || selectedVariant.price
+  const priceSource: any = selectedVariant || cheapestVariant;
+  const displayPrice: number = priceSource
+    ? effectivePrice(priceSource)
     : product.salePrice || product.price;
-  const displayOriginal: number | null = selectedVariant
-    ? selectedVariant.salePrice && selectedVariant.price > selectedVariant.salePrice ? selectedVariant.price : null
+  const displayOriginal: number | null = priceSource
+    ? priceSource.salePrice && priceSource.price > priceSource.salePrice ? priceSource.price : null
     : product.salePrice && product.price > product.salePrice ? product.price : null;
 
+  // Until a variant is chosen, stock is the total across all variants.
   const availableQty = hasVariants
-    ? Number(selectedVariant?.quantity ?? 0)
+    ? selectedVariant
+      ? Number(selectedVariant.quantity ?? 0)
+      : variantList.reduce((n: number, v: any) => n + Number(v.quantity || 0), 0)
     : Number(product.quantity ?? product.qty ?? 0);
   const outOfStock = availableQty <= 0;
   const canExpandDescription = useMemo(() => {
@@ -336,7 +352,28 @@ export default function ProductDetailPageClient({
   const variantThumbIndex = variantImage ? thumbImages.indexOf(variantImage) : -1;
   useEffect(() => {
     setActiveThumb(Math.max(0, variantThumbIndex));
+    scrollThumbIntoView(Math.max(0, variantThumbIndex));
   }, [variantThumbIndex]);
+
+  /** Scrolls the thumbnail strip just enough to bring thumbnail `i` into view. */
+  function scrollThumbIntoView(i: number) {
+    const strip = thumbStripRef.current;
+    const thumb = strip?.children[i] as HTMLElement | undefined;
+    if (!strip || !thumb) return;
+    const left = thumb.offsetLeft;
+    const right = left + thumb.offsetWidth;
+    if (left < strip.scrollLeft) strip.scrollTo({ left, behavior: "smooth" });
+    else if (right > strip.scrollLeft + strip.clientWidth) strip.scrollTo({ left: right - strip.clientWidth, behavior: "smooth" });
+  }
+
+  /** Shows photo `i`, or steps from the current photo when given a function (so rapid arrow clicks all count). */
+  const showPhoto = (i: number | ((current: number) => number)) =>
+    setActiveThumb((current) => {
+      const target = typeof i === "function" ? i(current) : i;
+      const next = (target + thumbImages.length) % thumbImages.length;
+      requestAnimationFrame(() => scrollThumbIntoView(next));
+      return next;
+    });
 
   const cartLine = (qty: number) => ({
     productId: product._id,
@@ -349,15 +386,23 @@ export default function ProductDetailPageClient({
     ...(selectedVariant ? { variantKey: selectedVariant.key, variantLabel } : {}),
   });
 
+  /** True (and the missing options are flagged) when the shopper still has to choose a variant. */
+  const promptForSelection = () => {
+    if (!needsSelection) return false;
+    setSelectionPrompt(true);
+    variantSelectorRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    return true;
+  };
+
   const handleAddToCart = () => {
-    if (outOfStock) return;
+    if (outOfStock || promptForSelection()) return;
     addItem(cartLine(selectedQty), selectedQty);
     setAdded(true);
     setTimeout(() => setAdded(false), 1800);
   };
 
   const handleBuyNow = () => {
-    if (outOfStock) return;
+    if (outOfStock || promptForSelection()) return;
 
     clearCart();
     addItem(cartLine(selectedQty), selectedQty);
@@ -449,16 +494,24 @@ export default function ProductDetailPageClient({
             animate="visible"
             className="space-y-4"
           >
-            {/* Main image card */}
+            {/* Main image card: each photo at its own size at most, centred on white (see ProductPhoto).
+                Every photo is mounted (only the active one visible) so switching is instant. */}
             <div className="relative aspect-square w-full overflow-hidden rounded-3xl bg-white shadow-card">
-              <Image
-                src={thumbImages[Math.max(0, activeThumb)] ?? thumbImages[0]}
-                alt={product.name}
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                priority
-              />
+              {thumbImages.map((img: string, i: number) => (
+                <ProductPhoto
+                  key={img}
+                  src={img}
+                  alt={i === activeThumb ? product.name : ""}
+                  requestWidth={1200}
+                  quality={100}
+                  loading="eager"
+                  fetchPriority={i === 0 ? "high" : "low"}
+                  className={cn(
+                    "transition-opacity duration-150",
+                    i === activeThumb ? "opacity-100" : "pointer-events-none opacity-0",
+                  )}
+                />
+              ))}
               {/* Overlay badges */}
               {offerBadgeText && (
                 <span className="absolute left-4 top-4 rounded-full bg-gradient-yellow px-3 py-1 font-poppins text-sm font-bold text-text-dark shadow-button">
@@ -472,29 +525,55 @@ export default function ProductDetailPageClient({
               )}
             </div>
 
-            {/* Thumbnails */}
-            <div className="flex flex-wrap gap-3">
-              {thumbImages.map((img: string, i: number) => (
+            {/* Thumbnails: 3 visible on mobile, 5 from sm up; arrows step through the photos */}
+            {thumbImages.length > 1 && (
+              <div className="flex items-center gap-2">
                 <button
-                  key={i}
-                  onClick={() => setActiveThumb(i)}
-                  className={cn(
-                    "relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl border-2 transition-all duration-200",
-                    activeThumb === i
-                      ? "border-primary-pink shadow-button scale-105"
-                      : "border-transparent opacity-60 shadow-card hover:opacity-100",
-                  )}
+                  type="button"
+                  onClick={() => showPhoto((c) => c - 1)}
+                  aria-label="Previous photo"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-text-dark shadow-card transition-colors hover:bg-primary-pink hover:text-white"
                 >
-                  <Image
-                    src={img}
-                    alt={`View ${i + 1}`}
-                    fill
-                    className="object-cover"
-                    sizes="80px"
-                  />
+                  <FiChevronLeft size={18} />
                 </button>
-              ))}
-            </div>
+                <div
+                  ref={thumbStripRef}
+                  className="relative flex min-w-0 flex-1 gap-3 overflow-x-auto py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                >
+                  {thumbImages.map((img: string, i: number) => (
+                    <button
+                      key={img}
+                      type="button"
+                      onClick={() => showPhoto(i)}
+                      aria-label={`Show photo ${i + 1}`}
+                      aria-current={activeThumb === i}
+                      className={cn(
+                        "relative aspect-square w-[calc((100%-1.5rem)/3)] shrink-0 overflow-hidden rounded-2xl border-2 bg-white transition-all duration-200 sm:w-[calc((100%-3rem)/5)]",
+                        activeThumb === i
+                          ? "border-primary-pink shadow-button"
+                          : "border-transparent opacity-60 shadow-card hover:opacity-100",
+                      )}
+                    >
+                      <Image
+                        src={img}
+                        alt={`View ${i + 1}`}
+                        fill
+                        className="object-contain"
+                        sizes="(max-width: 640px) 30vw, 120px"
+                      />
+                    </button>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => showPhoto((c) => c + 1)}
+                  aria-label="Next photo"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-text-dark shadow-card transition-colors hover:bg-primary-pink hover:text-white"
+                >
+                  <FiChevronRight size={18} />
+                </button>
+              </div>
+            )}
           </motion.div>
 
           {/* ── Right: Product details ── */}
@@ -523,6 +602,9 @@ export default function ProductDetailPageClient({
             {/* Price */}
             <motion.div variants={fadeUp} className="flex items-baseline gap-3">
               <span className="font-poppins text-4xl font-bold text-primary-pink">
+                {needsSelection && pricesVary && (
+                  <span className="mr-2 text-base font-medium text-text-muted">From</span>
+                )}
                 ৳{displayPrice.toLocaleString()}.00
               </span>
               {displayOriginal && (
@@ -534,14 +616,16 @@ export default function ProductDetailPageClient({
 
             {/* Variant selectors */}
             {variantOptions.length > 0 && (
-              <motion.div variants={fadeUp} className="space-y-4">
+              <motion.div variants={fadeUp} className="space-y-4" ref={variantSelectorRef}>
                 {variantOptions.map((opt) => (
                   <div key={opt.name}>
                     <p className="mb-2 font-poppins text-sm font-semibold text-text-dark">
                       {opt.name}
-                      {selectedOptions[opt.name] && (
+                      {selectedOptions[opt.name] ? (
                         <span className="ml-2 font-normal text-text-muted">{selectedOptions[opt.name]}</span>
-                      )}
+                      ) : selectionPrompt ? (
+                        <span className="ml-2 font-normal text-red-500">Please select a {opt.name.toLowerCase()}</span>
+                      ) : null}
                     </p>
                     <div className="flex flex-wrap gap-2">
                       {opt.values.map((val) => {
@@ -551,7 +635,16 @@ export default function ProductDetailPageClient({
                           <button
                             key={val}
                             type="button"
-                            onClick={() => setSelectedOptions((prev) => ({ ...prev, [opt.name]: val }))}
+                            aria-pressed={active}
+                            // Clicking the chosen value again clears it.
+                            onClick={() =>
+                              setSelectedOptions((prev) => {
+                                const next = { ...prev };
+                                if (active) delete next[opt.name];
+                                else next[opt.name] = val;
+                                return next;
+                              })
+                            }
                             className={cn(
                               "rounded-xl border-2 px-4 py-2 font-poppins text-sm font-medium transition-all",
                               active
@@ -567,7 +660,7 @@ export default function ProductDetailPageClient({
                     </div>
                   </div>
                 ))}
-                {!selectedVariant && (
+                {allOptionsChosen && !selectedVariant && (
                   <p className="font-poppins text-sm text-red-500">No product exists for this combination.</p>
                 )}
               </motion.div>
@@ -678,22 +771,6 @@ export default function ProductDetailPageClient({
               <ColorfulTitle title="Product Description" className="text-primary-pink" />
             </div>
 
-            {product.whyLoveIt?.length > 0 && (
-              <motion.div variants={fadeUp} className="mx-auto w-full rounded-3xl p-6 sm:p-8">
-                <p className="mb-3 font-poppins text-xs font-semibold uppercase tracking-widest text-primary-pink">
-                  What they will love:
-                </p>
-                <ul className="space-y-2">
-                  {product.whyLoveIt.map((feat: string, i: number) => (
-                    <li key={i} className="flex items-start gap-2.5 text-sm text-text-muted">
-                      <FiCheck size={14} className="mt-0.5 shrink-0 text-primary-pink" />
-                      <span>{feat}</span>
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
-            )}
-
             <motion.div
               variants={fadeUp}
               className="mx-auto w-full rounded-3xl p-6 sm:p-8"
@@ -784,9 +861,9 @@ export default function ProductDetailPageClient({
             {reviewList.length === 0 ? (
               <div className="text-center text-sm text-text-muted">No reviews yet.</div>
             ) : (
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="grid grid-cols-1 gap-4 md:auto-rows-fr md:grid-cols-2">
                 {reviewList.map((review) => (
-                  <div key={review._id} className="rounded-3xl border border-primary-pink/15 bg-white p-5 shadow-card">
+                  <div key={review._id} className="h-full rounded-3xl border border-primary-pink/15 bg-white p-5 shadow-card">
                     <div className="mb-2 flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary-pink/10 text-primary-pink">

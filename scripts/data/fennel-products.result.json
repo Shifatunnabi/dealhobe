@@ -1,0 +1,199 @@
+[
+ {
+  "name": "Fennel Body Lotion Vitamin Series",
+  "status": "skipped",
+  "sku": "DH-43809673",
+  "slug": "fennel-body-lotion-vitamin-series-7947954"
+ },
+ {
+  "name": "Fennel Spotless Brightening Booster Serum",
+  "status": "skipped",
+  "sku": "DH-95462742",
+  "slug": "fennel-spotless-brightening-booster-serum-7684160"
+ },
+ {
+  "name": "Fennel Loose Rice Powder",
+  "status": "skipped",
+  "sku": "DH-85186735",
+  "slug": "fennel-loose-rice-powder-2489019"
+ },
+ {
+  "name": "Fennel Aqua Lip Tint",
+  "status": "skipped",
+  "sku": "DH-88001637",
+  "slug": "fennel-aqua-lip-tint-3224115"
+ },
+ {
+  "name": "Fennel Blush On",
+  "status": "skipped",
+  "sku": "DH-43374646",
+  "slug": "fennel-blush-on-4981117"
+ },
+ {
+  "name": "Fennel Matte Lipstick",
+  "status": "skipped",
+  "sku": "DH-90003129",
+  "slug": "fennel-matte-lipstick-6708026"
+ },
+ {
+  "name": "Fennel Volume Express Mascara",
+  "status": "skipped",
+  "sku": "DH-38388154",
+  "slug": "fennel-volume-express-mascara-4681586"
+ },
+ {
+  "name": "Fennel Lip Balm",
+  "status": "skipped",
+  "sku": "DH-59144444",
+  "slug": "fennel-lip-balm-3784339"
+ },
+ {
+  "name": "Fennel BB Cream SPF 35++",
+  "status": "skipped",
+  "sku": "DH-65658326",
+  "slug": "fennel-bb-cream-spf-35-0303543"
+ },
+ {
+  "id": "6ad5df40e6c430b7fe555b22",
+  "name": "Fennel Hair Food",
+  "status": "created",
+  "sku": "DH-19928630",
+  "slug": "fennel-hair-food-1812329",
+  "category": "Hair Care › Hair Cream",
+  "images": 3,
+  "imageSizes": [
+   "1472x1210",
+   "2613x1344",
+   "1806x1812"
+  ],
+  "variants": 0,
+  "option": null,
+  "tags": "isNewArrival, isFeatured, isTopSeller",
+  "source": "https://fennelcos.com/product/view.php?main_id=342&cate=&subcate=&brand="
+ },
+ {
+  "id": "6ad5df54e6c430b7fe555b23",
+  "name": "Fennel Anti-Acne Booster Serum",
+  "status": "created",
+  "sku": "DH-43196335",
+  "slug": "fennel-anti-acne-booster-serum-8034795",
+  "category": "Skin Care › Serums & Treatments",
+  "images": 5,
+  "imageSizes": [
+   "371x500",
+   "371x500",
+   "371x500",
+   "371x500",
+   "371x500"
+  ],
+  "variants": 0,
+  "option": null,
+  "tags": "isNewArrival, isTopSeller",
+  "source": "https://fennelcos.com/product/view.php?main_id=395&cate=&subcate=&brand="
+ },
+ {
+  "id": "6ad5df69e6c430b7fe555b24",
+  "name": "Fennel Melasma Booster Serum",
+  "status": "created",
+  "sku": "DH-91855882",
+  "slug": "fennel-melasma-booster-serum-1034432",
+  "category": "Skin Care › Serums & Treatments",
+  "images": 5,
+  "imageSizes": [
+   "371x500",
+   "371x500",
+   "371x500",
+   "371x500",
+   "371x500"
+  ],
+  "variants": 0,
+  "option": null,
+  "tags": "isTrending, isFeatured",
+  "source": "https://fennelcos.com/whatnew/view.php?main_id=400&cate=&subcate=&brand="
+ },
+ {
+  "id": "6ad5dfbae6c430b7fe555b25",
+  "name": "Fennel Romance Compact Powder",
+  "status": "created",
+  "sku": "DH-85617269",
+  "slug": "fennel-romance-compact-powder-7530622",
+  "category": "Makeup › Face",
+  "images": 2,
+  "imageSizes": [
+   "800x500",
+   "800x500"
+  ],
+  "variants": 10,
+  "option": "Color",
+  "tags": "isTrending",
+  "source": "https://www.fennelcos.com/product/view.php?main_id=4&cate=&subcate=&brand="
+ },
+ {
+  "id": "6ad5dfc6e6c430b7fe555b26",
+  "name": "Fennel Lightening Face Wash Aloe Vera",
+  "status": "created",
+  "sku": "DH-82814378",
+  "slug": "fennel-lightening-face-wash-aloe-vera-9364677",
+  "category": "Skin Care › Cleansers & Face Wash",
+  "images": 2,
+  "imageSizes": [
+   "371x500",
+   "371x500"
+  ],
+  "variants": 0,
+  "option": null,
+  "tags": "isTrending, isTopSeller",
+  "source": "https://www.fennelcos.com/product/view.php?main_id=406&cate=&subcate=&brand="
+ },
+ {
+  "id": "6ad5dfd1e6c430b7fe555b27",
+  "name": "Fennel Lightening Face Wash Lemon Vitamin C",
+  "status": "created",
+  "sku": "DH-02641835",
+  "slug": "fennel-lightening-face-wash-lemon-vitamin-c-7188392",
+  "category": "Skin Care › Cleansers & Face Wash",
+  "images": 2,
+  "imageSizes": [
+   "371x500",
+   "371x500"
+  ],
+  "variants": 0,
+  "option": null,
+  "tags": "isTrending, isTopSeller",
+  "source": "https://www.fennelcos.com/product/view.php?main_id=405&cate=&subcate=&brand="
+ },
+ {
+  "id": "6ad5dfdee6c430b7fe555b28",
+  "name": "Fennel Lightening Face Wash Neem",
+  "status": "created",
+  "sku": "DH-42379004",
+  "slug": "fennel-lightening-face-wash-neem-2656036",
+  "category": "Skin Care › Cleansers & Face Wash",
+  "images": 2,
+  "imageSizes": [
+   "371x500",
+   "371x500"
+  ],
+  "variants": 0,
+  "option": null,
+  "tags": "isFeatured",
+  "source": "https://fennelcos.com/whatnew/view.php?main_id=403&cate=&subcate=&brand="
+ },
+ {
+  "id": "6ad5e005e6c430b7fe555b29",
+  "name": "Fennel Pumped Up Mascara",
+  "status": "created",
+  "sku": "DH-58239909",
+  "slug": "fennel-pumped-up-mascara-8072230",
+  "category": "Makeup › Eyes",
+  "images": 2,
+  "imageSizes": [
+   "1289x2000",
+   "615x2000"
+  ],
+  "variants": 0,
+  "option": null,
+  "tags": "isTrending, isNewArrival, isFeatured, isTopSeller",
+  "source": "https://makeup.com.ua/product/1485696/"
+ }
+]
