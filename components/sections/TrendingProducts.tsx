@@ -6,7 +6,7 @@ import SectionHeader from "./SectionHeader";
 import ProductCard, { type GridProduct } from "./ProductCard";
 import { HOMEPAGE_GRID_CLASS, HOMEPAGE_GRID_ITEMS } from "@/lib/homepage-grid";
 
-/* ── Section — 3 rows of products, then a View All CTA ─────────── */
+/* ── Section — 12 products (see lib/homepage-grid.ts), then a View All CTA ── */
 export default function TrendingProducts({ products = [] }: { products?: GridProduct[] }) {
 
   if (!products.length) {
@@ -27,7 +27,7 @@ export default function TrendingProducts({ products = [] }: { products?: GridPro
       >
         <SectionHeader title="Trending Products" />
 
-        {/* Grid — 3 rows: 3 × 2 on mobile, 3 × 4 from md up */}
+        {/* Grid — 6 rows of 2 on mobile, 3 rows of 4 from md up */}
         <div className={HOMEPAGE_GRID_CLASS}>
           {products.slice(0, HOMEPAGE_GRID_ITEMS).map((product) => (
             <ProductCard key={product._id} product={product} />
