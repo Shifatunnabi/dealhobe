@@ -8,6 +8,7 @@ import { FiEdit2, FiTrash2, FiRefreshCw, FiPackage, FiPlus, FiX } from 'react-ic
 import MultiImageUpload from '@/components/admin/MultiImageUpload';
 import { getProductCoverImage } from '@/lib/product-images';
 import VariantsEditor, { VariantOption, Variant } from '@/components/admin/VariantsEditor';
+import { withLowestVariantPrice } from '@/lib/pricing';
 
 const RichTextEditor = dynamic(() => import('@/components/admin/RichTextEditor'), { ssr: false });
 
@@ -272,6 +273,7 @@ export default function ProductsPage() {
             </thead>
             <tbody>
               {pagedProducts.map(p => {
+                  const shown = withLowestVariantPrice(p);
                   const cat = categories.find(c => c._id === p.category)?.name || 'Unknown';
                   const subCat = subCategories.find(s => s._id === p.subCategory)?.name;
                   return (
@@ -288,7 +290,7 @@ export default function ProductsPage() {
                                 {p.sku && <div style={{fontSize: '0.7rem', color: 'var(--text-muted)', fontFamily: 'monospace'}}>{p.sku}</div>}
                             </div>
                         </td>
-                        <td>{p.hasVariants && <span style={{fontSize:'0.75em', color:'var(--text-muted)'}}>From </span>}৳{p.salePrice || p.price} {!!p.salePrice && <span style={{textDecoration:'line-through', color:'var(--text-muted)', fontSize: '0.75em'}}>৳{p.price}</span>}</td>
+                        <td>{p.hasVariants && <span style={{fontSize:'0.75em', color:'var(--text-muted)'}}>From </span>}৳{shown.salePrice || shown.price} {!!shown.salePrice && <span style={{textDecoration:'line-through', color:'var(--text-muted)', fontSize: '0.75em'}}>৳{shown.price}</span>}</td>
                         <td>
                             {p.quantity === 0 ? <span className="badge badge-red">Out of Stock</span> :
                              p.quantity < 10 ? <span className="badge badge-yellow">Low: {p.quantity}</span> :

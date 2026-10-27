@@ -5,6 +5,7 @@ import Category from "@/lib/models/Category";
 import SubCategory from "@/lib/models/SubCategory";
 import Brand from "@/lib/models/Brand";
 import { getProductCoverImage } from "@/lib/product-images";
+import { lowestVariantPricing } from "@/lib/pricing";
 
 /*
  * Generic, category-agnostic product search — works the same whether the
@@ -38,16 +39,14 @@ const toResult = (p: any) => {
   // Variant products carry per-variant prices; the product-level price/salePrice
   // can be 0, so surface the lowest effective variant price and flag it for "From".
   const hasVariants = !!p.hasVariants && Array.isArray(p.variants) && p.variants.length > 0;
-  const lowest = hasVariants
-    ? Math.min(...p.variants.map((v: any) => v.salePrice || v.price))
-    : null;
+  const lowest = lowestVariantPricing(p);
   return {
     _id: String(p._id),
     name: p.name,
     slug: p.slug,
     image: getProductCoverImage(p),
-    price: lowest ?? p.price,
-    salePrice: lowest !== null ? null : p.salePrice || null,
+    price: lowest ? lowest.price : p.price,
+    salePrice: (lowest ? lowest.salePrice : p.salePrice) || null,
     hasVariants,
   };
 };

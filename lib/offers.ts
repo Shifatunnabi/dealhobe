@@ -1,3 +1,5 @@
+import { withLowestVariantPrice } from "@/lib/pricing";
+
 export type OfferLike = {
   _id?: string | { toString(): string };
   discountType: "percentage" | "flat";
@@ -16,7 +18,7 @@ export function isOfferActive(offer: OfferLike, now = new Date()): boolean {
   return end >= now;
 }
 
-export function applyOffersToProduct<T extends { _id: any; price: number; salePrice?: number }>(
+function applyBestOffer<T extends { _id: any; price: number; salePrice?: number }>(
   product: T,
   offers: OfferLike[],
   now = new Date(),
@@ -79,6 +81,18 @@ export function applyOffersToProduct<T extends { _id: any; price: number; salePr
     offerDiscountType: bestOffer.discountType,
     offerDiscountAmount: bestOffer.discountAmount,
   };
+}
+
+/**
+ * Applies the best active offer, then sets the product-level price/salePrice from the lowest variant
+ * (after any offer discount) so "From ৳…" is right everywhere the product is displayed.
+ */
+export function applyOffersToProduct<T extends { _id: any; price: number; salePrice?: number }>(
+  product: T,
+  offers: OfferLike[],
+  now = new Date(),
+): ReturnType<typeof applyBestOffer<T>> {
+  return withLowestVariantPrice(applyBestOffer(product, offers, now));
 }
 
 export function applyOffersToProducts<T extends { _id: any; price: number; salePrice?: number }>(
