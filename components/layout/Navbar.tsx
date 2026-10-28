@@ -462,7 +462,8 @@ export default function Navbar({ storefront }: { storefront: NavStorefront }) {
         </header>
 
         {/* ── Category pills (edited in Admin › Homepage Builder › Storefront) ── */}
-        {storefront.navPills.length > 0 && (
+        {/* Hidden while searching: the results dropdown opens in this exact spot. */}
+        {storefront.navPills.length > 0 && !searchOpen && (
           <div className="h-11 border-b border-black/5 bg-white/95 backdrop-blur-md">
             <PillRow pills={storefront.navPills} />
           </div>

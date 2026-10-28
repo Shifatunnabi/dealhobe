@@ -92,6 +92,18 @@ export default function NavSearchOverlay({ onClose, placeholders = [] }: { onClo
     goToFullSearch();
   };
 
+  // Height left for the results above the on-screen keyboard (visualViewport shrinks when it opens;
+  // plain vh/dvh don't on iOS). 100px = announcement bar + search row, 12px breathing room.
+  const [maxPanelHeight, setMaxPanelHeight] = useState<number | undefined>(undefined);
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const update = () => setMaxPanelHeight(Math.max(160, vv.height - 100 - 12));
+    update();
+    vv.addEventListener("resize", update);
+    return () => vv.removeEventListener("resize", update);
+  }, []);
+
   return (
     <>
       {typeof document !== "undefined" &&
@@ -142,7 +154,7 @@ export default function NavSearchOverlay({ onClose, placeholders = [] }: { onClo
 
       {showPanel && (
         <div className="absolute inset-x-0 top-full z-10 px-4 md:mx-auto md:w-[90%] md:max-w-[1400px] md:px-0">
-          <div className="max-h-[70vh] overflow-y-auto rounded-b-2xl border border-t-0 border-gray-100 bg-white shadow-hover">
+          <div className="max-h-[70vh] overflow-y-auto overscroll-contain rounded-b-2xl border border-t-0 border-gray-100 bg-white shadow-hover" style={maxPanelHeight ? { maxHeight: maxPanelHeight } : undefined}>
             {loading ? (
               <div className="flex items-center justify-center gap-2 py-10 text-sm text-text-muted">
                 <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-pink/30 border-t-primary-pink" />
