@@ -198,7 +198,7 @@ export default function BlogsPageClient({ blogs = [] }: { blogs?: any[] }) {
   };
 
   return (
-    <div className="min-h-screen bg-soft-bg pt-26 pb-24">
+    <div className="min-h-screen bg-soft-bg pt-6 md:pt-8 pb-24">
       <div className="mx-auto max-w-6xl px-section">
 
         {/* ── Page header ────────────────────────────────────── */}

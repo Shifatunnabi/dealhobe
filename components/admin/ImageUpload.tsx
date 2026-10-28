@@ -60,6 +60,10 @@ export default function ImageUpload({
         onDragLeave={() => setDragOver(false)}
         onDrop={handleDrop}
         onClick={() => inputRef.current?.click()}
+        onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); inputRef.current?.click(); } }}
+        role="button"
+        tabIndex={0}
+        aria-label={value ? `${label}: change image` : `${label}: upload image`}
       >
         {uploading ? (
           <div className="upload-loader">
@@ -68,7 +72,8 @@ export default function ImageUpload({
           </div>
         ) : value ? (
           <div className="image-preview-wrapper">
-            <Image src={value} alt="Preview" fill style={{ objectFit: 'cover' }} />
+            {/* contain: show the whole upload at its real aspect ratio, never cropped or stretched */}
+            <Image src={value} alt="Preview" fill sizes="(max-width: 640px) 100vw, 600px" style={{ objectFit: 'contain' }} />
             <div className="image-overlay">
               <span>Click to change</span>
             </div>

@@ -31,6 +31,8 @@ type RevalidateType =
   | 'reviews'
   | 'tips'
   | 'blogs'
+  | 'homepage'
+  | 'settings'
   | 'all';
 
 export async function POST(req: NextRequest) {
@@ -121,9 +123,19 @@ export async function POST(req: NextRequest) {
       if (slug) revalidatePath(`/blogs/${slug}`);
       break;
 
+    case 'homepage':
+      revalidateTag('homepage', { expire: 0 });
+      revalidatePath('/');
+      break;
+
+    case 'settings':
+      revalidateTag('settings', { expire: 0 });
+      revalidatePath('/', 'layout');
+      break;
+
     case 'all':
       (
-        ['products', 'categories', 'ages', 'brands', 'offers', 'hero', 'reviews', 'tips', 'blogs'] as const
+        ['products', 'categories', 'ages', 'brands', 'offers', 'hero', 'reviews', 'tips', 'blogs', 'homepage', 'settings'] as const
       ).forEach((tag) => revalidateTag(tag, { expire: 0 }));
       revalidatePath('/', 'layout');  // wipes every cached page
       break;

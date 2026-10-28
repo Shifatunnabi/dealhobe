@@ -375,7 +375,7 @@ export default function CheckoutPage() {
 
   if (!items.length) {
     return (
-      <div className="min-h-screen bg-soft-bg pt-26 pb-24 flex items-center justify-center px-section">
+      <div className="min-h-screen bg-soft-bg pt-6 md:pt-8 pb-24 flex items-center justify-center px-section">
         <motion.div
           className="w-full max-w-md rounded-3xl bg-white p-10 shadow-card text-center"
           initial={{ opacity: 0, scale: 0.92 }}
@@ -401,7 +401,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-soft-bg pt-34 pb-24">
+    <div className="min-h-screen bg-soft-bg pt-8 md:pt-10 pb-24">
       <div className="mx-auto max-w-5xl px-section">
         <motion.div
           className="mb-10 text-center"

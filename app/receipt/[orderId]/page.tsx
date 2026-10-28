@@ -72,7 +72,7 @@ export default function ReceiptPage() {
   );
 
   return (
-    <div className="min-h-screen bg-soft-bg pt-26 pb-24">
+    <div className="min-h-screen bg-soft-bg pt-6 md:pt-8 pb-24">
       <div className="mx-auto max-w-5xl px-section">
         <div className="rounded-3xl bg-white p-6 shadow-card">
           <div className="flex flex-wrap items-center justify-between gap-3">

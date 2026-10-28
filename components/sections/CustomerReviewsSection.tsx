@@ -26,7 +26,7 @@ function ReviewCard({ name, text }: { name: string; text: string }) {
   );
 }
 
-export default function CustomerReviewsSection({ reviews = [] }: { reviews?: PlainReview[] }) {
+export default function CustomerReviewsSection({ reviews = [], title = "Customer reviews" }: { reviews?: PlainReview[]; title?: string }) {
   const [startIndex, setStartIndex] = useState(0);
   const reducedMotion = useReducedMotion();
 
@@ -79,7 +79,7 @@ export default function CustomerReviewsSection({ reviews = [] }: { reviews?: Pla
     return (
       <section className="w-full bg-soft-bg px-section py-section">
         <div className="mx-auto max-w-7xl">
-          <SectionHeader title="Customer Reviews" />
+          <SectionHeader title={title} />
           <p className="text-sm text-text-muted">No customer reviews yet.</p>
         </div>
       </section>
@@ -91,7 +91,7 @@ export default function CustomerReviewsSection({ reviews = [] }: { reviews?: Pla
       <div
         className="mx-auto max-w-7xl"
       >
-        <SectionHeader title="Customer Reviews" />
+        <SectionHeader title={title} />
 
         {/* Desktop: imperative CSS slide */}
         <div className="hidden overflow-hidden md:block">

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import connectDB from "@/lib/mongodb";
 import Settings from "@/lib/models/Settings";
 import { deleteImage } from "@/lib/cloudinary";
@@ -52,7 +52,8 @@ export async function PUT(req: NextRequest) {
     await deleteImage(prevLogoPublicId);
   }
 
-  revalidatePath('/');
+  revalidateTag('settings', { expire: 0 });
+  revalidatePath('/', 'layout');
   void notifyLiveSite('all');
   return NextResponse.json({
     freeDeliveryThreshold: updated?.freeDeliveryThreshold || 0,

@@ -155,17 +155,9 @@ export default function AdminOrdersPage() {
           <h1 className="admin-page-title"><span className="page-icon"><FiFileText size={20} /></span> Orders</h1>
           <p className="admin-page-subtitle">Review customer orders and manage Steadfast shipments.</p>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}>
+        <div className="admin-header-actions">
           {balance !== null && (
-            <div style={{
-              background: "rgba(52,199,89,0.1)",
-              border: "1px solid rgba(52,199,89,0.25)",
-              borderRadius: 8,
-              padding: "0.4rem 0.85rem",
-              fontSize: 13,
-              fontWeight: 600,
-              color: "#15803d",
-            }}>
+            <div className="admin-pill-stat">
               Steadfast Balance: ৳{balance.toLocaleString()}
             </div>
           )}
@@ -178,14 +170,7 @@ export default function AdminOrdersPage() {
       </div>
 
       {bulkResult && (
-        <div style={{
-          marginBottom: "1rem",
-          padding: "0.75rem 1rem",
-          background: "rgba(59,130,246,0.08)",
-          border: "1px solid rgba(59,130,246,0.2)",
-          borderRadius: 8,
-          fontSize: 14,
-        }}>
+        <div className="admin-notice admin-notice--info" role="status">
           {bulkResult}
         </div>
       )}
@@ -199,16 +184,30 @@ export default function AdminOrdersPage() {
           <p>Orders will appear here as customers check out.</p>
         </div>
       ) : (
-        <div className="admin-table-wrap">
-          <table className="admin-table">
+        <>
+        {eligibleOrders.length > 0 && (
+          <label className="admin-checkbox-row orders-select-all">
+            <input
+              type="checkbox"
+              className="admin-checkbox"
+              checked={allEligibleSelected}
+              onChange={toggleAll}
+            />
+            <span>Select all unsent orders</span>
+          </label>
+        )}
+        <div className="admin-table-wrap admin-table-wrap--stack">
+          <table className="admin-table admin-table--stack">
             <thead>
               <tr>
                 <th style={{ width: 40 }}>
                   <input
                     type="checkbox"
+                    className="admin-checkbox"
                     checked={allEligibleSelected}
                     onChange={toggleAll}
                     title="Select all unsent orders"
+                    aria-label="Select all unsent orders"
                   />
                 </th>
                 <th>#</th>
@@ -230,32 +229,34 @@ export default function AdminOrdersPage() {
 
                 return (
                   <tr key={order._id}>
-                    <td>
-                      <input
-                        type="checkbox"
-                        checked={selected.has(order.orderNumber)}
-                        disabled={isSent}
-                        onChange={() => toggleSelect(order.orderNumber)}
-                      />
+                    <td className="cell-head order-cell-head">
+                      <label className="order-select">
+                        <input
+                          type="checkbox"
+                          className="admin-checkbox"
+                          checked={selected.has(order.orderNumber)}
+                          disabled={isSent}
+                          onChange={() => toggleSelect(order.orderNumber)}
+                          aria-label={`Select order ${order.orderNumber}`}
+                        />
+                        <span className="order-select-id">{order.orderNumber}</span>
+                      </label>
                     </td>
-                    <td>{index + 1}</td>
-                    <td style={{ fontWeight: 600 }}>{order.orderNumber}</td>
-                    <td>{new Date(order.createdAt).toLocaleDateString()}</td>
-                    <td>৳{order.total.toLocaleString()}</td>
-                    <td>
-                      <span style={{
-                        display: "inline-block",
-                        padding: "2px 10px",
-                        borderRadius: 20,
-                        fontSize: 12,
-                        fontWeight: 600,
-                        background: `${STATUS_COLORS[order.status] || "#6b7280"}20`,
-                        color: STATUS_COLORS[order.status] || "#6b7280",
-                      }}>
-                        {order.status}
+                    <td className="hide-stacked">{index + 1}</td>
+                    <td className="hide-stacked" style={{ fontWeight: 600 }}>{order.orderNumber}</td>
+                    <td data-label="Date" className="nowrap">{new Date(order.createdAt).toLocaleDateString()}</td>
+                    <td data-label="Total" className="nowrap"><strong style={{ fontWeight: 600 }}>৳{order.total.toLocaleString()}</strong></td>
+                    <td data-label="Status">
+                      <span>
+                        <span className="status-pill" style={{
+                          background: `${STATUS_COLORS[order.status] || "#6b7280"}1a`,
+                          color: STATUS_COLORS[order.status] || "#6b7280",
+                        }}>
+                          {order.status}
+                        </span>
                       </span>
                     </td>
-                    <td style={{ fontSize: 12 }}>
+                    <td data-label="Steadfast" style={{ fontSize: 12 }}>
                       {isSent ? (
                         <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
                           <span style={{ color: "#6b7280" }}>{order.steadfastTrackingCode}</span>
@@ -269,15 +270,14 @@ export default function AdminOrdersPage() {
                         <span style={{ color: "#9ca3af" }}>Not sent</span>
                       )}
                     </td>
-                    <td>
-                      <div className="admin-item-actions" style={{ flexWrap: "wrap", gap: "0.35rem" }}>
-                        <Link href={`/admin/orders/${order.orderNumber}`} className="btn-admin-edit">
+                    <td className="cell-actions-td">
+                      <div className="cell-actions">
+                        <Link href={`/admin/orders/${order.orderNumber}`} className="btn-admin-edit btn-sm">
                           View
                         </Link>
                         {!isSent ? (
                           <button
-                            className="btn-admin-primary"
-                            style={{ fontSize: 12, padding: "4px 10px" }}
+                            className="btn-admin-primary btn-sm"
                             onClick={() => sendSingle(order.orderNumber)}
                             disabled={isLoading}
                           >
@@ -286,8 +286,7 @@ export default function AdminOrdersPage() {
                         ) : (
                           <>
                             <button
-                              className="btn-admin-secondary"
-                              style={{ fontSize: 12, padding: "4px 10px" }}
+                              className="btn-admin-secondary btn-sm"
                               onClick={() => syncStatus(order.orderNumber)}
                               disabled={isSyncing}
                             >
@@ -295,8 +294,7 @@ export default function AdminOrdersPage() {
                             </button>
                             {order.status !== "Delivered" && (
                               <button
-                                className="btn-admin-success"
-                                style={{ fontSize: 12, padding: "4px 10px" }}
+                                className="btn-admin-success btn-sm"
                                 onClick={() => markDelivered(order.orderNumber)}
                                 disabled={isMarkingDelivered}
                               >
@@ -306,8 +304,7 @@ export default function AdminOrdersPage() {
                           </>
                         )}
                         <button
-                          className="btn-admin-danger"
-                          style={{ fontSize: 12, padding: "4px 10px" }}
+                          className="btn-admin-danger btn-sm"
                           onClick={() => cancelOrder(order.orderNumber)}
                           disabled={isCancelling}
                         >
@@ -321,6 +318,7 @@ export default function AdminOrdersPage() {
             </tbody>
           </table>
         </div>
+        </>
       )}
     </div>
   );

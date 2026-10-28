@@ -1,19 +1,27 @@
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
+import { Poppins, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
-import Loader from "@/components/layout/Loader";
 import RouteChrome from "@/components/layout/RouteChrome";
 import ScrollReset from "@/components/layout/ScrollReset";
 import { CartProvider } from "@/components/cart/CartProvider";
 import CartSidebar from "@/components/cart/CartSidebar";
 import QueryProvider from "@/components/providers/QueryProvider";
 import { Toaster } from "react-hot-toast";
+import { getStorefront } from "@/lib/data";
+import { DEFAULT_STOREFRONT } from "@/lib/homepage/defaults";
 
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800"],
+  display: "swap",
+});
+
+const playfair = Playfair_Display({
+  variable: "--font-display",
+  subsets: ["latin"],
+  weight: ["600", "700"],
   display: "swap",
 });
 
@@ -116,30 +124,40 @@ const jsonLd = {
   logo: `${siteUrl}/logo/main-logo.png`,
 };
 
-export default function RootLayout({
+// The navbar/footer chrome must render even if the database is briefly unreachable.
+async function loadStorefront() {
+  try {
+    return await getStorefront();
+  } catch (err) {
+    console.error("[layout] storefront settings unavailable:", err instanceof Error ? err.message : err);
+    return { ...DEFAULT_STOREFRONT, logoUrl: "/logo/main-logo.png", freeDeliveryThreshold: 0 };
+  }
+}
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const storefront = await loadStorefront();
   return (
     <html lang="en-BD">
       <body
-        className={`${poppins.variable} antialiased bg-soft-bg text-text-dark`}
+        className={`${poppins.variable} ${playfair.variable} antialiased bg-soft-bg text-text-dark`}
       >
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <Loader />
         <ScrollReset />
 
         <QueryProvider>
           <CartProvider>
             <CartSidebar />
             <div className="flex min-h-screen flex-col">
-              <Navbar />
-              <main className="flex-1 pt-25 pb-20 md:pb-0">{children}</main>
-              <RouteChrome />
+              <Navbar storefront={storefront} />
+              <main className="flex-1 pt-36 pb-20 md:pb-0">{children}</main>
+              <RouteChrome storefront={storefront} />
             </div>
           </CartProvider>
         </QueryProvider>

@@ -10,7 +10,7 @@ import { ColorfulTitle, OfferCard } from "@/components/ui";
 export default function OffersPageClient({ offers = [] }: { offers?: any[] }) {
   const now = new Date();
   return (
-    <main className="min-h-screen bg-soft-bg py-24">
+    <main className="min-h-screen bg-soft-bg pt-8 pb-24">
       <motion.section
         className="mx-auto w-full max-w-7xl px-section"
         variants={staggerContainer}

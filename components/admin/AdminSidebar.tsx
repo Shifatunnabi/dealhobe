@@ -7,8 +7,9 @@ import { useState } from 'react';
 import {
   FiHome, FiTag, FiFolder, FiPackage, FiShoppingCart, FiSlash, FiBarChart2,
   FiImage, FiGift, FiFileText, FiMessageCircle, FiUsers, FiStar, FiSettings,
-  FiShoppingBag, FiLogOut, FiChevronLeft, FiChevronRight,
+  FiShoppingBag, FiLogOut, FiChevronLeft, FiChevronRight, FiLayout,
 } from 'react-icons/fi';
+import { FiX } from 'react-icons/fi';
 import type { IconType } from 'react-icons';
 
 type NavItem = {
@@ -26,7 +27,8 @@ const navItems: NavItem[] = [
   { href: '/admin/orders',         icon: FiShoppingCart,  label: 'Order Management' },
   { href: '/admin/cancelled-orders', icon: FiSlash,       label: 'Cancelled Orders' },
   { href: '/admin/sales-report',   icon: FiBarChart2,     label: 'Sales Report' },
-  { href: '/admin/hero',           icon: FiImage,         label: 'Hero Section' },
+  { href: '/admin/homepage',       icon: FiLayout,        label: 'Homepage Builder' },
+  { href: '/admin/hero',           icon: FiImage,         label: 'Top Bar & Hero' },
   { href: '/admin/offers',         icon: FiGift,          label: 'Offer Management' },
   { href: '/admin/blogs',          icon: FiFileText,      label: 'Blogs' },
   { href: '/admin/chat',           icon: FiMessageCircle, label: 'Chat' },
@@ -35,49 +37,76 @@ const navItems: NavItem[] = [
   { href: '/admin/settings',       icon: FiSettings,      label: 'Settings' },
 ];
 
-export default function AdminSidebar() {
+type SidebarProps = {
+  /** `rail` = persistent desktop/tablet sidebar; `drawer` = mobile off-canvas copy. */
+  variant?: 'rail' | 'drawer';
+  /** Called after a nav link is tapped (the drawer uses it to close itself). */
+  onNavigate?: () => void;
+  /** Drawer only: renders a close button in the header. */
+  onClose?: () => void;
+};
+
+// 'auto' follows the viewport (full sidebar on desktop, icon rail on tablet);
+// the toggle pins it to an explicit state.
+type RailMode = 'auto' | 'expanded' | 'collapsed';
+const RAIL_QUERY = '(max-width: 1199.98px)';
+
+export default function AdminSidebar({ variant = 'rail', onNavigate, onClose }: SidebarProps) {
   const pathname  = usePathname();
-  const [collapsed, setCollapsed] = useState(false);
+  const [mode, setMode] = useState<RailMode>('auto');
+  const isDrawer = variant === 'drawer';
 
   const isActive = (href: string) =>
     href === '/admin' ? pathname === '/admin' : pathname.startsWith(href);
 
+  const toggle = () => {
+    const autoCollapsed = window.matchMedia(RAIL_QUERY).matches;
+    const collapsedNow = mode === 'collapsed' || (mode === 'auto' && autoCollapsed);
+    setMode(collapsedNow ? 'expanded' : 'collapsed');
+  };
+
   return (
-    <aside className={`admin-sidebar ${collapsed ? 'collapsed' : ''}`}>
+    <aside
+      className={`admin-sidebar admin-sidebar--${variant} ${isDrawer ? '' : `is-${mode}`}`}
+      aria-label="Admin navigation"
+    >
       {/* Logo / Brand */}
       <div className="admin-sidebar-header">
-        <div className="admin-logo">
-          <span className="admin-logo-icon"><FiShoppingBag size={20} /></span>
-          {!collapsed && <span className="admin-logo-text">DealHobe <span>Admin</span></span>}
-        </div>
-        <button
-          className="sidebar-toggle"
-          onClick={() => setCollapsed(!collapsed)}
-          aria-label="Toggle sidebar"
-        >
-          {collapsed ? <FiChevronRight size={16} /> : <FiChevronLeft size={16} />}
-        </button>
+        <Link href="/admin" className="admin-logo" onClick={onNavigate} title="DealHobe Admin">
+          <span className="admin-logo-icon"><FiShoppingBag size={18} /></span>
+          <span className="admin-logo-text">DealHobe <span>Admin</span></span>
+        </Link>
+        {isDrawer ? (
+          <button type="button" className="admin-drawer-close" onClick={onClose} aria-label="Close menu">
+            <FiX size={18} />
+          </button>
+        ) : (
+          <button type="button" className="sidebar-toggle" onClick={toggle} aria-label="Toggle sidebar width">
+            <FiChevronLeft size={16} className="icon-collapse" />
+            <FiChevronRight size={16} className="icon-expand" />
+          </button>
+        )}
       </div>
 
       {/* Navigation */}
       <nav className="admin-nav">
         {navItems.map(item => {
           const Icon = item.icon;
+          const active = isActive(item.href);
           return (
             <Link
               key={item.href}
               href={item.soon ? '#' : item.href}
-              className={`admin-nav-item ${isActive(item.href) ? 'active' : ''} ${item.soon ? 'disabled' : ''}`}
-              title={collapsed ? item.label : undefined}
-              onClick={item.soon ? e => e.preventDefault() : undefined}
+              className={`admin-nav-item ${active ? 'active' : ''} ${item.soon ? 'disabled' : ''}`}
+              title={isDrawer ? undefined : item.label}
+              aria-current={active ? 'page' : undefined}
+              onClick={item.soon ? e => e.preventDefault() : onNavigate}
             >
-              <span className="nav-icon"><Icon size={17} /></span>
-              {!collapsed && (
-                <span className="nav-label">
-                  {item.label}
-                  {item.soon && <span className="nav-soon">Soon</span>}
-                </span>
-              )}
+              <span className="nav-icon"><Icon size={18} /></span>
+              <span className="nav-label">
+                {item.label}
+                {item.soon && <span className="nav-soon">Soon</span>}
+              </span>
             </Link>
           );
         })}
@@ -86,12 +115,13 @@ export default function AdminSidebar() {
       {/* Footer */}
       <div className="admin-sidebar-footer">
         <button
+          type="button"
           className="admin-logout-btn"
           onClick={() => signOut({ callbackUrl: '/admin/login' })}
-          title={collapsed ? 'Logout' : undefined}
+          title={isDrawer ? undefined : 'Logout'}
         >
-          <span className="nav-icon"><FiLogOut size={17} /></span>
-          {!collapsed && <span>Logout</span>}
+          <span className="nav-icon"><FiLogOut size={18} /></span>
+          <span className="logout-label">Logout</span>
         </button>
       </div>
     </aside>

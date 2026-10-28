@@ -1,5 +1,3 @@
-"use client";
-
 import type { ImageLoaderProps } from "next/image";
 
 /** Cloudinary resizes public uploads directly; Next only optimizes local files. */

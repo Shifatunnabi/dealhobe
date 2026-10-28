@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="192" viewBox="0 0 1920 192">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#A41B15"/><stop offset="1" stop-color="#E0564F"/></linearGradient></defs>
+<rect width="1920" height="192" fill="url(#g)"/>
+<circle cx="1689.6" cy="28.799999999999997" r="86.4" fill="#fff" opacity=".08"/>
+<circle cx="153.6" cy="182.39999999999998" r="67.19999999999999" fill="#fff" opacity=".06"/>
+<rect x="12" y="12" width="1896" height="168" rx="7.199999999999999" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="2" stroke-dasharray="4.800000000000001 3.5999999999999996"/>
+<text x="50%" y="90.6" text-anchor="middle" font-family="Poppins, Arial, sans-serif" font-weight="700" font-size="42" fill="#fff">Strip banner</text>
+<text x="50%" y="119.4" text-anchor="middle" font-family="Poppins, Arial, sans-serif" font-size="18" fill="#fff" fill-opacity=".8">1920 × 192 · GIF / WebP / MP4</text>
+</svg>

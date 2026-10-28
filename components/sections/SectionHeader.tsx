@@ -16,18 +16,17 @@ export default function SectionHeader({
   children?: ReactNode;
 }) {
   return (
-    <div data-home-reveal className="mb-6 md:mb-8">
+    <div data-home-reveal className="mb-4 md:mb-6">
       <div className="flex items-end justify-between gap-4">
         <div className="flex flex-wrap items-baseline gap-x-6 gap-y-2">
-          <h2 className="relative inline-block pb-2 font-poppins text-xl font-extrabold uppercase tracking-wide text-text-dark md:text-3xl">
+          <h2 className="section-title flex items-center gap-2.5">
+            <span aria-hidden className="h-6 w-1.5 shrink-0 rounded-full bg-primary-pink md:h-7" />
             {title}
-            <span className="absolute bottom-0 left-0 h-0.5 w-full rounded-full bg-primary-pink" />
           </h2>
           {children}
         </div>
-        {right && <div className="shrink-0 pb-2">{right}</div>}
+        {right && <div className="shrink-0">{right}</div>}
       </div>
-      <div className="h-px w-full bg-gray-200" />
     </div>
   );
 }

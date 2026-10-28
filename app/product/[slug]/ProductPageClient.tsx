@@ -255,7 +255,7 @@ export default function ProductDetailPageClient({
   /* ── Product not found ── */
   if (!product) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-soft-bg pt-16">
+      <div className="flex min-h-screen items-center justify-center bg-soft-bg pt-6">
         <div className="text-center">
           <FiAlertCircle size={64} className="mb-4 inline-block text-primary-pink/40" />
           <h2 className="text-card-title mb-2 text-text-dark">
@@ -460,7 +460,7 @@ export default function ProductDetailPageClient({
   };
 
   return (
-    <div className="min-h-screen bg-soft-bg pt-26">
+    <div className="min-h-screen bg-soft-bg pt-6 md:pt-8">
       {/* ─── Breadcrumb ─── */}
       <div className="px-section pt-8 pb-2">
         <nav className="flex flex-wrap items-center justify-center gap-2 text-small text-text-muted">

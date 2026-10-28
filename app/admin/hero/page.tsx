@@ -29,13 +29,13 @@ function ColorField({
   return (
     <div className="admin-field">
       <label className="admin-label">{label}</label>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+      <div className="admin-color-field">
         <input
           type="color"
           aria-label={label}
           value={safeColor(value, fallback)}
           onChange={e => onChange(e.target.value.toUpperCase())}
-          style={{ width: 48, height: 40, padding: 2, borderRadius: 8, border: '1px solid #e5e7eb', background: '#fff', cursor: 'pointer', flexShrink: 0 }}
+          className="admin-color-swatch"
         />
         <input
           className="admin-input"
@@ -59,17 +59,17 @@ function HeroSlideCard({
   const { setNodeRef, style, isDragging, handle } = useSortableItem(slide._id);
   return (
     <div ref={setNodeRef} style={style} className={`admin-item-card${isDragging ? ' is-dragging' : ''}`}>
-      <div style={{ position: 'relative', height: 160 }}>
-        <Image src={slide.imageUrl} alt={slide.ctaText || 'Hero slide'} fill style={{ objectFit: 'cover' }} />
-        <span className={`badge ${slide.isActive ? 'badge-green' : 'badge-red'}`} style={{ position: 'absolute', top: 8, right: 8 }}>
+      <div className="admin-item-image admin-item-image--wide">
+        <Image src={slide.imageUrl} alt={slide.ctaText || 'Hero slide'} fill sizes="(max-width: 640px) 100vw, 400px" style={{ objectFit: 'cover' }} />
+        <span className={`admin-media-badge top-right ${slide.isActive ? 'is-gold' : ''}`}>
           {slide.isActive ? 'Active' : 'Hidden'}
         </span>
         {slide.mobileImageUrl && (
-          <span className="badge badge-green" style={{ position: 'absolute', bottom: 8, left: 8, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+          <span className="admin-media-badge bottom-left">
             <FiSmartphone size={11} /> Own mobile photo
           </span>
         )}
-        <div style={{ position: 'absolute', top: 8, left: 8, background: 'rgba(255,255,255,0.9)', borderRadius: 8, padding: '0.25rem' }}>
+        <div className="admin-media-handle">
           <DragHandle handle={handle} />
         </div>
       </div>
@@ -91,8 +91,8 @@ function HeroSlideCard({
           Order: {slide.order} · bg {safeColor(slide.ctaColor, DEFAULT_CTA_COLOR)} · text {safeColor(slide.ctaTextColor, DEFAULT_CTA_TEXT_COLOR)}
         </div>
         <div className="admin-item-actions">
-          <button className="btn-admin-edit"   onClick={onEdit}><FiEdit2 size={13} /> Edit</button>
-          <button className="btn-admin-danger" onClick={onDelete}><FiTrash2 size={13} /> Delete</button>
+          <button className="btn-admin-edit btn-sm"   onClick={onEdit}><FiEdit2 size={13} /> Edit</button>
+          <button className="btn-admin-danger btn-sm" onClick={onDelete}><FiTrash2 size={13} /> Delete</button>
         </div>
       </div>
     </div>
@@ -110,16 +110,14 @@ function TopBarRow({
   const { setNodeRef, style, isDragging, handle } = useSortableItem(text._id);
   return (
     <div ref={setNodeRef} style={style} className={`admin-card${isDragging ? ' is-dragging' : ''}`}>
-      <div className="admin-card-body" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', padding: '1rem 1.25rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1 }}>
-          <DragHandle handle={handle} />
-          <span style={{ fontWeight: 700, color: 'var(--text-muted)', fontSize: '0.8rem', minWidth: 20 }}>#{index + 1}</span>
-          <span style={{ flex: 1 }}>{text.text}</span>
-          <span className={`badge ${text.isActive ? 'badge-green' : 'badge-red'}`}>{text.isActive ? 'Active' : 'Hidden'}</span>
-        </div>
-        <div className="admin-item-actions">
-          <button className="btn-admin-edit"   aria-label="Edit" onClick={onEdit}><FiEdit2 size={13} /></button>
-          <button className="btn-admin-danger" aria-label="Delete" onClick={onDelete}><FiTrash2 size={13} /></button>
+      <div className="admin-card-body topbar-row">
+        <DragHandle handle={handle} />
+        <span className="topbar-row-index">#{index + 1}</span>
+        <span className="topbar-row-text">{text.text}</span>
+        <span className={`badge ${text.isActive ? 'badge-green' : 'badge-red'}`}>{text.isActive ? 'Active' : 'Hidden'}</span>
+        <div className="cell-actions topbar-row-actions">
+          <button className="btn-admin-edit btn-sm btn-icon"   aria-label="Edit" title="Edit" onClick={onEdit}><FiEdit2 size={14} /></button>
+          <button className="btn-admin-danger btn-sm btn-icon" aria-label="Delete" title="Delete" onClick={onDelete}><FiTrash2 size={14} /></button>
         </div>
       </div>
     </div>
@@ -255,16 +253,15 @@ export default function HeroPage() {
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
+      <div className="admin-tabs" role="group" aria-label="Section">
         {(['slides', 'topbar'] as const).map(t => (
-          <button key={t} onClick={() => setTab(t)} style={{
-            display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
-            padding: '0.5rem 1.2rem', borderRadius: '10px', border: 'none', cursor: 'pointer',
-            fontWeight: 600, fontSize: '0.875rem',
-            background: tab === t ? 'var(--primary-pink)' : 'rgba(45,27,78,0.06)',
-            color: tab === t ? '#fff' : 'var(--text-dark)',
-            transition: 'all 0.2s',
-          }}>
+          <button
+            key={t}
+            type="button"
+            aria-pressed={tab === t}
+            className={`admin-tab ${tab === t ? 'is-active' : ''}`}
+            onClick={() => setTab(t)}
+          >
             {t === 'slides' ? <FiImage size={15} /> : <FiVolume2 size={15} />}
             {t === 'slides' ? 'Hero Slides' : 'Top Bar Texts'}
           </button>
@@ -284,8 +281,7 @@ export default function HeroPage() {
             items={slides}
             onReorder={handleReorderSlides}
             layout="grid"
-            className="admin-grid"
-            style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}
+            className="admin-grid admin-grid--wide"
           >
             {slides.map(s => (
               <HeroSlideCard key={s._id} slide={s} onEdit={() => openEditSlide(s)} onDelete={() => deleteSlide(s._id)} />
@@ -318,12 +314,12 @@ export default function HeroPage() {
       {/* Slide Modal */}
       {slideModal && (
         <div className="modal-overlay">
-          <div className="modal-box modal-lg">
+          <div className="modal-box modal-lg" role="dialog" aria-modal="true" aria-label={editingSlide ? 'Edit Hero Slide' : 'Add Hero Slide'}>
             <div className="modal-header">
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
                 {editingSlide ? <FiEdit2 size={16} /> : <FiPlus size={16} />} {editingSlide ? 'Edit Hero Slide' : 'Add Hero Slide'}
               </span>
-              <button className="modal-close" onClick={() => setSlideModal(false)}><FiX size={16} /></button>
+              <button className="modal-close" aria-label="Close" onClick={() => setSlideModal(false)}><FiX size={18} /></button>
             </div>
             <div className="modal-body">
               <div className="admin-form">
@@ -333,7 +329,7 @@ export default function HeroPage() {
                     <button type="button" className="btn-admin-secondary" onClick={() => setMobileOpen(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
                       <FiSmartphone size={14} /> Add a different photo for mobile
                     </button>
-                    <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '0.4rem 0 0' }}>
+                    <p className="admin-hint" style={{ margin: '0.4rem 0 0' }}>
                       Without one, phones show the desktop photo above.
                     </p>
                   </div>
@@ -365,7 +361,7 @@ export default function HeroPage() {
                 </div>
                 <div className="admin-field">
                   <label className="admin-label">Preview</label>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '1rem', borderRadius: 12, background: 'rgba(45,27,78,0.05)' }}>
+                  <div className="admin-subpanel" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', overflow: 'hidden' }}>
                     <span
                       style={{
                         display: 'inline-flex', alignItems: 'center', borderRadius: 12,
@@ -378,12 +374,12 @@ export default function HeroPage() {
                       {slideForm.ctaText || 'Shop Now'}
                     </span>
                   </div>
-                  <small style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>The slide shows only the photo and this button — no heading or subtitle.</small>
+                  <small className="admin-hint">The slide shows only the photo and this button — no heading or subtitle.</small>
                 </div>
                 <div className="admin-form-row">
                   <div className="admin-field"><label className="admin-label">Order</label><input type="number" className="admin-input" value={slideForm.order} onChange={e => setSlideForm(f => ({ ...f, order: +e.target.value }))} /></div>
-                  <div className="admin-field" style={{ justifyContent: 'flex-end', paddingBottom: 6 }}>
-                    <label className="admin-checkbox-row" style={{ marginTop: 'auto' }}>
+                  <div className="admin-field admin-field--end">
+                    <label className="admin-checkbox-row">
                       <input type="checkbox" className="admin-checkbox" checked={slideForm.isActive} onChange={e => setSlideForm(f => ({ ...f, isActive: e.target.checked }))} />
                       <span className="admin-label">Active</span>
                     </label>
@@ -402,24 +398,24 @@ export default function HeroPage() {
       {/* Topbar Modal */}
       {tbModal && (
         <div className="modal-overlay">
-          <div className="modal-box">
+          <div className="modal-box" role="dialog" aria-modal="true" aria-label={editingTb ? 'Edit Top Bar Text' : 'Add Top Bar Text'}>
             <div className="modal-header">
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
                 {editingTb ? <FiEdit2 size={16} /> : <FiPlus size={16} />} {editingTb ? 'Edit Top Bar Text' : 'Add Top Bar Text'}
               </span>
-              <button className="modal-close" onClick={() => setTbModal(false)}><FiX size={16} /></button>
+              <button className="modal-close" aria-label="Close" onClick={() => setTbModal(false)}><FiX size={18} /></button>
             </div>
             <div className="modal-body">
               <div className="admin-form">
                 <div className="admin-field">
                   <label className="admin-label">Announcement Text</label>
                   <input className="admin-input" value={tbForm.text} onChange={e => setTbForm(f => ({ ...f, text: e.target.value }))} placeholder="Free shipping on orders over ৳500!" />
-                  <small style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>One text = static, multiple = auto-slides every 10 seconds.</small>
+                  <small className="admin-hint">One text = static, multiple = auto-slides every 10 seconds.</small>
                 </div>
                 <div className="admin-form-row">
                   <div className="admin-field"><label className="admin-label">Order</label><input type="number" className="admin-input" value={tbForm.order} onChange={e => setTbForm(f => ({ ...f, order: +e.target.value }))} /></div>
-                  <div className="admin-field" style={{ justifyContent: 'flex-end', paddingBottom: 6 }}>
-                    <label className="admin-checkbox-row" style={{ marginTop: 'auto' }}>
+                  <div className="admin-field admin-field--end">
+                    <label className="admin-checkbox-row">
                       <input type="checkbox" className="admin-checkbox" checked={tbForm.isActive} onChange={e => setTbForm(f => ({ ...f, isActive: e.target.checked }))} />
                       <span className="admin-label">Active</span>
                     </label>

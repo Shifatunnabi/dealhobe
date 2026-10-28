@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6A1B9A"/><stop offset="1" stop-color="#AB47BC"/></linearGradient></defs>
+<rect width="1080" height="1080" fill="url(#g)"/>
+<circle cx="950.4" cy="162" r="486" fill="#fff" opacity=".08"/>
+<circle cx="86.4" cy="1026" r="378" fill="#fff" opacity=".06"/>
+<rect x="65" y="65" width="950" height="950" rx="39" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="5.2" stroke-dasharray="26 19.5"/>
+<text x="50%" y="529.8" text-anchor="middle" font-family="Poppins, Arial, sans-serif" font-weight="700" font-size="81" fill="#fff">Hero 3 · mobile</text>
+<text x="50%" y="584.2" text-anchor="middle" font-family="Poppins, Arial, sans-serif" font-size="34" fill="#fff" fill-opacity=".8">1080 × 1080 · GIF / WebP / MP4</text>
+</svg>

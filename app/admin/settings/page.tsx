@@ -72,7 +72,7 @@ export default function AdminSettingsPage() {
       {loading ? (
         <div className="admin-empty"><div className="spinner" style={{ margin: "0 auto 1rem" }} /><p>Loading…</p></div>
       ) : (
-        <div className="admin-grid" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))" }}>
+        <div className="admin-grid admin-grid--wide">
           <div className="admin-card">
             <div className="admin-card-header"><span style={{display:"inline-flex",alignItems:"center",gap:"0.5rem"}}><FiTruck size={16} /> Free Delivery</span></div>
             <div className="admin-card-body">
@@ -85,7 +85,7 @@ export default function AdminSettingsPage() {
                   onChange={(e) => setFreeDeliveryThreshold(Number(e.target.value) || 0)}
                   min={0}
                 />
-                <p className="admin-item-meta" style={{ marginTop: "0.5rem" }}>
+                <p className="admin-hint" style={{ marginTop: "0.25rem" }}>
                   Orders with subtotal greater than or equal to this amount will get free delivery.
                 </p>
               </div>

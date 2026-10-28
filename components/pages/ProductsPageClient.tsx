@@ -820,7 +820,7 @@ export default function ProductsPageClient({
 
   /* ── Render ── */
   return (
-    <div className="min-h-screen bg-soft-bg pt-26 pb-20">
+    <div className="min-h-screen bg-soft-bg pt-6 md:pt-8 pb-20">
       {/* ─── Header ─── */}
       <div className="px-section pt-8">
         {/* Breadcrumb */}
@@ -978,7 +978,7 @@ export default function ProductsPageClient({
         {/* Desktop sidebar — always visible */}
         <aside className="hidden w-70 shrink-0 lg:block">
           <div
-            className="sticky top-26 overflow-y-auto rounded-3xl bg-white p-5 shadow-card"
+            className="sticky top-40 overflow-y-auto rounded-3xl bg-white p-5 shadow-card"
             style={{ maxHeight: "calc(100vh - 104px)" }}
           >
             {SidebarContent}

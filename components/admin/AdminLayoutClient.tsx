@@ -2,15 +2,46 @@
 
 import { SessionProvider, useSession } from 'next-auth/react';
 import { useRouter, usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { FiMenu, FiX } from 'react-icons/fi';
+import { useEffect, useRef, useState } from 'react';
+import { FiMenu, FiShoppingBag } from 'react-icons/fi';
 import AdminSidebar from '@/components/admin/AdminSidebar';
+
+/* Compact titles for the mobile top bar (longest prefix wins). */
+const PAGE_TITLES: [prefix: string, title: string][] = [
+  ['/admin/brands',           'Brands'],
+  ['/admin/categories',       'Categories'],
+  ['/admin/products',         'Products'],
+  ['/admin/cancelled-orders', 'Cancelled Orders'],
+  ['/admin/orders',           'Orders'],
+  ['/admin/sales-report',     'Sales Report'],
+  ['/admin/homepage',         'Homepage Builder'],
+  ['/admin/hero',             'Top Bar & Hero'],
+  ['/admin/offers',           'Offers'],
+  ['/admin/blogs',            'Blogs'],
+  ['/admin/chat',             'Chat'],
+  ['/admin/user-directory',   'Users'],
+  ['/admin/reviews',          'Reviews'],
+  ['/admin/settings',         'Settings'],
+];
+
+function titleFor(pathname: string) {
+  if (pathname === '/admin') return 'Dashboard';
+  return PAGE_TITLES.find(([prefix]) => pathname.startsWith(prefix))?.[1] ?? 'Admin';
+}
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
   const router                    = useRouter();
   const pathname                  = usePathname();
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+
+  // The drawer remembers the path it was opened on, so any navigation closes it
+  // without needing an effect that resets state.
+  const [drawerPath, setDrawerPath] = useState<string | null>(null);
+  const drawerOpen = drawerPath !== null && drawerPath === pathname;
+  const closeDrawer = () => setDrawerPath(null);
+
+  const menuBtnRef = useRef<HTMLButtonElement>(null);
+  const drawerRef  = useRef<HTMLElement>(null);
 
   useEffect(() => {
     if (status === 'loading') return;
@@ -19,15 +50,28 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
     }
   }, [session, status, router, pathname]);
 
+  // While the drawer is open: Escape closes it, the page behind can't scroll,
+  // and focus moves into the drawer (and back to the menu button afterwards).
   useEffect(() => {
-    setMobileSidebarOpen(false);
-  }, [pathname]);
+    if (!drawerOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setDrawerPath(null); };
+    document.addEventListener('keydown', onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    drawerRef.current?.querySelector<HTMLElement>('a, button')?.focus();
+    const menuBtn = menuBtnRef.current;
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prevOverflow;
+      menuBtn?.focus({ preventScroll: true });
+    };
+  }, [drawerOpen]);
 
   if (status === 'loading') {
     return (
       <div className="admin-loading">
         <div className="admin-spinner" />
-        <p>Loading...</p>
+        <p>Loading…</p>
       </div>
     );
   }
@@ -41,39 +85,48 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   return (
     <div className="admin-shell">
       <div className="admin-desktop-sidebar">
-        <AdminSidebar />
+        <AdminSidebar variant="rail" />
       </div>
-      <button
-        type="button"
-        className="admin-mobile-menu-btn"
-        aria-label="Open admin menu"
-        onClick={() => setMobileSidebarOpen(true)}
-      >
-        <FiMenu size={18} />
-      </button>
 
       <div
-        className={`admin-mobile-overlay ${mobileSidebarOpen ? 'open' : ''}`}
-        onClick={() => setMobileSidebarOpen(false)}
+        className={`admin-mobile-overlay ${drawerOpen ? 'open' : ''}`}
+        onClick={closeDrawer}
+        aria-hidden="true"
       />
 
-      <aside className={`admin-mobile-drawer ${mobileSidebarOpen ? 'open' : ''}`}>
-        <div className="admin-mobile-drawer-close-row">
-          <button
-            type="button"
-            className="admin-mobile-drawer-close"
-            aria-label="Close admin menu"
-            onClick={() => setMobileSidebarOpen(false)}
-          >
-            <FiX size={18} />
-          </button>
-        </div>
-        <AdminSidebar />
+      <aside
+        id="admin-mobile-drawer"
+        ref={drawerRef}
+        className={`admin-mobile-drawer ${drawerOpen ? 'open' : ''}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Admin menu"
+        inert={!drawerOpen}
+      >
+        <AdminSidebar variant="drawer" onNavigate={closeDrawer} onClose={closeDrawer} />
       </aside>
 
-      <main className="admin-main">
-        {children}
-      </main>
+      <div className="admin-column">
+        <header className="admin-topbar">
+          <button
+            ref={menuBtnRef}
+            type="button"
+            className="admin-topbar-menu"
+            aria-label="Open admin menu"
+            aria-expanded={drawerOpen}
+            aria-controls="admin-mobile-drawer"
+            onClick={() => setDrawerPath(pathname)}
+          >
+            <FiMenu size={20} />
+          </button>
+          <div className="admin-topbar-title">{titleFor(pathname)}</div>
+          <span className="admin-topbar-mark" aria-hidden="true"><FiShoppingBag size={16} /></span>
+        </header>
+
+        <main className="admin-main">
+          <div className="admin-content">{children}</div>
+        </main>
+      </div>
     </div>
   );
 }

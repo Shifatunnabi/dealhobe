@@ -19,7 +19,10 @@ import {
   FiChevronDown,
   FiShoppingBag,
 } from "react-icons/fi";
-import { FaFacebook, FaWhatsapp } from "react-icons/fa";
+import { FaFacebook, FaWhatsapp, FaInstagram, FaYoutube, FaTiktok } from "react-icons/fa";
+import type { Storefront } from "@/lib/homepage/types";
+
+export type NavStorefront = Pick<Storefront, "navPills" | "contact" | "socials"> & { logoUrl: string };
 import { useCart } from "@/components/cart/CartProvider";
 import NavSearchOverlay from "./NavSearchOverlay";
 
@@ -29,22 +32,6 @@ const navLinks = [
   { label: "Offers",   href: "/offers"   },
   { label: "Blogs",    href: "/blogs"    },
 ];
-
-/* Shared logo used in the navbar */
-function Logo({ logoUrl }: { logoUrl: string }) {
-  return (
-    <Link href={"/"} className="shrink-0">
-      <Image
-        src={logoUrl}
-        alt="DealHobe"
-        width={48}
-        height={48}
-        className="w-11 h-11 md:w-12 md:h-12 object-contain"
-        priority
-      />
-    </Link>
-  );
-}
 
 /**
  * One category row in the sidebar's Categories accordion. Hovering a row
@@ -183,7 +170,7 @@ function CategoryRowWithFlyout({
   );
 }
 
-export default function Navbar() {
+export default function Navbar({ storefront }: { storefront: NavStorefront }) {
   const pathname = usePathname();
   const router = useRouter();
   const [visible, setVisible]           = useState(true);
@@ -196,8 +183,15 @@ export default function Navbar() {
   const [categories, setCategories]     = useState<Array<{ _id: string; name: string }>>([]);
   const [subCategories, setSubCategories] = useState<Array<{ _id: string; name: string; category: string }>>([]);
   const [openSection, setOpenSection]   = useState<"categories" | null>(null);
-  const [logoUrl, setLogoUrl]           = useState("/logo/main-logo.png");
-  const { itemCount, hydrated }         = useCart();
+  const logoUrl                         = storefront.logoUrl || "/logo/main-logo.png";
+  const { itemCount, hydrated, openSidebar: openCart } = useCart();
+  const socialLinks = [
+    { href: storefront.socials.facebook, label: "Facebook", Icon: FaFacebook },
+    { href: storefront.socials.instagram, label: "Instagram", Icon: FaInstagram },
+    { href: storefront.socials.youtube, label: "YouTube", Icon: FaYoutube },
+    { href: storefront.socials.tiktok, label: "TikTok", Icon: FaTiktok },
+    { href: storefront.contact.whatsapp ? `https://wa.me/${storefront.contact.whatsapp.replace(/\D/g, "")}` : "", label: "WhatsApp", Icon: FaWhatsapp },
+  ].filter((s) => s.href);
   const cartCount                       = hydrated ? itemCount : 0;
 
   const isAdminRoute = pathname?.startsWith("/admin");
@@ -207,7 +201,7 @@ export default function Navbar() {
     { label: "Offers",     type: "link",   href: "/offers",              icon: FiTag         },
     { label: "Cart",       type: "link",   href: "/cart",                icon: FiShoppingCart, isCenter: true },
     { label: "Products",   type: "link",   href: "/products",            icon: FiShoppingBag },
-    { label: "Categories", type: "scroll", targetId: "top-categories",       icon: FiGrid   },
+    { label: "Menu",       type: "menu",                                     icon: FiGrid   },
   ];
 
   /*
@@ -326,21 +320,6 @@ export default function Navbar() {
     return () => { alive = false; };
   }, []);
 
-  useEffect(() => {
-    let alive = true;
-    const loadLogo = async () => {
-      try {
-        const res = await fetch("/api/settings");
-        const data = await res.json();
-        if (!alive) return;
-        if (res.ok && data?.logoUrl) setLogoUrl(data.logoUrl);
-      } catch {
-        if (alive) setLogoUrl("/logo/main-logo.png");
-      }
-    };
-    loadLogo();
-    return () => { alive = false; };
-  }, []);
 
   useEffect(() => {
     const openSidebar = () => setSidebarOpen(true);
@@ -397,15 +376,6 @@ export default function Navbar() {
 
   if (isAdminRoute) return null;
 
-  const handleScrollTo = (targetId: string) => {
-    if (pathname !== "/") {
-      router.push(`/#${targetId}`);
-      return;
-    }
-    const el = document.getElementById(targetId);
-    if (!el) return;
-    el.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "start" });
-  };
 
   const toggleSection = (key: "categories") => {
     setOpenSection((prev) => (prev === key ? null : key));
@@ -422,9 +392,9 @@ export default function Navbar() {
         transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
       >
         {/* ── Top Bar ─────────────────────────────────────────────── */}
-        <div className="h-9 bg-[#A41B15] text-white text-xs flex items-center">
-          <div className="w-full md:w-[62.5%] md:mx-auto flex items-center justify-between px-4 md:px-0">
-            <span className="font-poppins font-medium relative overflow-hidden h-4">
+        <div className="h-9 bg-plum text-white text-xs flex items-center">
+          <div className="shell flex items-center justify-between gap-3">
+            <span className="font-poppins font-medium relative overflow-hidden h-4 min-w-0 flex-1 truncate">
               <AnimatePresence mode="wait" initial={false}>
                 <motion.span
                   key={topbarTexts[topbarIndex] || "fallback"}
@@ -432,104 +402,117 @@ export default function Navbar() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -6 }}
                   transition={{ duration: 0.25 }}
-                  className="block"
+                  className="block truncate"
                 >
                   {topbarTexts[topbarIndex] || (
-                    <>Free shipping over <strong>2999BDT</strong> shopping</>
+                    <>100% authentic beauty · Cash on delivery across Bangladesh</>
                   )}
                 </motion.span>
               </AnimatePresence>
             </span>
-            <div className="flex items-center gap-3">
-              <a href="#" aria-label="Facebook" className="hover:text-[#A41B15] transition-colors">
-                <FaFacebook size={14} />
-              </a>
-              <a href="#" aria-label="WhatsApp" className="hover:text-[#A41B15] transition-colors">
-                <FaWhatsapp size={14} />
-              </a>
+            <div className="hidden items-center gap-4 sm:flex">
+              {storefront.contact.phone && (
+                <a href={`tel:${storefront.contact.phone}`} className="text-white/80 transition-colors hover:text-gold">
+                  {storefront.contact.phone}
+                </a>
+              )}
+              {socialLinks.map(({ href, label, Icon }) => (
+                <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label} className="text-white/80 transition-colors hover:text-gold">
+                  <Icon size={14} />
+                </a>
+              ))}
             </div>
           </div>
         </div>
 
         {/* ── Main Navbar ─────────────────────────────────────────── */}
-        <header className="relative h-16 bg-white shadow-[0_4px_14px_rgba(0,0,0,0.08)]">
+        <header className="relative h-16 border-b border-black/5 bg-white/95 backdrop-blur-md">
           {searchOpen ? (
             <NavSearchOverlay onClose={() => setSearchOpen(false)} />
           ) : (
-            <>
-              <div className="mx-auto flex h-full items-center justify-between px-4 md:w-[90%] md:max-w-[1400px]">
+            <div className="shell flex h-full items-center gap-2 md:gap-4">
+              <button
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-text-dark transition-colors hover:bg-black/5"
+                aria-label="Open menu"
+                onClick={() => setSidebarOpen(true)}
+              >
+                <FiMenu size={21} />
+              </button>
 
-                {/* Left: hamburger — pinned to the edge */}
-                <motion.button
-                  whileHover={{ scale: 1.12 }} whileTap={{ scale: 0.92 }}
-                  transition={{ duration: 0.15 }}
-                  className="flex h-9 w-9 items-center justify-center rounded-xl text-text-dark transition-colors hover:bg-black/5"
-                  aria-label="Open menu"
-                  onClick={() => setSidebarOpen(true)}
-                >
-                  <FiMenu size={20} />
-                </motion.button>
+              <Link href="/" className="shrink-0" aria-label="DealHobe home">
+                <Image src={logoUrl} alt="DealHobe" width={48} height={48} className="h-10 w-10 object-contain md:h-12 md:w-12" priority />
+              </Link>
 
-                {/* Right: account + search — pinned to the edge */}
-                <div className="flex items-center gap-1">
-                  <motion.button
-                    whileHover={{ scale: 1.12 }} whileTap={{ scale: 0.92 }}
-                    transition={{ duration: 0.15 }}
-                    className="flex h-9 w-9 items-center justify-center rounded-xl text-text-dark transition-colors hover:bg-black/5"
-                    aria-label="Search"
-                    onClick={() => {
-                      setSidebarOpen(false);
-                      setSearchOpen(true);
-                    }}
+              {/* Desktop search field — opens the live search overlay */}
+              <button
+                type="button"
+                onClick={() => { setSidebarOpen(false); setSearchOpen(true); }}
+                className="mx-auto hidden h-11 w-full max-w-xl items-center gap-3 rounded-full border border-primary-pink/25 bg-soft-bg-alt/60 px-5 text-left text-sm text-text-muted transition-colors hover:border-primary-pink/60 md:flex"
+              >
+                <FiSearch size={18} className="text-primary-pink" />
+                Search lipstick, serum, sunscreen…
+              </button>
+
+              <nav className="hidden items-center gap-1 lg:flex">
+                {navLinks.slice(1).map((link) => (
+                  <Link
+                    key={link.label}
+                    href={link.href}
+                    className={`rounded-full px-3.5 py-2 text-sm font-semibold transition-colors hover:bg-primary-pink/8 hover:text-primary-pink ${pathname?.startsWith(link.href) ? "text-primary-pink" : "text-text-dark"}`}
                   >
-                    <FiSearch size={19} />
-                  </motion.button>
-                  <Link href={isLoggedIn ? "/profile" : "/auth/login"}>
-                    <motion.div
-                      whileHover={{ scale: 1.12 }} whileTap={{ scale: 0.92 }}
-                      transition={{ duration: 0.15 }}
-                      className="flex h-9 w-9 items-center justify-center rounded-xl text-text-dark transition-colors hover:bg-black/5"
-                      aria-label="Account"
-                    >
-                      <FiUser size={19} />
-                    </motion.div>
+                    {link.label}
                   </Link>
-                </div>
-              </div>
+                ))}
+              </nav>
 
-              {/* Center: links hugging the logo, always centered regardless of edge icon widths */}
-              <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                <div className="pointer-events-auto flex items-center gap-2 md:gap-4 lg:gap-6">
-                  <nav className="hidden md:flex items-center gap-0.5">
-                    {navLinks.slice(0, 2).map((link) => (
-                      <Link
-                        key={link.label}
-                        href={link.href}
-                        className="group relative px-3 py-2 font-poppins text-sm font-medium uppercase tracking-wide text-text-dark rounded-xl transition-colors duration-200 hover:bg-black/5"
-                      >
-                        {link.label}
-                        <span className="absolute bottom-1.5 left-3 right-3 h-0.5 rounded-full bg-primary-pink/70 scale-x-0 origin-left transition-transform duration-300 group-hover:scale-x-100" />
-                      </Link>
-                    ))}
-                  </nav>
-                  <Logo logoUrl={logoUrl} />
-                  <nav className="hidden md:flex items-center gap-0.5">
-                    {navLinks.slice(2).map((link) => (
-                      <Link
-                        key={link.label}
-                        href={link.href}
-                        className="group relative px-3 py-2 font-poppins text-sm font-medium uppercase tracking-wide text-text-dark rounded-xl transition-colors duration-200 hover:bg-black/5"
-                      >
-                        {link.label}
-                        <span className="absolute bottom-1.5 left-3 right-3 h-0.5 rounded-full bg-primary-pink/70 scale-x-0 origin-left transition-transform duration-300 group-hover:scale-x-100" />
-                      </Link>
-                    ))}
-                  </nav>
-                </div>
+              <div className="ml-auto flex items-center gap-1 md:ml-0">
+                <button
+                  className="flex h-10 w-10 items-center justify-center rounded-xl text-text-dark transition-colors hover:bg-black/5 md:hidden"
+                  aria-label="Search"
+                  onClick={() => { setSidebarOpen(false); setSearchOpen(true); }}
+                >
+                  <FiSearch size={20} />
+                </button>
+                <Link
+                  href={isLoggedIn ? "/profile" : "/auth/login"}
+                  aria-label="Account"
+                  className="flex h-10 items-center gap-2 rounded-xl px-2 text-text-dark transition-colors hover:bg-black/5"
+                >
+                  <FiUser size={20} />
+                  <span className="hidden text-sm font-semibold xl:inline">{isLoggedIn ? "Account" : "Login"}</span>
+                </Link>
+                <button
+                  type="button"
+                  onClick={openCart}
+                  aria-label={`Bag, ${cartCount} items`}
+                  className="relative hidden h-10 items-center gap-2 rounded-full bg-primary-pink px-4 text-sm font-semibold text-white shadow-button transition-transform hover:-translate-y-0.5 md:flex"
+                >
+                  <FiShoppingBag size={18} />
+                  Bag
+                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-white px-1 text-[11px] font-bold text-primary-pink">{cartCount}</span>
+                </button>
               </div>
-            </>
+            </div>
           )}
         </header>
+
+        {/* ── Category pills (edited in Admin › Homepage Builder › Storefront) ── */}
+        {storefront.navPills.length > 0 && (
+          <div className="h-11 border-b border-black/5 bg-white/95 backdrop-blur-md">
+            <div className="shell no-scrollbar flex h-full items-center gap-2 overflow-x-auto">
+              {storefront.navPills.map((pill) => (
+                <Link
+                  key={pill.label + pill.link}
+                  href={pill.link}
+                  className="shrink-0 rounded-full px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wide text-white transition-transform hover:-translate-y-0.5 md:text-[13px]"
+                  style={{ backgroundColor: pill.color }}
+                >
+                  {pill.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </motion.div>
 
       {/* ── Sidebar ─────────────────────────────────────────────── */}
@@ -675,12 +658,11 @@ export default function Navbar() {
                   View All Products
                 </Link>
                 <div className="flex items-center justify-center gap-4 text-text-muted">
-                  <a href="#" aria-label="Facebook" className="transition-colors hover:text-[#1877F2]">
-                    <FaFacebook size={18} />
-                  </a>
-                  <a href="#" aria-label="WhatsApp" className="transition-colors hover:text-[#25D366]">
-                    <FaWhatsapp size={18} />
-                  </a>
+                  {socialLinks.map(({ href, label, Icon }) => (
+                    <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label} className="transition-colors hover:text-primary-pink">
+                      <Icon size={18} />
+                    </a>
+                  ))}
                 </div>
               </div>
             </motion.aside>
@@ -738,7 +720,7 @@ export default function Navbar() {
             return (
               <button
                 key={item.label}
-                onClick={() => handleScrollTo(item.targetId ?? "")}
+                onClick={() => setSidebarOpen(true)}
                 className="flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-xl text-[11px] font-semibold text-[#6a7280] transition-colors"
               >
                 <Icon size={18} />

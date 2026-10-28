@@ -32,7 +32,7 @@ export default async function BlogDetailPage({
     : date.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
 
   return (
-    <main className="min-h-screen bg-soft-bg pt-34 pb-24">
+    <main className="min-h-screen bg-soft-bg pt-8 md:pt-10 pb-24">
       <div className="mx-auto max-w-4xl px-section">
         <Link
           href="/blogs"

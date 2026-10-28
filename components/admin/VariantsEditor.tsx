@@ -225,11 +225,11 @@ export default function VariantsEditor({ options, variants, defaults, mainImage,
   const unused = SUGGESTIONS.filter(s => !options.some(o => o.name.toLowerCase() === s.toLowerCase()));
 
   return (
-    <div style={{ border: '1px solid var(--border, #e5e7eb)', borderRadius: 8, padding: '1rem', display: 'grid', gap: '1rem' }}>
+    <div className="variants-editor">
       <div style={{ display: 'grid', gap: '0.75rem' }}>
         {options.map((opt, i) => (
-          <div key={i} style={{ display: 'grid', gap: '0.5rem', paddingBottom: '0.75rem', borderBottom: '1px dashed #ddd' }}>
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <div key={i} className="variants-option">
+            <div className="admin-input-group">
               <input
                 className="admin-input"
                 value={opt.name}
@@ -237,7 +237,7 @@ export default function VariantsEditor({ options, variants, defaults, mainImage,
                 placeholder="Option name (e.g. Shade)"
                 list="variant-option-suggestions"
               />
-              <button type="button" className="btn-admin-danger" aria-label="Remove option" onClick={() => removeOption(i)}>
+              <button type="button" className="btn-admin-danger btn-icon" aria-label="Remove option" title="Remove option" onClick={() => removeOption(i)}>
                 <FiTrash2 size={14} />
               </button>
             </div>
@@ -257,13 +257,13 @@ export default function VariantsEditor({ options, variants, defaults, mainImage,
                     <span style={{ cursor: 'text' }} title="Click to rename" onClick={() => setEditing({ i, value: v, text: v })}>{v}</span>
                   )}
                   <button type="button" aria-label={`Remove ${v}`} onClick={() => removeValue(i, v)}
-                    style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 0, display: 'inline-flex' }}>
+                    style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 4, margin: -4, display: 'inline-flex', color: 'inherit' }}>
                     <FiX size={12} />
                   </button>
                 </span>
               ))}
             </div>
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <div className="admin-input-group">
               <input
                 className="admin-input"
                 value={drafts[i] || ''}
@@ -281,8 +281,8 @@ export default function VariantsEditor({ options, variants, defaults, mainImage,
             <FiPlus size={14} /> Add option
           </button>
           {unused.map(s => (
-            <button key={s} type="button" className="btn-admin-secondary"
-              style={{ fontSize: '0.72rem', padding: '0.2rem 0.5rem' }} onClick={() => addOption(s)}>
+            <button key={s} type="button" className="btn-admin-secondary btn-sm"
+              onClick={() => addOption(s)}>
               + {s}
             </button>
           ))}
@@ -290,10 +290,10 @@ export default function VariantsEditor({ options, variants, defaults, mainImage,
       </div>
 
       {variants.length > 0 && (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
-          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Apply to all:</span>
+        <div className="variants-bulk">
+          <span className="admin-label" style={{ flexBasis: '100%' }}>Apply to all variants</span>
           {([['price', 'Price'], ['salePrice', 'Sale'], ['costPrice', 'Cost'], ['quantity', 'Stock']] as const).map(([k, label]) => (
-            <input key={k} type="number" min={0} className="admin-input" style={{ width: 90 }} placeholder={label}
+            <input key={k} type="number" min={0} className="admin-input" placeholder={label} aria-label={`${label} for all variants`}
               value={bulk[k]} onChange={e => setBulk(b => ({ ...b, [k]: e.target.value }))} />
           ))}
           <button type="button" className="btn-admin-secondary" onClick={applyToAll}>Apply</button>
@@ -301,17 +301,17 @@ export default function VariantsEditor({ options, variants, defaults, mainImage,
       )}
 
       {variants.length > 0 && (
-        <div className="admin-table-wrap" style={{ overflowX: 'auto' }}>
-          <table className="admin-table">
+        <div className="admin-table-wrap">
+          <table className="admin-table admin-table--sticky variants-table">
             <thead>
-              <tr><th>Variant</th><th>Price (৳)</th><th>Sale (৳)</th><th>Cost (৳)</th><th>SKU</th><th>Stock</th><th>Image</th></tr>
+              <tr><th className="sticky-col">Variant</th><th>Price (৳)</th><th>Sale (৳)</th><th>Cost (৳)</th><th>SKU</th><th>Stock</th><th>Image</th></tr>
             </thead>
             <tbody>
               {variants.map(v => {
                 const img = v.useMainImage ? mainImage : v.image;
                 return (
                   <tr key={v.key}>
-                    <td style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>{v.options.map(o => o.value).join(' / ')}</td>
+                    <td className="sticky-col" style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>{v.options.map(o => o.value).join(' / ')}</td>
                     <td><input type="number" min={0} className="admin-input" style={{ width: 90 }} value={v.price}
                       onChange={e => patchVariant(v.key, { price: +e.target.value })} /></td>
                     <td><input type="number" min={0} className="admin-input" style={{ width: 90 }} value={v.salePrice ?? 0}
@@ -326,21 +326,16 @@ export default function VariantsEditor({ options, variants, defaults, mainImage,
                       <div
                         {...dropHandlers(v.key)}
                         title="Drop an image here to upload it for this variant"
-                        style={{
-                          display: 'flex', alignItems: 'center', gap: '0.5rem', padding: 4, borderRadius: 8,
-                          border: `2px dashed ${dragKey === v.key ? '#2563eb' : 'transparent'}`,
-                          background: dragKey === v.key ? 'rgba(37, 99, 235, 0.08)' : 'transparent',
-                          transition: 'background 0.15s, border-color 0.15s',
-                        }}
+                        className={`variant-image-cell ${dragKey === v.key ? 'is-drag' : ''}`}
                       >
                         <div
                           onClick={() => { if (!v.useMainImage) { uploadTarget.current = v.key; fileRef.current?.click(); } }}
-                          style={{ width: 40, height: 40, position: 'relative', border: '1px dashed #ccc', borderRadius: 4, overflow: 'hidden',
-                            cursor: v.useMainImage ? 'default' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#aaa' }}
+                          className="variant-image-box"
+                          style={{ cursor: v.useMainImage ? 'default' : 'pointer' }}
                           title={v.useMainImage ? 'Using main image' : 'Click to upload'}
                         >
                           {uploadingKeys.has(v.key) ? <div className="spinner" style={{ width: 14, height: 14 }} />
-                            : img ? <Image src={img} alt="" fill style={{ objectFit: 'cover' }} /> : '+'}
+                            : img ? <Image src={img} alt="" fill sizes="44px" style={{ objectFit: 'cover' }} /> : '+'}
                         </div>
                         <label className="admin-checkbox-row" style={{ whiteSpace: 'nowrap' }}>
                           <input type="checkbox" className="admin-checkbox" checked={v.useMainImage}

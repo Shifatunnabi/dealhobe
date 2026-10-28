@@ -60,7 +60,7 @@ export default function CartPage() {
   );
 
   return (
-    <div className="min-h-screen bg-soft-bg pt-34 pb-24">
+    <div className="min-h-screen bg-soft-bg pt-8 md:pt-10 pb-24">
       <div className="mx-auto max-w-5xl px-section">
 
         {/* ── Page Header ────────────────────────────────────── */}

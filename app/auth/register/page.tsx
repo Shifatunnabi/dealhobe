@@ -67,7 +67,7 @@ export default function AuthRegisterPage() {
 	};
 
 	return (
-		<div className="min-h-screen bg-soft-bg pt-34 pb-24">
+		<div className="min-h-screen bg-soft-bg pt-8 md:pt-10 pb-24">
 			<div className="mx-auto max-w-md px-section md:max-w-xl">
 				<motion.div
 					className="mb-8 text-center"

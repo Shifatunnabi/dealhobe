@@ -45,7 +45,7 @@ export default function AdminDashboard() {
       <div className="admin-page-header">
         <div>
           <h1 className="admin-page-title"><span className="page-icon"><FiZap size={20} /></span> Dashboard</h1>
-          <p className="admin-page-subtitle">Welcome back! Here's what's happening at DealHobe.</p>
+          <p className="admin-page-subtitle">Welcome back! Here&apos;s what&apos;s happening at DealHobe.</p>
         </div>
       </div>
 
@@ -60,9 +60,9 @@ export default function AdminDashboard() {
           {statCards(stats).map(s => {
             const Icon = s.icon;
             return (
-              <a key={s.label} href={s.href} className="stat-card" style={{ textDecoration: 'none' }}>
+              <a key={s.label} href={s.href} className="stat-card">
                 <div className={`stat-icon ${s.color}`}><Icon size={20} /></div>
-                <div>
+                <div style={{ minWidth: 0 }}>
                   <div className="stat-value">{s.value}</div>
                   <div className="stat-label">{s.label}</div>
                 </div>
@@ -74,19 +74,19 @@ export default function AdminDashboard() {
 
       {/* Low stock (variant-aware) */}
       {stats?.lowStock && stats.lowStock.length > 0 && (
-        <div className="admin-card" style={{ marginTop: '1rem' }}>
-          <div className="admin-card-header" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <FiAlertTriangle size={16} /> Low Stock
+        <div className="admin-card">
+          <div className="admin-card-header">
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}><FiAlertTriangle size={16} /> Low Stock</span>
           </div>
-          <div className="admin-card-body">
+          <div className="admin-table-wrap" style={{ border: 'none', borderRadius: 0, boxShadow: 'none' }}>
             <table className="admin-table">
-              <thead><tr><th>Product</th><th>Variant</th><th>Left</th></tr></thead>
+              <thead><tr><th>Product</th><th>Variant</th><th className="num">Left</th></tr></thead>
               <tbody>
                 {stats.lowStock.map((r, i) => (
                   <tr key={`${r.productId}-${i}`}>
-                    <td>{r.name}</td>
+                    <td className="cell-title" style={{ fontWeight: 500 }}>{r.name}</td>
                     <td>{r.variant || '—'}</td>
-                    <td>{r.quantity === 0 ? <span className="badge badge-red">Out of stock</span> : <span className="badge badge-yellow">{r.quantity}</span>}</td>
+                    <td className="num">{r.quantity === 0 ? <span className="badge badge-red">Out of stock</span> : <span className="badge badge-yellow">{r.quantity}</span>}</td>
                   </tr>
                 ))}
               </tbody>
@@ -97,20 +97,20 @@ export default function AdminDashboard() {
 
       {/* Quick action shortcuts */}
       <div className="admin-card" style={{ marginTop: '1rem' }}>
-        <div className="admin-card-header" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <FiZap size={16} /> Quick Actions
+        <div className="admin-card-header">
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}><FiZap size={16} /> Quick Actions</span>
         </div>
         <div className="admin-card-body">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))', gap: '1rem' }}>
+          <div className="admin-grid">
             {quickLinks.map(l => {
               const Icon = l.icon;
               return (
-                <a key={l.href} href={l.href} style={{ textDecoration: 'none' }}>
-                  <div className="admin-item-card" style={{ cursor: 'pointer', padding: '1.25rem' }}>
-                    <div style={{ marginBottom: '0.5rem', color: 'var(--primary-pink)' }}><Icon size={26} /></div>
-                    <div className="admin-item-title">{l.label}</div>
-                    <div className="admin-item-meta">{l.desc}</div>
-                  </div>
+                <a key={l.href} href={l.href} className="admin-item-card quick-link">
+                  <span className="quick-link-icon"><Icon size={20} /></span>
+                  <span style={{ minWidth: 0 }}>
+                    <span className="admin-item-title" style={{ display: 'block' }}>{l.label}</span>
+                    <span className="admin-item-meta" style={{ display: 'block', margin: 0 }}>{l.desc}</span>
+                  </span>
                 </a>
               );
             })}

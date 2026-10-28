@@ -13,7 +13,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ or
   }
 
   return (
-    <div className="min-h-screen bg-soft-bg pt-34 pb-24">
+    <div className="min-h-screen bg-soft-bg pt-8 md:pt-10 pb-24">
       <div className="mx-auto max-w-5xl px-section">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <h1 className="font-poppins text-2xl font-bold text-text-dark">Order {order.orderNumber}</h1>

@@ -23,21 +23,7 @@ function Initials({ name }: { name: string }) {
       : `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
 
   return (
-    <div
-      style={{
-        width: 48,
-        height: 48,
-        borderRadius: "50%",
-        background: "linear-gradient(135deg, #A41B15, #ff8fab)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontSize: 16,
-        fontWeight: 700,
-        color: "#fff",
-        flexShrink: 0,
-      }}
-    >
+    <div className="user-avatar" aria-hidden="true">
       {text}
     </div>
   );
@@ -65,67 +51,30 @@ function UserCard({
   };
 
   return (
-    <div
-      style={{
-        background: "#fff",
-        borderRadius: 16,
-        boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
-        padding: "1.25rem",
-        border: user.isBanned ? "2px solid #fca5a5" : "2px solid transparent",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
+    <div className={`user-card ${user.isBanned ? "is-banned" : ""}`}>
       {/* Top row: avatar + info + ban button */}
-      <div style={{ display: "flex", alignItems: "flex-start", gap: "1rem" }}>
+      <div className="user-card-top">
         <Initials name={user.fullName} />
 
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-            <p style={{ fontWeight: 700, fontSize: 15, color: "#1a1a2e", margin: 0 }}>
-              {user.fullName}
-            </p>
-            {user.isBanned && (
-              <span
-                style={{
-                  background: "#fee2e2",
-                  color: "#dc2626",
-                  fontSize: 10,
-                  fontWeight: 700,
-                  borderRadius: 20,
-                  padding: "2px 8px",
-                }}
-              >
-                Banned
-              </span>
-            )}
+        <div className="user-card-info">
+          <div className="user-card-name">
+            <span>{user.fullName}</span>
+            {user.isBanned && <span className="badge badge-red">Banned</span>}
           </div>
-          <p style={{ fontSize: 13, color: "#666", margin: "3px 0 0" }}>{user.phone}</p>
-          {user.email && (
-            <p style={{ fontSize: 13, color: "#888", margin: "2px 0 0" }}>{user.email}</p>
-          )}
-          <p style={{ fontSize: 12, color: "#aaa", margin: "3px 0 0" }}>
+          <p className="user-card-line">{user.phone}</p>
+          {user.email && <p className="user-card-line">{user.email}</p>}
+          <p className="user-card-line is-muted">
             {user.area === "inside_dhaka" ? "Inside Dhaka" : "Outside Dhaka"} — {user.address}
           </p>
         </div>
 
         {/* Ban / Unban button */}
         <button
+          type="button"
           onClick={handleBan}
           disabled={banning}
-          style={{
-            flexShrink: 0,
-            padding: "5px 14px",
-            borderRadius: 20,
-            fontSize: 12,
-            fontWeight: 600,
-            cursor: banning ? "not-allowed" : "pointer",
-            border: "none",
-            background: user.isBanned ? "#dcfce7" : "#fee2e2",
-            color: user.isBanned ? "#16a34a" : "#dc2626",
-            opacity: banning ? 0.6 : 1,
-            whiteSpace: "nowrap",
-          }}
+          className={`${user.isBanned ? "btn-admin-success" : "btn-admin-danger"} btn-sm`}
+          style={{ flexShrink: 0 }}
         >
           {banning ? "..." : user.isBanned ? "Unban" : "Ban"}
         </button>
@@ -133,69 +82,31 @@ function UserCard({
 
       {/* Expanded details */}
       {expanded && (
-        <div
-          style={{
-            marginTop: "1rem",
-            paddingTop: "1rem",
-            borderTop: "1px solid #f0f0f0",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              gap: "0.75rem",
-              marginBottom: "1rem",
-              flexWrap: "wrap",
-            }}
-          >
-            <div
-              style={{
-                background: "#f8f9fa",
-                borderRadius: 10,
-                padding: "10px 16px",
-                flex: "1 1 140px",
-              }}
-            >
-              <p style={{ fontSize: 11, color: "#aaa", margin: 0 }}>Date Registered</p>
-              <p style={{ fontSize: 13, fontWeight: 600, color: "#333", margin: "4px 0 0" }}>
-                {new Date(user.createdAt).toLocaleDateString("en-GB", {
-                  day: "numeric",
-                  month: "short",
-                  year: "numeric",
-                })}
-              </p>
-            </div>
-            <div
-              style={{
-                background: "#f8f9fa",
-                borderRadius: 10,
-                padding: "10px 16px",
-                flex: "1 1 140px",
-              }}
-            >
-              <p style={{ fontSize: 11, color: "#aaa", margin: 0 }}>Total Orders</p>
-              <p style={{ fontSize: 13, fontWeight: 600, color: "#333", margin: "4px 0 0" }}>
-                {user.totalOrders}
-              </p>
-            </div>
+        <div className="user-card-stats">
+          <div className="user-card-stat">
+            <p>Date Registered</p>
+            <p>
+              {new Date(user.createdAt).toLocaleDateString("en-GB", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              })}
+            </p>
+          </div>
+          <div className="user-card-stat">
+            <p>Total Orders</p>
+            <p>{user.totalOrders}</p>
           </div>
         </div>
       )}
 
       {/* Bottom row: view details button aligned right */}
-      <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "1rem" }}>
+      <div className="user-card-footer">
         <button
+          type="button"
           onClick={() => setExpanded((v) => !v)}
-          style={{
-            background: expanded ? "#fff0f5" : "#f8f9fa",
-            border: "none",
-            borderRadius: 8,
-            padding: "6px 14px",
-            fontSize: 12,
-            fontWeight: 600,
-            color: expanded ? "#A41B15" : "#555",
-            cursor: "pointer",
-          }}
+          className="btn-admin-secondary btn-sm"
+          aria-expanded={expanded}
         >
           {expanded ? "Hide Details ▲" : "View Details ▼"}
         </button>
@@ -261,22 +172,14 @@ export default function UserDirectoryPage() {
       </div>
 
       {/* Search */}
-      <div style={{ marginBottom: "1.5rem" }}>
+      <div className="admin-toolbar" style={{ marginBottom: "1.25rem" }}>
         <input
-          type="text"
+          type="search"
+          className="admin-input toolbar-search"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search by name, email, or phone..."
-          style={{
-            width: "100%",
-            maxWidth: 440,
-            padding: "10px 16px",
-            borderRadius: 10,
-            border: "1.5px solid #e5e7eb",
-            fontSize: 14,
-            outline: "none",
-            boxSizing: "border-box",
-          }}
+          aria-label="Search users"
         />
       </div>
 
@@ -293,11 +196,11 @@ export default function UserDirectoryPage() {
         </div>
       ) : (
         <>
-          <p style={{ fontSize: 13, color: "#aaa", marginBottom: "1rem" }}>
+          <p className="admin-toolbar-meta" style={{ marginBottom: "0.75rem" }}>
             {total} user{total !== 1 ? "s" : ""} total
           </p>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <div className="user-list">
             {users.map((user) => (
               <UserCard key={user._id} user={user} onBanToggle={handleBanToggle} />
             ))}
@@ -305,72 +208,39 @@ export default function UserDirectoryPage() {
 
           {/* Pagination */}
           {pages > 1 && (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 8,
-                marginTop: "2rem",
-              }}
-            >
-              <button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page === 1}
-                style={{
-                  padding: "6px 14px",
-                  borderRadius: 8,
-                  border: "1.5px solid #e5e7eb",
-                  background: page === 1 ? "#f8f9fa" : "#fff",
-                  cursor: page === 1 ? "not-allowed" : "pointer",
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: page === 1 ? "#ccc" : "#333",
-                  display: "inline-flex", alignItems: "center", gap: "0.35rem",
-                }}
-              >
-                <FiChevronLeft size={14} /> Prev
-              </button>
-
-              {Array.from({ length: pages }, (_, i) => i + 1).map((p) => (
+            <nav className="admin-pagination" aria-label="User pages">
+              <div className="admin-pagination-pages">
                 <button
-                  key={p}
-                  onClick={() => setPage(p)}
-                  style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: 8,
-                    border: "1.5px solid",
-                    borderColor: p === page ? "#A41B15" : "#e5e7eb",
-                    background: p === page ? "#A41B15" : "#fff",
-                    color: p === page ? "#fff" : "#333",
-                    fontWeight: 700,
-                    fontSize: 13,
-                    cursor: "pointer",
-                  }}
+                  type="button"
+                  className="btn-admin-secondary"
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page === 1}
                 >
-                  {p}
+                  <FiChevronLeft size={14} /> Prev
                 </button>
-              ))}
 
-              <button
-                onClick={() => setPage((p) => Math.min(pages, p + 1))}
-                disabled={page === pages}
-                style={{
-                  padding: "6px 14px",
-                  borderRadius: 8,
-                  border: "1.5px solid #e5e7eb",
-                  background: page === pages ? "#f8f9fa" : "#fff",
-                  cursor: page === pages ? "not-allowed" : "pointer",
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: page === pages ? "#ccc" : "#333",
-                  display: "inline-flex", alignItems: "center", gap: "0.35rem",
-                }}
-              >
-                Next <FiChevronRight size={14} />
-              </button>
-            </div>
+                {Array.from({ length: pages }, (_, i) => i + 1).map((p) => (
+                  <button
+                    key={p}
+                    type="button"
+                    className={p === page ? "btn-admin-primary" : "btn-admin-secondary"}
+                    aria-current={p === page ? "page" : undefined}
+                    onClick={() => setPage(p)}
+                  >
+                    {p}
+                  </button>
+                ))}
+
+                <button
+                  type="button"
+                  className="btn-admin-secondary"
+                  onClick={() => setPage((p) => Math.min(pages, p + 1))}
+                  disabled={page === pages}
+                >
+                  Next <FiChevronRight size={14} />
+                </button>
+              </div>
+            </nav>
           )}
         </>
       )}

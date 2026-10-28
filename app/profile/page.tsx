@@ -483,7 +483,7 @@ export default function ProfilePage() {
 
   if (profileLoading) {
     return (
-      <div className="min-h-screen bg-soft-bg pt-26 pb-24">
+      <div className="min-h-screen bg-soft-bg pt-6 md:pt-8 pb-24">
         <div className="mx-auto max-w-6xl px-section">
           <div className="rounded-3xl bg-white p-6 text-center shadow-card">
             <p className="font-poppins text-sm text-text-muted">Loading your profile...</p>
@@ -495,7 +495,7 @@ export default function ProfilePage() {
 
   if (isBanned) {
     return (
-      <div className="min-h-screen bg-soft-bg pt-26 pb-24 flex items-center justify-center">
+      <div className="min-h-screen bg-soft-bg pt-6 md:pt-8 pb-24 flex items-center justify-center">
         <div className="mx-auto max-w-md px-section text-center">
           <div className="rounded-3xl bg-white p-10 shadow-card">
             <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-red-50">
@@ -520,7 +520,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-soft-bg pt-34 pb-24">
+    <div className="min-h-screen bg-soft-bg pt-8 md:pt-10 pb-24">
       <div className="mx-auto max-w-6xl px-section">
         <motion.div className="mb-8 text-center" initial="hidden" animate="visible" variants={fadeUp}>
           <nav className="mb-4 flex items-center justify-center gap-2 text-small text-text-muted">

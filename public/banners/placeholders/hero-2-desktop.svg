@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="600" viewBox="0 0 1920 600">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#C2185B"/><stop offset="1" stop-color="#F06292"/></linearGradient></defs>
+<rect width="1920" height="600" fill="url(#g)"/>
+<circle cx="1689.6" cy="90" r="270" fill="#fff" opacity=".08"/>
+<circle cx="153.6" cy="570" r="210" fill="#fff" opacity=".06"/>
+<rect x="36" y="36" width="1848" height="528" rx="21.599999999999998" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="2.88" stroke-dasharray="14.4 10.799999999999999"/>
+<text x="50%" y="283.5" text-anchor="middle" font-family="Poppins, Arial, sans-serif" font-weight="700" font-size="132" fill="#fff">Hero banner 2</text>
+<text x="50%" y="371.5" text-anchor="middle" font-family="Poppins, Arial, sans-serif" font-size="55" fill="#fff" fill-opacity=".8">1920 × 600 · GIF / WebP / MP4</text>
+</svg>

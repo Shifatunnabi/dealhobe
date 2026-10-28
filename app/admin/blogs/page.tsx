@@ -98,7 +98,7 @@ export default function BlogsPage() {
         <div className="admin-empty">
           <div className="empty-icon"><FiFileText size={40} /></div>
           <h3>No Blog Posts Yet</h3>
-          <p>Click "Add New Blog" to publish your first post.</p>
+          <p>Click &quot;Add New Blog&quot; to publish your first post.</p>
         </div>
       ) : (
         <div className="blog-grid">
@@ -108,10 +108,10 @@ export default function BlogsPage() {
             return (
               <div key={b._id} className="blog-card">
                 <div className="blog-card-image">
-                  <Image src={b.imageUrl} alt={b.title} fill style={{ objectFit: 'cover' }} />
+                  <Image src={b.imageUrl} alt={b.title} fill sizes="(max-width: 640px) 100vw, 400px" style={{ objectFit: 'cover' }} />
                   <span className="blog-card-cat">{b.category}</span>
                   {b.isFeatured && (
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', position: 'absolute', top: 8, right: 8, background: '#FFD93D', color: '#7a5c00', fontSize: '0.65rem', fontWeight: 700, padding: '0.2rem 0.5rem', borderRadius: '20px' }}>
+                    <span className="admin-media-badge top-right is-gold">
                       <FaStar size={10} /> Featured
                     </span>
                   )}
@@ -122,13 +122,13 @@ export default function BlogsPage() {
                   <div className="blog-card-excerpt">{excerpt}{excerpt.length >= 160 ? '…' : ''}</div>
                   <div className="blog-card-footer">
                     <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                      <button className="btn-admin-edit"   onClick={() => openEdit(b)}><FiEdit2 size={13} /> Edit</button>
-                      <button className="btn-admin-danger" aria-label="Delete" onClick={() => handleDelete(b._id)}><FiTrash2 size={13} /></button>
+                      <button className="btn-admin-edit btn-sm"   onClick={() => openEdit(b)}><FiEdit2 size={13} /> Edit</button>
+                      <button className="btn-admin-danger btn-sm btn-icon" aria-label="Delete" title="Delete" onClick={() => handleDelete(b._id)}><FiTrash2 size={14} /></button>
                     </div>
                     <button
-                      className={b.isFeatured ? 'btn-admin-success' : 'btn-admin-secondary'}
+                      className={`${b.isFeatured ? 'btn-admin-success' : 'btn-admin-secondary'} btn-sm`}
                       onClick={() => toggleFeatured(b)}
-                      style={{ fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}
+                      aria-pressed={b.isFeatured}
                     >
                       {b.isFeatured ? <FaStar size={12} /> : <FaRegStar size={12} />} {b.isFeatured ? 'Featured' : 'Feature'}
                     </button>
@@ -143,12 +143,12 @@ export default function BlogsPage() {
       {/* Blog Modal */}
       {modal && (
         <div className="modal-overlay">
-          <div className="modal-box modal-lg">
+          <div className="modal-box modal-lg" role="dialog" aria-modal="true" aria-label={editing ? 'Edit Blog Post' : 'Write New Blog Post'}>
             <div className="modal-header">
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
                 {editing ? <FiEdit2 size={16} /> : <FiPlus size={16} />} {editing ? 'Edit Blog Post' : 'Write New Blog Post'}
               </span>
-              <button className="modal-close" onClick={() => setModal(false)}><FiX size={16} /></button>
+              <button className="modal-close" aria-label="Close" onClick={() => setModal(false)}><FiX size={18} /></button>
             </div>
             <div className="modal-body">
               <div className="admin-form">
@@ -164,8 +164,8 @@ export default function BlogsPage() {
                       {BLOG_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                     </select>
                   </div>
-                  <div className="admin-field" style={{ justifyContent: 'flex-end', paddingBottom: 6 }}>
-                    <label className="admin-checkbox-row" style={{ marginTop: 'auto' }}>
+                  <div className="admin-field admin-field--end">
+                    <label className="admin-checkbox-row">
                       <input type="checkbox" className="admin-checkbox" checked={form.isFeatured} onChange={e => setForm(f => ({ ...f, isFeatured: e.target.checked }))} />
                       <span className="admin-label" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}><FaStar size={12} /> Feature this blog on homepage</span>
                     </label>

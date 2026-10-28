@@ -104,8 +104,8 @@ export default function AdminOrderActions({ order }: { order: OrderData }) {
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", alignItems: "flex-end" }}>
-      <div className="flex flex-wrap items-center gap-2">
+    <div className="order-actions">
+      <div className="order-actions-row">
         <ReceiptButton order={order} className="btn-admin-secondary" />
         {!isCancelled && (
           <button className="btn-admin-danger" onClick={cancelOrder} disabled={cancelling}>
@@ -115,42 +115,34 @@ export default function AdminOrderActions({ order }: { order: OrderData }) {
       </div>
 
       {!isCancelled && (
-        <div style={{
-          border: "1px solid rgba(45,27,78,0.12)",
-          borderRadius: 10,
-          padding: "0.85rem 1rem",
-          minWidth: 260,
-          background: "rgba(45,27,78,0.02)",
-        }}>
-          <div style={{ fontWeight: 700, fontSize: 13, marginBottom: "0.6rem", color: "#2d1b4e" }}>
-            Steadfast Courier
-          </div>
+        <div className="order-courier-card">
+          <div className="order-courier-title">Steadfast Courier</div>
 
           {isSent ? (
-            <div style={{ fontSize: 13, display: "grid", gap: "0.35rem", marginBottom: "0.75rem" }}>
+            <div className="order-courier-meta">
               <div>
-                <span style={{ color: "#6b7280" }}>Tracking: </span>
+                <span className="muted">Tracking: </span>
                 <strong>{trackingCode}</strong>
               </div>
               {localSteadfastStatus && (
                 <div>
-                  <span style={{ color: "#6b7280" }}>Courier status: </span>
-                  <strong style={{ color: "#8b5cf6" }}>{localSteadfastStatus}</strong>
+                  <span className="muted">Courier status: </span>
+                  <strong style={{ color: "#6d28d9" }}>{localSteadfastStatus}</strong>
                 </div>
               )}
               {order.steadfastSentAt && (
-                <div style={{ color: "#9ca3af", fontSize: 12 }}>
+                <div className="muted" style={{ fontSize: 12 }}>
                   Sent {new Date(order.steadfastSentAt).toLocaleDateString()}
                 </div>
               )}
             </div>
           ) : (
-            <div style={{ fontSize: 13, color: "#9ca3af", marginBottom: "0.75rem" }}>
+            <div className="order-courier-meta muted">
               Not yet sent to Steadfast.
             </div>
           )}
 
-          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+          <div className="order-actions-row" style={{ justifyContent: "flex-start" }}>
             {!isSent ? (
               <button className="btn-admin-primary" onClick={sendToSteadfast} disabled={sending}>
                 {sending ? "Sending…" : "Send to Steadfast"}
@@ -168,21 +160,13 @@ export default function AdminOrderActions({ order }: { order: OrderData }) {
           </div>
 
           {error && (
-            <div style={{ marginTop: "0.5rem", color: "#ef4444", fontSize: 12 }}>{error}</div>
+            <div className="order-courier-error" role="alert">{error}</div>
           )}
         </div>
       )}
 
       {isCancelled && (
-        <div style={{
-          border: "1px solid rgba(239,68,68,0.2)",
-          borderRadius: 10,
-          padding: "0.75rem 1rem",
-          background: "rgba(239,68,68,0.04)",
-          fontSize: 13,
-          color: "#ef4444",
-          fontWeight: 600,
-        }}>
+        <div className="order-cancelled-note">
           This order has been cancelled.
         </div>
       )}
