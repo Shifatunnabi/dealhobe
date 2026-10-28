@@ -23,6 +23,8 @@ export interface GridProduct {
   badge?: CardBadge;
   /** e.g. "4 shades" — from the product's first variant option. */
   variantLabel?: string;
+  /** Variant products: the variant the card's bag bubble adds (first in stock, else the first). */
+  defaultVariant?: { key: string; label: string; price: number; quantity: number; image?: string };
   createdAt?: string;
 }
 
@@ -41,7 +43,10 @@ type Source = {
   offerDiscountType?: 'percentage' | 'flat';
   offerDiscountAmount?: number;
   variantOptions?: { name: string; values: string[] }[];
-  variants?: { quantity?: number }[];
+  variants?: {
+    key: string; options?: { name: string; value: string }[]; price: number; salePrice?: number;
+    quantity?: number; useMainImage?: boolean; image?: string;
+  }[];
   createdAt?: string;
   images?: string[];
 };
@@ -59,6 +64,20 @@ function variantLabel(options?: Source['variantOptions']): string | undefined {
   const name = first.name.trim().toLowerCase();
   const word = /shade|colou?r/.test(name) ? 'shade' : /size|volume|ml|weight/.test(name) ? 'size' : name || 'option';
   return plural(first.values.length, word);
+}
+
+/** The variant a shopper gets by default: first in stock, otherwise the first one listed. */
+export function defaultVariantOf(variants: Source['variants']) {
+  if (!variants?.length) return undefined;
+  const v = variants.find((x) => Number(x.quantity) > 0) ?? variants[0];
+  const price = v.salePrice && v.salePrice < v.price ? v.salePrice : v.price;
+  return {
+    key: v.key,
+    label: (v.options ?? []).map((o) => o.value).join(' / '),
+    price,
+    quantity: Math.max(0, Number(v.quantity) || 0),
+    image: !v.useMainImage && v.image ? v.image : undefined,
+  };
 }
 
 export function toCardProduct(p: Source, ctx: CardContext): GridProduct {
@@ -86,6 +105,7 @@ export function toCardProduct(p: Source, ctx: CardContext): GridProduct {
     reviewCount: rating?.count,
     badge: p.isTopSeller ? 'Bestseller' : p.isNewArrival ? 'New' : p.isTrending ? 'Trending' : undefined,
     variantLabel: variantLabel(p.variantOptions),
+    defaultVariant: p.hasVariants ? defaultVariantOf(p.variants) : undefined,
     createdAt: p.createdAt,
   };
 }

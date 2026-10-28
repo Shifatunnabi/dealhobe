@@ -28,11 +28,9 @@ export default function Footer({ storefront }: { storefront: FooterStorefront })
   ].filter((s) => s.href);
 
   return (
-    <footer className="relative mt-auto overflow-hidden bg-plum text-text-light">
-      <div aria-hidden className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-primary-pink/25 blur-3xl" />
-      <div aria-hidden className="pointer-events-none absolute -bottom-32 -left-20 h-72 w-72 rounded-full bg-gold/15 blur-3xl" />
+    <footer className="mt-auto border-t-4 border-primary-pink bg-plum text-text-light">
 
-      <div className="shell relative pt-14 pb-28 md:pb-10">
+      <div className="shell pt-14 pb-28 md:pb-10">
         <div className="grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-[1.4fr_0.8fr_1fr_1.3fr] lg:gap-10">
           <div className="col-span-2 lg:col-span-1">
             <Image src={storefront.logoUrl} alt="DealHobe" width={120} height={44} className="mb-4 h-12 w-auto object-contain brightness-0 invert" />

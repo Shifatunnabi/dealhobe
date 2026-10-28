@@ -45,14 +45,22 @@ export default function ProductCard({ product, priority = false }: { product: Gr
   const price = product.salePrice && product.salePrice < product.price ? product.salePrice : product.price;
   const saving = product.price - price;
   const pct = saving > 0 ? Math.round((saving / product.price) * 100) : 0;
-  const href = `/product/${product.slug}`;
+  const dv = product.hasVariants ? product.defaultVariant : undefined;
+  const href = `/product/${product.slug}${dv ? `?variant=${encodeURIComponent(dv.key)}` : ""}`;
   const cover = product.images?.[0] || "/placeholder.png";
 
   const handleAdd = () => {
     if (outOfStock) return;
-    // Variant products need a shade/size chosen first.
-    if (product.hasVariants) return router.push(href);
-    cart?.addItem({ productId: product._id, slug: product.slug, name: product.name, image: cover, unitPrice: price, qty: 1, maxQty: qty }, 1);
+    if (product.hasVariants) {
+      // Variant products add their default variant (first in stock); without variant data, open the product.
+      if (!dv || dv.quantity <= 0) return router.push(href);
+      cart?.addItem({
+        productId: product._id, slug: product.slug, name: product.name, image: dv.image || cover,
+        unitPrice: dv.price, qty: 1, maxQty: dv.quantity, variantKey: dv.key, variantLabel: dv.label,
+      }, 1);
+    } else {
+      cart?.addItem({ productId: product._id, slug: product.slug, name: product.name, image: cover, unitPrice: price, qty: 1, maxQty: qty }, 1);
+    }
     setAdded(true);
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => setAdded(false), 1800);
@@ -118,7 +126,8 @@ export default function ProductCard({ product, priority = false }: { product: Gr
         type="button"
         onClick={handleAdd}
         disabled={outOfStock}
-        aria-label={outOfStock ? "Out of stock" : product.hasVariants ? `Choose options for ${product.name}` : added ? "Added to bag" : `Add ${product.name} to bag`}
+        aria-label={outOfStock ? "Out of stock" : added ? "Added to bag" : `Add ${product.name}${dv?.label ? ` (${dv.label})` : ""} to bag`}
+        title={dv?.label ? `Add ${dv.label}` : undefined}
         className={`absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full border transition-all duration-200 active:scale-90 md:right-3 md:top-3 md:h-10 md:w-10 ${
           added
             ? "border-[#1F8A4C] bg-[#1F8A4C] text-white shadow-[0_4px_12px_rgba(31,138,76,0.3)]"
