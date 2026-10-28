@@ -4,6 +4,7 @@ import HeroCarousel from "./HeroCarousel";
 import ProductRail from "./ProductRail";
 import Countdown from "./Countdown";
 import TrustBadges from "./TrustBadges";
+import ScrollRow from "@/components/ui/ScrollRow";
 import BrandMarquee from "./BrandMarquee";
 import CustomerReviewsSection from "@/components/sections/CustomerReviewsSection";
 import type { GridProduct } from "@/components/sections/ProductCard";
@@ -52,15 +53,17 @@ export default function SectionRenderer({ section, data, first }: { section: Hom
       return (
         <section className="shell pt-8 md:pt-12">
           <SectionHeading title={section.title} subtitle={section.subtitle} accent={st.accent} />
-          <div
-            className="tile-grid"
+          {/* A grid from tablet up; on phones "scroll" sections become a swipe row (arrows/wheel for mice). */}
+          <ScrollRow
+            label={section.title || "banners"}
+            trackClassName="tile-grid"
             data-mobile={st.mobileLayout ?? "grid"}
-            style={{ "--cols-m": st.cols?.mobile ?? 2, "--cols-t": st.cols?.tablet ?? 3, "--cols-d": st.cols?.desktop ?? 4 } as React.CSSProperties}
+            trackStyle={{ "--cols-m": st.cols?.mobile ?? 2, "--cols-t": st.cols?.tablet ?? 3, "--cols-d": st.cols?.desktop ?? 4 } as React.CSSProperties}
           >
             {tiles.map((t, i) => (
               <TileLink key={t._id ?? i} tile={t} ratio={st.ratio} sizes={gridSizes(st.cols)} priority={first && i < 4} />
             ))}
-          </div>
+          </ScrollRow>
         </section>
       );
 
@@ -72,7 +75,7 @@ export default function SectionRenderer({ section, data, first }: { section: Hom
           <SectionHeading title={section.title} subtitle={section.subtitle} accent={st.accent} viewAll={st.viewAllLink}>
             {st.countdownTo && <Countdown to={st.countdownTo} />}
           </SectionHeading>
-          <ProductRail products={products} />
+          <ProductRail products={products} label={section.title || "products"} />
         </section>
       );
     }

@@ -7,6 +7,7 @@ import { FiArrowRight, FiBookOpen, FiChevronLeft, FiChevronRight } from "react-i
 import { cn } from "@/lib/utils";
 import Breadcrumbs from "@/components/content/Breadcrumbs";
 import { formatBlogDate, type BlogSummary } from "@/components/content/blog";
+import ScrollRow from "@/components/ui/ScrollRow";
 
 const PER_PAGE = 9;
 
@@ -225,7 +226,7 @@ export default function BlogsPageClient({ blogs = [] }: { blogs?: BlogSummary[] 
               <div className="flex flex-wrap items-center justify-between gap-4 border-t border-[#EADDE3] pt-8">
                 <h2 id="all-stories-title" className="section-title">Latest stories</h2>
                 {categories.length > 2 && (
-                  <div className="no-scrollbar -mx-4 flex w-[calc(100%+2rem)] gap-2 overflow-x-auto px-4 sm:mx-0 sm:w-auto sm:px-0" role="group" aria-label="Filter by topic">
+                  <ScrollRow label="topics" arrowSize="sm" className="-mx-4 w-[calc(100%+2rem)] sm:mx-0 sm:w-auto" trackClassName="no-scrollbar flex gap-2 overflow-x-auto px-4 sm:px-0" role="group" trackLabel="Filter by topic">
                     {categories.map((cat) => (
                       <button
                         key={cat}
@@ -240,7 +241,7 @@ export default function BlogsPageClient({ blogs = [] }: { blogs?: BlogSummary[] 
                         {cat}
                       </button>
                     ))}
-                  </div>
+                  </ScrollRow>
                 )}
               </div>
 

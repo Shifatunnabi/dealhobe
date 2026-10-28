@@ -59,11 +59,11 @@ export default function HeroCarousel({ children, count, autoplayMs = 6000 }: { c
       {count > 1 && (
         <>
           <button type="button" onClick={() => goTo(index - 1)} aria-label="Previous slide"
-            className="absolute left-3 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-text-dark opacity-0 shadow-card backdrop-blur transition-opacity group-hover:opacity-100 focus-visible:opacity-100 md:flex">
+            className="absolute left-3 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-text-dark opacity-0 shadow-card backdrop-blur transition-opacity group-hover:opacity-100 focus-visible:opacity-100 any-pointer-fine:flex">
             <FiChevronLeft size={22} />
           </button>
           <button type="button" onClick={() => goTo(index + 1)} aria-label="Next slide"
-            className="absolute right-3 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-text-dark opacity-0 shadow-card backdrop-blur transition-opacity group-hover:opacity-100 focus-visible:opacity-100 md:flex">
+            className="absolute right-3 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-text-dark opacity-0 shadow-card backdrop-blur transition-opacity group-hover:opacity-100 focus-visible:opacity-100 any-pointer-fine:flex">
             <FiChevronRight size={22} />
           </button>
           <div className="mt-3 flex justify-center gap-1.5">

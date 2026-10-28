@@ -23,6 +23,7 @@ import { cn } from "@/lib/utils";
 import Breadcrumbs from "@/components/content/Breadcrumbs";
 import PasswordInput from "@/components/content/PasswordInput";
 import ProductPhoto from "@/components/ui/ProductPhoto";
+import ScrollRow from "@/components/ui/ScrollRow";
 
 type Tab = "orders" | "profile" | "addresses" | "settings";
 type OrderStatus = "Pending" | "Processing" | "Shipped" | "Delivered" | "Cancelled";
@@ -620,7 +621,7 @@ export default function ProfilePage() {
 
         {/* Tabs (phones/tablets) */}
         <div className="sticky top-36 z-20 -mx-4 mt-4 border-b border-[#F1E7EB] bg-soft-bg/95 px-4 py-2 backdrop-blur lg:hidden">
-          <div role="tablist" aria-label="Account sections" className="no-scrollbar flex gap-2 overflow-x-auto">
+          <ScrollRow label="account sections" arrowSize="sm" trackClassName="no-scrollbar flex gap-2 overflow-x-auto" role="tablist" trackLabel="Account sections">
             {TABS.map(({ id, label, icon: Icon }) => (
               <button
                 key={id}
@@ -636,7 +637,7 @@ export default function ProfilePage() {
                 <Icon size={14} aria-hidden /> {label}
               </button>
             ))}
-          </div>
+          </ScrollRow>
         </div>
 
         <div className="mt-4 grid gap-6 md:mt-6 lg:grid-cols-[260px_minmax(0,1fr)] lg:items-start">

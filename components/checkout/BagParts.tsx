@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import type { CartItem } from "@/components/cart/CartProvider";
 import { money } from "./money";
 import { effectivePrice, type ProductHit } from "./useCartInsights";
+import ScrollRow from "@/components/ui/ScrollRow";
 
 const LOW_STOCK = 5;
 
@@ -269,7 +270,7 @@ export function UpsellRow({
           {freeDeliveryGap > 0 ? "Complete your routine" : "You may also like"}
         </h3>
       </div>
-      <div className="no-scrollbar -mx-1 flex snap-x snap-proximity gap-2.5 overflow-x-auto px-1 pb-1">
+      <ScrollRow label="product suggestions" arrowSize="sm" trackClassName="no-scrollbar -mx-1 flex snap-x snap-proximity gap-2.5 overflow-x-auto px-1 pb-1">
         {products.map((p) => {
           const price = effectivePrice(p);
           return (
@@ -296,7 +297,7 @@ export function UpsellRow({
             </Link>
           );
         })}
-      </div>
+      </ScrollRow>
     </section>
   );
 }

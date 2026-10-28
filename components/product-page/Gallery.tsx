@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { FiChevronLeft, FiChevronRight, FiMaximize2, FiX } from "react-icons/fi";
 import ProductPhoto from "@/components/ui/ProductPhoto";
+import { useScrollRow } from "@/components/ui/ScrollRow";
 import { cn } from "@/lib/utils";
 
 /**
@@ -24,7 +25,8 @@ export default function Gallery({
   overlay?: ReactNode;
 }) {
   const track = useRef<HTMLDivElement>(null);
-  const thumbs = useRef<HTMLDivElement>(null);
+  // Thumbnail strip: horizontal at tablet width (mouse wheel scrolls it), vertical from lg.
+  const { ref: thumbs } = useScrollRow<HTMLDivElement>();
   const frame = useRef(0);
   const [active, setActive] = useState(0);
   const [viewer, setViewer] = useState<number | null>(null);
@@ -71,7 +73,7 @@ export default function Gallery({
       if (left < strip.scrollLeft || left + el.offsetWidth > strip.scrollLeft + strip.clientWidth)
         strip.scrollTo({ left: left - strip.clientWidth / 2 + el.offsetWidth / 2, behavior: "smooth" });
     }
-  }, [active]);
+  }, [active, thumbs]);
 
   return (
     <div className="flex flex-col gap-3 lg:flex-row-reverse lg:items-start lg:gap-4">
@@ -122,7 +124,7 @@ export default function Gallery({
               type="button"
               onClick={() => go(active - 1)}
               aria-label="Previous photo"
-              className="absolute left-3 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-[#EFE3E8] bg-white/95 text-text-dark opacity-0 shadow-tile transition hover:text-primary-pink group-hover:opacity-100 focus-visible:opacity-100 md:flex"
+              className="absolute left-3 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-[#EFE3E8] bg-white/95 text-text-dark opacity-0 shadow-tile transition hover:text-primary-pink group-hover:opacity-100 focus-visible:opacity-100 any-pointer-fine:flex"
             >
               <FiChevronLeft size={20} />
             </button>
@@ -130,7 +132,7 @@ export default function Gallery({
               type="button"
               onClick={() => go(active + 1)}
               aria-label="Next photo"
-              className="absolute right-3 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-[#EFE3E8] bg-white/95 text-text-dark opacity-0 shadow-tile transition hover:text-primary-pink group-hover:opacity-100 focus-visible:opacity-100 md:flex"
+              className="absolute right-3 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-[#EFE3E8] bg-white/95 text-text-dark opacity-0 shadow-tile transition hover:text-primary-pink group-hover:opacity-100 focus-visible:opacity-100 any-pointer-fine:flex"
             >
               <FiChevronRight size={20} />
             </button>
@@ -184,6 +186,8 @@ export default function Gallery({
 function Viewer({ images, alt, start, onClose }: { images: string[]; alt: string; start: number; onClose: (i: number) => void }) {
   const [i, setI] = useState(start);
   const touchX = useRef<number | null>(null);
+  // Centred when the thumbnails fit; scrollable (wheel included) and never cut off when they don't.
+  const { ref: viewerThumbs } = useScrollRow<HTMLDivElement>();
   const n = images.length;
   const step = useCallback((d: number) => setI((c) => (((c + d) % n) + n) % n), [n]);
   useEffect(() => {
@@ -244,7 +248,7 @@ function Viewer({ images, alt, start, onClose }: { images: string[]; alt: string
         )}
       </div>
       {n > 1 && (
-        <div className="flex justify-center gap-2 overflow-x-auto px-4 py-3 [scrollbar-width:none]">
+        <div ref={viewerThumbs} className="flex justify-center-safe gap-2 overflow-x-auto px-4 py-3 [scrollbar-width:none]">
           {images.map((src, k) => (
             <button key={src} type="button" onClick={() => setI(k)} aria-label={`Show photo ${k + 1}`}
               className={cn("relative h-14 w-14 shrink-0 overflow-hidden rounded-lg border bg-white", k === i ? "border-plum ring-1 ring-plum" : "border-[#EFE3E8] opacity-70")}>
