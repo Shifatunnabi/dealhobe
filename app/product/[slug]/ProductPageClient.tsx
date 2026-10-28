@@ -58,7 +58,7 @@ function StockBadge({ stockStr, qty }: { stockStr?: string, qty?: number }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 font-poppins text-xs font-semibold",
+        "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 font-body text-xs font-semibold",
         pill,
       )}
     >
@@ -97,23 +97,23 @@ function RelatedCard({ product }: { product: any }) {
               imgClassName="transition-transform duration-500 hover:scale-105"
             />
             {product.badge && (
-              <span className="absolute left-2 top-2 z-10 rounded-full bg-gradient-primary px-2.5 py-0.5 text-xs font-poppins font-semibold text-white">
+              <span className="absolute left-2 top-2 z-10 rounded-full bg-gradient-primary px-2.5 py-0.5 text-xs font-body font-semibold text-white">
                 {product.badge}
               </span>
             )}
             {!product.badge && offerBadgeText && (
-              <span className="absolute left-2 top-2 z-10 rounded-full bg-gradient-yellow px-2.5 py-0.5 text-xs font-poppins font-semibold text-text-dark">
+              <span className="absolute left-2 top-2 z-10 rounded-full bg-gradient-yellow px-2.5 py-0.5 text-xs font-body font-semibold text-text-dark">
                 {offerBadgeText}
               </span>
             )}
           </div>
         </div>
         <div className="px-3 pb-1 pt-2.5">
-          <h3 className="line-clamp-2 font-poppins text-sm font-semibold leading-snug text-gray-900">
+          <h3 className="line-clamp-2 font-body text-sm font-semibold leading-snug text-gray-900">
             {product.name}
           </h3>
           <div className="mt-1.5 flex items-baseline gap-1.5">
-            <p className="font-poppins text-lg font-bold text-primary-pink">
+            <p className="font-body text-lg font-bold text-primary-pink">
               {hasVariants && <span className="mr-1 text-xs font-medium text-text-muted">From</span>}
               ৳{(product.salePrice || product.price).toLocaleString()}.00
             </p>
@@ -266,7 +266,7 @@ export default function ProductDetailPageClient({
           </p>
           <Link
             href="/products"
-            className="inline-flex items-center gap-2 rounded-2xl bg-primary-pink px-6 py-3 font-poppins font-semibold text-white shadow-button hover:shadow-hover transition-all"
+            className="inline-flex items-center gap-2 rounded-2xl bg-primary-pink px-6 py-3 font-body font-semibold text-white shadow-button hover:shadow-hover transition-all"
           >
             Browse All Products <FiChevronRight size={16} />
           </Link>
@@ -514,12 +514,12 @@ export default function ProductDetailPageClient({
               ))}
               {/* Overlay badges */}
               {offerBadgeText && (
-                <span className="absolute left-4 top-4 rounded-full bg-gradient-yellow px-3 py-1 font-poppins text-sm font-bold text-text-dark shadow-button">
+                <span className="absolute left-4 top-4 rounded-full bg-gradient-yellow px-3 py-1 font-body text-sm font-bold text-text-dark shadow-button">
                   {offerBadgeText} OFF
                 </span>
               )}
               {product.badge && !offerBadgeText && (
-                <span className="absolute left-4 top-4 rounded-full bg-gradient-primary px-3 py-1 font-poppins text-sm font-bold text-white shadow-button">
+                <span className="absolute left-4 top-4 rounded-full bg-gradient-primary px-3 py-1 font-body text-sm font-bold text-white shadow-button">
                   {product.badge}
                 </span>
               )}
@@ -586,7 +586,7 @@ export default function ProductDetailPageClient({
             {/* Stock + category row */}
             <motion.div variants={fadeUp} className="flex flex-wrap items-center gap-3">
               <StockBadge qty={availableQty} stockStr="in_stock" />
-              <span className="rounded-full bg-soft-bg-alt px-3 py-1 font-poppins text-xs font-semibold text-text-muted">
+              <span className="rounded-full bg-soft-bg-alt px-3 py-1 font-body text-xs font-semibold text-text-muted">
                 {categoryPathLabel}
               </span>
             </motion.div>
@@ -601,14 +601,14 @@ export default function ProductDetailPageClient({
 
             {/* Price */}
             <motion.div variants={fadeUp} className="flex items-baseline gap-3">
-              <span className="font-poppins text-4xl font-bold text-primary-pink">
+              <span className="font-body text-4xl font-bold text-primary-pink">
                 {needsSelection && pricesVary && (
                   <span className="mr-2 text-base font-medium text-text-muted">From</span>
                 )}
                 ৳{displayPrice.toLocaleString()}.00
               </span>
               {displayOriginal && (
-                <span className="font-poppins text-lg text-text-muted line-through">
+                <span className="font-body text-lg text-text-muted line-through">
                   ৳{displayOriginal.toLocaleString()}.00
                 </span>
               )}
@@ -619,7 +619,7 @@ export default function ProductDetailPageClient({
               <motion.div variants={fadeUp} className="space-y-4" ref={variantSelectorRef}>
                 {variantOptions.map((opt) => (
                   <div key={opt.name}>
-                    <p className="mb-2 font-poppins text-sm font-semibold text-text-dark">
+                    <p className="mb-2 font-body text-sm font-semibold text-text-dark">
                       {opt.name}
                       {selectedOptions[opt.name] ? (
                         <span className="ml-2 font-normal text-text-muted">{selectedOptions[opt.name]}</span>
@@ -646,7 +646,7 @@ export default function ProductDetailPageClient({
                               })
                             }
                             className={cn(
-                              "rounded-xl border-2 px-4 py-2 font-poppins text-sm font-medium transition-all",
+                              "rounded-xl border-2 px-4 py-2 font-body text-sm font-medium transition-all",
                               active
                                 ? "border-primary-pink bg-primary-pink/5 text-primary-pink"
                                 : "border-gray-200 text-text-dark hover:border-primary-pink",
@@ -661,7 +661,7 @@ export default function ProductDetailPageClient({
                   </div>
                 ))}
                 {allOptionsChosen && !selectedVariant && (
-                  <p className="font-poppins text-sm text-red-500">No product exists for this combination.</p>
+                  <p className="font-body text-sm text-red-500">No product exists for this combination.</p>
                 )}
               </motion.div>
             )}
@@ -677,8 +677,8 @@ export default function ProductDetailPageClient({
             {/* Meta pills */}
             <motion.div variants={fadeUp} className="flex flex-wrap gap-3">
               <div className="flex items-center gap-2 rounded-2xl border border-gray-100 bg-white px-4 py-2 shadow-soft">
-                <span className="font-poppins text-xs text-text-muted">Brand</span>
-                <span className="font-poppins text-sm font-semibold text-text-dark">
+                <span className="font-body text-xs text-text-muted">Brand</span>
+                <span className="font-body text-sm font-semibold text-text-dark">
                   {brandLabel}
                 </span>
               </div>
@@ -699,7 +699,7 @@ export default function ProductDetailPageClient({
                 >
                   <FiMinus size={15} />
                 </button>
-                <span className="min-w-10 text-center font-poppins text-sm font-semibold text-text-dark">
+                <span className="min-w-10 text-center font-body text-sm font-semibold text-text-dark">
                   {selectedQty}
                 </span>
                 <button
@@ -721,7 +721,7 @@ export default function ProductDetailPageClient({
                   onClick={handleAddToCart}
                   disabled={outOfStock}
                   className={cn(
-                    "flex items-center justify-center gap-2.5 rounded-2xl border-2 py-4 font-poppins text-base font-semibold transition-all",
+                    "flex items-center justify-center gap-2.5 rounded-2xl border-2 py-4 font-body text-base font-semibold transition-all",
                     outOfStock
                       ? "cursor-not-allowed border-gray-200 text-gray-400"
                       : added
@@ -744,7 +744,7 @@ export default function ProductDetailPageClient({
                   onClick={handleBuyNow}
                   disabled={outOfStock}
                   className={cn(
-                    "flex items-center justify-center gap-2.5 rounded-2xl px-4 py-3 font-poppins text-base font-semibold transition-all",
+                    "flex items-center justify-center gap-2.5 rounded-2xl px-4 py-3 font-body text-base font-semibold transition-all",
                     outOfStock
                       ? "cursor-not-allowed bg-gray-200 text-gray-400"
                       : "bg-gradient-primary text-white shadow-button hover:shadow-hover",
@@ -775,7 +775,7 @@ export default function ProductDetailPageClient({
               variants={fadeUp}
               className="mx-auto w-full rounded-3xl p-6 sm:p-8"
             >
-              <p className="mb-3 font-poppins text-xs font-semibold uppercase tracking-widest text-primary-pink">
+              <p className="mb-3 font-body text-xs font-semibold uppercase tracking-widest text-primary-pink">
                   Everything about this product
                 </p>
               <div
@@ -810,7 +810,7 @@ export default function ProductDetailPageClient({
           >
             <motion.div variants={fadeUp} className="mb-8 text-center">
               <ColorfulTitle title="Customer Reviews" className="text-primary-pink" />
-              <p className="mt-2 font-poppins text-sm text-text-muted">
+              <p className="mt-2 font-body text-sm text-text-muted">
                 Share your thoughts on this product.
               </p>
             </motion.div>
@@ -819,7 +819,7 @@ export default function ProductDetailPageClient({
               {isLoggedIn ? (
                 <>
                   <div className="mb-4 flex items-center justify-between">
-                    <div className="font-poppins text-sm font-semibold text-text-dark">
+                    <div className="font-body text-sm font-semibold text-text-dark">
                       Writing as {customerName || "Customer"}
                     </div>
                   </div>
@@ -870,7 +870,7 @@ export default function ProductDetailPageClient({
                           <FiUser className="h-4 w-4" />
                         </span>
                         <div>
-                          <div className="font-poppins text-sm font-semibold text-text-dark">
+                          <div className="font-body text-sm font-semibold text-text-dark">
                             {review.customerName}
                           </div>
                           <div className="text-xs text-text-muted">
@@ -900,7 +900,7 @@ export default function ProductDetailPageClient({
             >
               <motion.div variants={fadeUp} className="mb-8 text-center">
                 <ColorfulTitle title="YOU MAY ALSO LIKE" className="text-primary-pink" />
-                <p className="mt-2 font-poppins text-sm text-text-muted">
+                <p className="mt-2 font-body text-sm text-text-muted">
                   More picks from {product.category.name}
                 </p>
               </motion.div>
@@ -914,7 +914,7 @@ export default function ProductDetailPageClient({
               <motion.div variants={fadeUp} className="mt-10 text-center">
                 <Link
                   href="/products"
-                  className="inline-flex items-center gap-2 rounded-2xl border-2 border-primary-pink px-6 py-3 font-poppins font-semibold text-primary-pink transition-all hover:bg-primary-pink hover:text-white"
+                  className="inline-flex items-center gap-2 rounded-2xl border-2 border-primary-pink px-6 py-3 font-body font-semibold text-primary-pink transition-all hover:bg-primary-pink hover:text-white"
                 >
                   View All Products
                   <FiChevronRight size={16} />

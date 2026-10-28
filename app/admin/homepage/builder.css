@@ -185,3 +185,7 @@
 @media (max-width: 760px) {
   .hb-card > .hb-row { padding-bottom: var(--adm-s3, 0.75rem); border-bottom: 1px solid var(--adm-border, rgba(59, 13, 46, 0.09)); }
 }
+
+.hb-term-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--adm-s2, 0.5rem); }
+.hb-term { display: flex; align-items: center; gap: 4px; }
+.hb-term .admin-input { flex: 1; min-width: 0; }

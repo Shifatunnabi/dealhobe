@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Poppins, Playfair_Display } from "next/font/google";
+import { Plus_Jakarta_Sans, Fraunces } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import RouteChrome from "@/components/layout/RouteChrome";
@@ -11,14 +11,14 @@ import { Toaster } from "react-hot-toast";
 import { getStorefront } from "@/lib/data";
 import { DEFAULT_STOREFRONT } from "@/lib/homepage/defaults";
 
-const poppins = Poppins({
-  variable: "--font-poppins",
+const jakarta = Plus_Jakarta_Sans({
+  variable: "--font-body",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
+  weight: ["400", "500", "600", "700", "800"],
   display: "swap",
 });
 
-const playfair = Playfair_Display({
+const fraunces = Fraunces({
   variable: "--font-display",
   subsets: ["latin"],
   weight: ["600", "700"],
@@ -143,7 +143,7 @@ export default async function RootLayout({
   return (
     <html lang="en-BD">
       <body
-        className={`${poppins.variable} ${playfair.variable} antialiased bg-soft-bg text-text-dark`}
+        className={`${jakarta.variable} ${fraunces.variable} antialiased bg-soft-bg text-text-dark`}
       >
         <script
           type="application/ld+json"

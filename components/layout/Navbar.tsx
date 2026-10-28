@@ -22,9 +22,10 @@ import {
 import { FaFacebook, FaWhatsapp, FaInstagram, FaYoutube, FaTiktok } from "react-icons/fa";
 import type { Storefront } from "@/lib/homepage/types";
 
-export type NavStorefront = Pick<Storefront, "navPills" | "contact" | "socials"> & { logoUrl: string };
+export type NavStorefront = Pick<Storefront, "navPills" | "contact" | "socials" | "searchPlaceholders"> & { logoUrl: string };
 import { useCart } from "@/components/cart/CartProvider";
 import NavSearchOverlay from "./NavSearchOverlay";
+import AnimatedPlaceholder from "./AnimatedPlaceholder";
 
 const navLinks = [
   { label: "Home",     href: "/"         },
@@ -394,7 +395,7 @@ export default function Navbar({ storefront }: { storefront: NavStorefront }) {
         {/* ── Top Bar ─────────────────────────────────────────────── */}
         <div className="h-9 bg-plum text-white text-xs flex items-center">
           <div className="shell flex items-center justify-between gap-3">
-            <span className="font-poppins font-medium relative overflow-hidden h-4 min-w-0 flex-1 truncate">
+            <span className="font-body font-medium relative overflow-hidden h-4 min-w-0 flex-1 truncate">
               <AnimatePresence mode="wait" initial={false}>
                 <motion.span
                   key={topbarTexts[topbarIndex] || "fallback"}
@@ -428,7 +429,7 @@ export default function Navbar({ storefront }: { storefront: NavStorefront }) {
         {/* ── Main Navbar ─────────────────────────────────────────── */}
         <header className="relative h-16 border-b border-black/5 bg-white/95 backdrop-blur-md">
           {searchOpen ? (
-            <NavSearchOverlay onClose={() => setSearchOpen(false)} />
+            <NavSearchOverlay onClose={() => setSearchOpen(false)} placeholders={storefront.searchPlaceholders ?? []} />
           ) : (
             <div className="shell flex h-full items-center gap-2 md:gap-4">
               <button
@@ -449,8 +450,8 @@ export default function Navbar({ storefront }: { storefront: NavStorefront }) {
                 onClick={() => { setSidebarOpen(false); setSearchOpen(true); }}
                 className="mx-auto hidden h-11 w-full max-w-xl items-center gap-3 rounded-full border border-primary-pink/25 bg-soft-bg-alt/60 px-5 text-left text-sm text-text-muted transition-colors hover:border-primary-pink/60 md:flex"
               >
-                <FiSearch size={18} className="text-primary-pink" />
-                Search lipstick, serum, sunscreen…
+                <FiSearch size={18} className="shrink-0 text-primary-pink" />
+                <AnimatedPlaceholder terms={storefront.searchPlaceholders ?? []} />
               </button>
 
               <nav className="hidden items-center gap-1 lg:flex">
@@ -499,7 +500,7 @@ export default function Navbar({ storefront }: { storefront: NavStorefront }) {
         {/* ── Category pills (edited in Admin › Homepage Builder › Storefront) ── */}
         {storefront.navPills.length > 0 && (
           <div className="h-11 border-b border-black/5 bg-white/95 backdrop-blur-md">
-            <div className="shell no-scrollbar flex h-full items-center gap-2 overflow-x-auto">
+            <div className="shell no-scrollbar flex h-full items-center gap-2 overflow-x-auto [mask-image:linear-gradient(90deg,#000_92%,transparent)]">
               {storefront.navPills.map((pill) => (
                 <Link
                   key={pill.label + pill.link}

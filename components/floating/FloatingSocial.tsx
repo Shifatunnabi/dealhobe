@@ -340,7 +340,7 @@ function ChatPopup({ onClose }: { onClose: () => void }) {
             <FiX size={14} />
           </button>
 
-          <p className="font-poppins text-base font-semibold text-text-dark">
+          <p className="font-body text-base font-semibold text-text-dark">
             Please fill the information
           </p>
 
@@ -350,7 +350,7 @@ function ChatPopup({ onClose }: { onClose: () => void }) {
               value={guestName}
               onChange={(e) => setGuestName(e.target.value)}
               placeholder="Your name"
-              className="w-full rounded-2xl border border-gray-200 bg-soft-bg px-4 py-2.5 font-poppins text-sm text-text-dark placeholder:text-text-muted outline-none focus:border-[#3DA7E4]"
+              className="w-full rounded-2xl border border-gray-200 bg-soft-bg px-4 py-2.5 font-body text-sm text-text-dark placeholder:text-text-muted outline-none focus:border-[#3DA7E4]"
             />
             <input
               type="tel"
@@ -358,12 +358,12 @@ function ChatPopup({ onClose }: { onClose: () => void }) {
               onChange={(e) => setGuestMobile(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") handleGuestName(); }}
               placeholder="Your mobile number"
-              className="w-full rounded-2xl border border-gray-200 bg-soft-bg px-4 py-2.5 font-poppins text-sm text-text-dark placeholder:text-text-muted outline-none focus:border-[#3DA7E4]"
+              className="w-full rounded-2xl border border-gray-200 bg-soft-bg px-4 py-2.5 font-body text-sm text-text-dark placeholder:text-text-muted outline-none focus:border-[#3DA7E4]"
             />
             <button
               onClick={handleGuestName}
               disabled={!guestName.trim() || loading}
-              className="rounded-2xl bg-[#3DA7E4] py-2.5 font-poppins text-sm font-semibold text-white shadow-button disabled:opacity-60"
+              className="rounded-2xl bg-[#3DA7E4] py-2.5 font-body text-sm font-semibold text-white shadow-button disabled:opacity-60"
             >
               {loading ? "Starting..." : "Start messaging"}
             </button>
@@ -390,8 +390,8 @@ function ChatPopup({ onClose }: { onClose: () => void }) {
             <Image src={logoUrl} alt="DealHobe" width={24} height={24} />
           </div>
           <div>
-            <p className="font-poppins text-base font-semibold">DealHobe Support</p>
-            <p className="font-poppins text-xs opacity-90">We reply as soon as possible</p>
+            <p className="font-body text-base font-semibold">DealHobe Support</p>
+            <p className="font-body text-xs opacity-90">We reply as soon as possible</p>
           </div>
         </div>
         <motion.button
@@ -422,7 +422,7 @@ function ChatPopup({ onClose }: { onClose: () => void }) {
                     : "bg-soft-bg text-text-dark rounded-tl-sm"
                 }`}
               >
-                <p className="font-poppins">{msg.text}</p>
+                <p className="font-body">{msg.text}</p>
                 <p className={`mt-0.5 text-[10px] ${msg.sender === "customer" ? "text-white/70" : "text-text-muted"}`}>
                   {formatTime(msg.createdAt)}
                 </p>
@@ -441,7 +441,7 @@ function ChatPopup({ onClose }: { onClose: () => void }) {
             if (e.key === "Enter") sendMessage();
           }}
           placeholder="Type a message..."
-          className="flex-1 rounded-2xl border border-gray-200 bg-soft-bg px-3 py-2.5 font-poppins text-sm text-text-dark placeholder:text-text-muted outline-none focus:border-[#3DA7E4] transition-colors"
+          className="flex-1 rounded-2xl border border-gray-200 bg-soft-bg px-3 py-2.5 font-body text-sm text-text-dark placeholder:text-text-muted outline-none focus:border-[#3DA7E4] transition-colors"
         />
         <motion.button
           whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}

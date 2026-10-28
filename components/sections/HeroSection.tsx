@@ -83,7 +83,7 @@ export default function HeroSection({ slides = [] }: { slides?: PlainHeroSlide[]
                   whileHover={{ scale: 1.04, y: -2 }}
                   whileTap={{ scale: 0.96 }}
                   transition={{ duration: 0.2, ease: [0.34, 1.56, 0.64, 1] }}
-                  className="inline-flex items-center gap-2 rounded-2xl bg-primary-pink px-7 py-3.5 font-poppins text-base font-semibold text-white shadow-button transition-shadow hover:shadow-hover cursor-pointer"
+                  className="inline-flex items-center gap-2 rounded-2xl bg-primary-pink px-7 py-3.5 font-body text-base font-semibold text-white shadow-button transition-shadow hover:shadow-hover cursor-pointer"
                 >
                   Browse Products
                   <FiChevronRight size={18} />
@@ -162,7 +162,7 @@ export default function HeroSection({ slides = [] }: { slides?: PlainHeroSlide[]
                 backgroundColor: slide.ctaColor || "#A41B15",
                 color:           slide.ctaTextColor || "#FFFFFF",
               }}
-              className="inline-flex items-center gap-2 rounded-2xl px-7 py-3.5 font-poppins text-base font-semibold shadow-button transition-shadow hover:shadow-hover cursor-pointer"
+              className="inline-flex items-center gap-2 rounded-2xl px-7 py-3.5 font-body text-base font-semibold shadow-button transition-shadow hover:shadow-hover cursor-pointer"
             >
               {slide.ctaText || "Shop Now"}
               <FiChevronRight size={18} />

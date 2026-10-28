@@ -14,12 +14,12 @@ function ReviewCard({ name, text }: { name: string; text: string }) {
         <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary-pink/10 text-primary-pink">
           <FiUser className="h-4 w-4" />
         </span>
-        <p className="font-poppins text-base font-semibold text-text-dark">{name}</p>
+        <p className="font-body text-base font-semibold text-text-dark">{name}</p>
       </div>
 
       {/* Always 4 lines tall (longer reviews are clipped) so every card has the same height
           and the carousel doesn't jump as reviews rotate. 6.5em = 4 lines x 1.625 line-height. */}
-      <p className="line-clamp-4 h-[6.5em] font-poppins text-sm leading-relaxed text-text-muted md:text-base" title={text}>
+      <p className="line-clamp-4 h-[6.5em] font-body text-sm leading-relaxed text-text-muted md:text-base" title={text}>
         &quot;{text}&quot;
       </p>
     </article>

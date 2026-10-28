@@ -63,6 +63,7 @@ export type Storefront = {
   contact: { phone: string; email: string; address: string; whatsapp: string };
   socials: { facebook: string; instagram: string; youtube: string; tiktok: string };
   footerAbout: string;
+  searchPlaceholders: string[]; // rotating terms in the search bar placeholder
 };
 
 export const SECTION_LABELS: Record<SectionType, string> = {

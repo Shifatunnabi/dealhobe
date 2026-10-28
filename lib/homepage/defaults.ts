@@ -73,12 +73,19 @@ export const defaultSections = (): HomeSection[] =>
 
 export const DEFAULT_STOREFRONT: Storefront = {
   navPills: [
-    { label: 'Makeup',      link: '/products?category=Makeup',    color: '#A41B15' },
-    { label: 'Skin Care',   link: '/products?category=Skin%20Care', color: '#C2185B' },
-    { label: 'Hair Care',   link: '/products?category=Hair%20Care', color: '#6A1B9A' },
-    { label: 'Offers',      link: '/offers',                      color: '#D8902F' },
-    { label: 'New In',      link: '/products',                    color: '#00897B' },
-    { label: 'Blogs',       link: '/blogs',                       color: '#3B0D2E' },
+    { label: 'Makeup',        link: '/products?category=Makeup',                color: '#A41B15' },
+    { label: 'Skin Care',     link: '/products?category=Skin%20Care',           color: '#C2185B' },
+    { label: 'Hair Care',     link: '/products?category=Hair%20Care',           color: '#6A1B9A' },
+    { label: 'Bath & Body',   link: '/products?category=Bath%20%26%20Body',     color: '#00897B' },
+    { label: 'Personal Care', link: '/products?category=Personal%20Care',       color: '#1565C0' },
+    { label: 'Mom & Baby',    link: '/products?category=Baby%20%26%20Kids%20Care', color: '#E65100' },
+    { label: 'Serums',        link: '/products?q=serum',                        color: '#8E3B74' },
+    { label: 'Lipsticks',     link: '/products?q=lipstick',                     color: '#AD1457' },
+    { label: 'Sunscreen',     link: '/products?q=sunscreen',                    color: '#F9A825' },
+    { label: 'Body Lotion',   link: '/products?q=lotion',                       color: '#2E7D32' },
+    { label: 'Offers',        link: '/offers',                                  color: '#D8902F' },
+    { label: 'New In',        link: '/products',                                color: '#00838F' },
+    { label: 'Beauty Blog',   link: '/blogs',                                   color: '#3B0D2E' },
   ],
   trustBadges: [
     { icon: 'shield',  title: '100% authentic',     text: 'Sourced from trusted importers' },
@@ -94,4 +101,8 @@ export const DEFAULT_STOREFRONT: Storefront = {
   },
   socials: { facebook: '', instagram: '', youtube: '', tiktok: '' },
   footerAbout: 'Premium imported cosmetics and beauty essentials, delivered across Bangladesh.',
+  searchPlaceholders: [
+    'matte lipstick', 'niacinamide serum', 'sunscreen SPF 50', 'vitamin C serum', 'Korean skincare',
+    'hair oil', 'body lotion', 'blush on', 'face wash', 'Fennel',
+  ],
 };

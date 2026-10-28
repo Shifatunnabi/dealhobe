@@ -105,7 +105,7 @@
   --color-blush:                  var(--blush);
 
   /* Fonts — references Next.js injected CSS vars on <body> */
-  --font-poppins:   var(--font-poppins);
+  --font-body:   var(--font-body);
   --font-display:   var(--font-display);
 }
 
@@ -145,7 +145,7 @@
   }
 
   body {
-    font-family: var(--font-poppins), 'Poppins', system-ui, sans-serif;
+    font-family: var(--font-body), 'Plus Jakarta Sans', system-ui, sans-serif;
     background-color: var(--soft-bg);
     color: var(--text-dark);
     line-height: 1.65;
@@ -153,8 +153,13 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-poppins), 'Poppins', system-ui, sans-serif;
+  /* Fraunces for page and section titles; Plus Jakarta Sans for everything else. */
+  h1, h2 {
+    font-family: var(--font-display), Georgia, serif;
+    letter-spacing: -0.01em;
+  }
+  h3, h4, h5, h6 {
+    font-family: var(--font-body), 'Plus Jakarta Sans', system-ui, sans-serif;
     line-height: 1.2;
     color: var(--text-dark);
   }
@@ -209,7 +214,7 @@
 
   /* --- Typography Scale --- */
   .text-hero-title {
-    font-family:    var(--font-poppins), 'Poppins', sans-serif;
+    font-family:    var(--font-display), Georgia, serif;
     font-size:      clamp(2.5rem, 9vw, 5.5rem);
     font-weight:    700;
     line-height:    1.05;
@@ -217,7 +222,7 @@
   }
 
   .text-section-title {
-    font-family:    var(--font-poppins), 'Poppins', sans-serif;
+    font-family:    var(--font-display), Georgia, serif;
     font-size:      clamp(1.75rem, 5vw, 2.75rem);
     font-weight:    600;
     line-height:    1.2;
@@ -225,27 +230,27 @@
   }
 
     .product-page-title {
-    font-family:    var(--font-poppins), 'Poppins', sans-serif;
+    font-family:    var(--font-display), Georgia, serif;
     font-size:      clamp(1.75rem, 5vw, 2.75rem);
     font-weight:    700;
     line-height:    1.2;
     /* letter-spacing: -0.01em; */
   }
   .text-card-title {
-    font-family: var(--font-poppins), 'Poppins', sans-serif;
+    font-family: var(--font-body), 'Plus Jakarta Sans', sans-serif;
     font-size:   clamp(1rem, 2.5vw, 1.35rem);
     font-weight: 600;
     line-height: 1.3;
   }
 
   .text-body {
-    font-family: var(--font-poppins), 'Poppins', sans-serif;
+    font-family: var(--font-body), 'Plus Jakarta Sans', sans-serif;
     font-size:   1rem;
     line-height: 1.7;
   }
 
   .text-small {
-    font-family: var(--font-poppins), 'Poppins', sans-serif;
+    font-family: var(--font-body), 'Plus Jakarta Sans', sans-serif;
     font-size:   0.875rem;
     line-height: 1.6;
   }
@@ -372,10 +377,34 @@
   }
 }
 
+/* Search placeholder term: slides up into place each time it changes. */
+.search-term-in { animation: search-term-in 0.45s var(--ease-smooth) both; }
+@keyframes search-term-in {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) { .search-term-in { animation: none; } }
+
 .marquee-track { animation: marquee var(--marquee-dur, 30s) linear infinite; }
 .group:hover > .marquee-track,
-.group:focus-within > .marquee-track { animation-play-state: paused; }
-@media (prefers-reduced-motion: reduce) { .marquee-track { animation: none; } }
+.group:focus-within > /* Search placeholder term: slides up into place each time it changes. */
+.search-term-in { animation: search-term-in 0.45s var(--ease-smooth) both; }
+@keyframes search-term-in {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) { .search-term-in { animation: none; } }
+
+.marquee-track { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { /* Search placeholder term: slides up into place each time it changes. */
+.search-term-in { animation: search-term-in 0.45s var(--ease-smooth) both; }
+@keyframes search-term-in {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) { .search-term-in { animation: none; } }
+
+.marquee-track { animation: none; } }
 
 .no-scrollbar { scrollbar-width: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }

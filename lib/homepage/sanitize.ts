@@ -80,5 +80,8 @@ export function sanitizeStorefront(body: unknown): Storefront {
     contact: { phone: str(c.phone, 40), email: str(c.email, 120), address: str(c.address, 300), whatsapp: str(c.whatsapp, 40) },
     socials: { facebook: str(so.facebook), instagram: str(so.instagram), youtube: str(so.youtube), tiktok: str(so.tiktok) },
     footerAbout: str(o.footerAbout, 400) || DEFAULT_STOREFRONT.footerAbout,
+    searchPlaceholders: Array.isArray(o.searchPlaceholders)
+      ? o.searchPlaceholders.map((s) => str(s, 60)).filter(Boolean).slice(0, 20)
+      : DEFAULT_STOREFRONT.searchPlaceholders,
   };
 }

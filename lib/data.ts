@@ -474,7 +474,7 @@ const _getStorefront = unstable_cache(
       freeDeliveryThreshold: doc?.freeDeliveryThreshold || 0,
     });
   },
-  ['storefront'],
+  ['storefront-v2'], // bump when the Storefront shape changes so stale cached objects aren't served
   { revalidate: 3600, tags: ['settings'] }
 );
 /** Storefront chrome settings merged over defaults. Cached 1 h, tag: settings. */

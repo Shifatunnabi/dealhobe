@@ -81,10 +81,10 @@ function PriceRangeSlider({
       </div>
       {/* Value labels */}
       <div className="mt-3 flex justify-between gap-2">
-        <div className="rounded-xl border border-gray-100 bg-soft-bg px-3 py-1.5 text-sm font-poppins font-semibold text-text-dark">
+        <div className="rounded-xl border border-gray-100 bg-soft-bg px-3 py-1.5 text-sm font-body font-semibold text-text-dark">
           ৳{min.toLocaleString()}
         </div>
-        <div className="rounded-xl border border-gray-100 bg-soft-bg px-3 py-1.5 text-sm font-poppins font-semibold text-text-dark">
+        <div className="rounded-xl border border-gray-100 bg-soft-bg px-3 py-1.5 text-sm font-body font-semibold text-text-dark">
           ৳{max.toLocaleString()}
         </div>
       </div>
@@ -108,7 +108,7 @@ function FilterSection({
   return (
     <div className="border-b border-gray-100 pb-5 last:border-0 last:pb-0">
       <div className="flex items-center justify-between">
-        <h3 className="font-poppins text-base font-semibold text-text-dark">
+        <h3 className="font-body text-base font-semibold text-text-dark">
           {title}
         </h3>
         {collapsible && (
@@ -332,7 +332,7 @@ function ShopProductCard({
             />
             {/* Offer badge (shown only when product is in an active offer) */}
             {offerBadgeText && (
-              <span className="absolute left-2 top-2 z-10 rounded-full bg-gradient-yellow px-2.5 py-0.5 text-xs font-poppins font-semibold text-text-dark shadow-sm">
+              <span className="absolute left-2 top-2 z-10 rounded-full bg-gradient-yellow px-2.5 py-0.5 text-xs font-body font-semibold text-text-dark shadow-sm">
                 {offerBadgeText}
               </span>
             )}
@@ -341,11 +341,11 @@ function ShopProductCard({
 
         {/* ── Info ── */}
         <div className="flex flex-1 flex-col px-3 pb-1 pt-2.5">
-          <h3 className="truncate font-poppins text-sm font-semibold text-gray-900">
+          <h3 className="truncate font-body text-sm font-semibold text-gray-900">
             {product.name}
           </h3>
           <div className="mt-auto flex items-baseline gap-1.5 whitespace-nowrap">
-            <p className="font-poppins text-lg font-bold text-primary-pink">
+            <p className="font-body text-lg font-bold text-primary-pink">
               {hasVariants && <span className="mr-1 text-xs font-medium text-text-muted">From</span>}
               ৳{(product.salePrice || product.price).toLocaleString()}.00
             </p>
@@ -424,7 +424,7 @@ function Pagination({
   }
 
   const btnBase =
-    "flex h-9 w-9 items-center justify-center rounded-full text-sm font-poppins font-semibold transition-all";
+    "flex h-9 w-9 items-center justify-center rounded-full text-sm font-body font-semibold transition-all";
 
   return (
     <div className="mt-12 flex items-center justify-center gap-2">
@@ -485,7 +485,7 @@ function EmptyState({ onClear }: { onClear: () => void }) {
       </p>
       <button
         onClick={onClear}
-        className="rounded-2xl bg-primary-pink px-6 py-3 font-poppins font-semibold text-white shadow-button transition-all hover:shadow-hover"
+        className="rounded-2xl bg-primary-pink px-6 py-3 font-body font-semibold text-white shadow-button transition-all hover:shadow-hover"
       >
         Clear All Filters
       </button>
@@ -743,7 +743,7 @@ export default function ProductsPageClient({
       {/* Sidebar header */}
       <div>
         <div className="mb-3 flex items-center justify-between">
-          <span className="font-poppins text-lg font-semibold text-text-dark">
+          <span className="font-body text-lg font-semibold text-text-dark">
             Filters
           </span>
           {isMobile && (
@@ -800,7 +800,7 @@ export default function ProductsPageClient({
       {hasFilters && (
         <button
           onClick={resetFilters}
-          className="w-full rounded-xl border border-gray-200 py-2 font-poppins text-sm font-semibold text-text-muted transition-colors hover:text-primary-pink"
+          className="w-full rounded-xl border border-gray-200 py-2 font-body text-sm font-semibold text-text-muted transition-colors hover:text-primary-pink"
         >
           Clear All
         </button>
@@ -811,7 +811,7 @@ export default function ProductsPageClient({
         whileHover={{ y: -2 }}
         whileTap={{ scale: 0.96 }}
         onClick={() => setSidebarOpen(false)}
-        className="lg:hidden w-full rounded-2xl bg-gradient-primary py-3 font-poppins font-semibold text-white shadow-button hover:shadow-hover"
+        className="lg:hidden w-full rounded-2xl bg-gradient-primary py-3 font-body font-semibold text-white shadow-button hover:shadow-hover"
       >
         Apply Filters
       </motion.button>
@@ -849,7 +849,7 @@ export default function ProductsPageClient({
             )}
           >
             {normalizedSearch ? "Search Results" : "All Products"}{" "}
-            <span className="font-poppins text-xl font-normal text-text-muted">
+            <span className="font-body text-xl font-normal text-text-muted">
               ({filteredProducts.length} items)
             </span>
           </h1>
@@ -858,7 +858,7 @@ export default function ProductsPageClient({
             whileTap={{ scale: 0.96 }}
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className={cn(
-              "lg:hidden absolute right-0 flex shrink-0 items-center gap-2 rounded-2xl px-4 py-2.5 font-poppins font-semibold text-sm transition-all",
+              "lg:hidden absolute right-0 flex shrink-0 items-center gap-2 rounded-2xl px-4 py-2.5 font-body font-semibold text-sm transition-all",
               sidebarOpen
                 ? "bg-primary-pink text-white shadow-button"
                 : "bg-white text-text-dark shadow-card hover:shadow-soft",

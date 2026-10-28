@@ -91,7 +91,7 @@ function Field({
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="font-poppins text-sm font-medium text-text-dark">
+      <label htmlFor={id} className="font-body text-sm font-medium text-text-dark">
         {label}
         {required && <span className="ml-0.5 text-primary-pink">*</span>}
       </label>
@@ -104,7 +104,7 @@ function Field({
         disabled={disabled}
         onChange={(e) => onChange(e.target.value)}
         className={cn(
-          "w-full rounded-2xl border px-4 py-3 font-poppins text-sm transition-colors duration-200 focus:outline-none",
+          "w-full rounded-2xl border px-4 py-3 font-body text-sm transition-colors duration-200 focus:outline-none",
           disabled
             ? "border-gray-100 bg-gray-50 text-text-muted cursor-not-allowed"
             : "border-gray-200 bg-soft-bg text-text-dark placeholder:text-text-muted/60 focus:border-primary-pink focus:bg-white",
@@ -131,7 +131,7 @@ function TextareaField({
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="font-poppins text-sm font-medium text-text-dark">
+      <label htmlFor={id} className="font-body text-sm font-medium text-text-dark">
         {label}
       </label>
       <textarea
@@ -142,7 +142,7 @@ function TextareaField({
         disabled={disabled}
         onChange={(e) => onChange(e.target.value)}
         className={cn(
-          "w-full resize-none rounded-2xl border px-4 py-3 font-poppins text-sm transition-colors duration-200 focus:outline-none",
+          "w-full resize-none rounded-2xl border px-4 py-3 font-body text-sm transition-colors duration-200 focus:outline-none",
           disabled
             ? "border-gray-100 bg-gray-50 text-text-muted cursor-not-allowed"
             : "border-gray-200 bg-soft-bg text-text-dark placeholder:text-text-muted/60 focus:border-primary-pink focus:bg-white",
@@ -383,15 +383,15 @@ export default function CheckoutPage() {
           transition={{ duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
         >
           <FiShoppingCart size={48} className="text-primary-pink/40" />
-          <h2 className="mt-5 font-poppins text-2xl font-bold text-text-dark">
+          <h2 className="mt-5 font-display text-2xl font-bold text-text-dark">
             Your cart is empty
           </h2>
-          <p className="mt-2 font-poppins text-sm text-text-muted">
+          <p className="mt-2 font-body text-sm text-text-muted">
             Add some products before heading to checkout.
           </p>
           <Link
             href="/products"
-            className="mt-7 inline-flex items-center gap-2 rounded-2xl bg-gradient-primary px-8 py-3 font-poppins font-semibold text-white shadow-button transition-shadow hover:shadow-hover"
+            className="mt-7 inline-flex items-center gap-2 rounded-2xl bg-gradient-primary px-8 py-3 font-body font-semibold text-white shadow-button transition-shadow hover:shadow-hover"
           >
             Browse Products
           </Link>
@@ -417,7 +417,7 @@ export default function CheckoutPage() {
             <span className="font-semibold text-text-dark">Checkout</span>
           </nav>
           <ColorfulTitle title="Checkout" as="h1" className="text-primary-pink" />
-          <p className="mt-2 font-poppins text-sm text-text-muted">
+          <p className="mt-2 font-body text-sm text-text-muted">
             Fill in your delivery details and confirm your order.
           </p>
         </motion.div>
@@ -432,7 +432,7 @@ export default function CheckoutPage() {
             >
               <div className="mb-6 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <h2 className="font-poppins text-xl font-semibold text-text-dark">
+                  <h2 className="font-display text-xl font-semibold text-text-dark">
                     Delivery Details
                   </h2>
                   {!createAccount && savedInfo && !isEditing && (
@@ -493,7 +493,7 @@ export default function CheckoutPage() {
                 {hasCustomer ? (
                   <div className="flex flex-col gap-4">
                     <div className="flex items-center justify-between">
-                      <label className="font-poppins text-sm font-medium text-text-dark">
+                      <label className="font-body text-sm font-medium text-text-dark">
                         Delivery Address <span className="ml-0.5 text-primary-pink">*</span>
                       </label>
                       <Link
@@ -546,7 +546,7 @@ export default function CheckoutPage() {
                   <>
                     <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                       <div className="flex flex-col gap-1.5">
-                        <label htmlFor="area" className="font-poppins text-sm font-medium text-text-dark">
+                        <label htmlFor="area" className="font-body text-sm font-medium text-text-dark">
                           Delivery Area <span className="ml-0.5 text-primary-pink">*</span>
                         </label>
                         <select
@@ -555,7 +555,7 @@ export default function CheckoutPage() {
                           onChange={(e) => setArea(e.target.value as "inside_dhaka" | "outside_dhaka")}
                           disabled={!isEditing}
                           className={cn(
-                            "w-full rounded-2xl border px-4 py-3 font-poppins text-sm transition-colors duration-200 focus:outline-none",
+                            "w-full rounded-2xl border px-4 py-3 font-body text-sm transition-colors duration-200 focus:outline-none",
                             !isEditing
                               ? "border-gray-100 bg-gray-50 text-text-muted cursor-not-allowed"
                               : "border-gray-200 bg-soft-bg text-text-dark focus:border-primary-pink focus:bg-white",
@@ -579,7 +579,7 @@ export default function CheckoutPage() {
                 )}
 
                 <div className="flex flex-col gap-2">
-                  <label className="font-poppins text-sm font-medium text-text-dark">
+                  <label className="font-body text-sm font-medium text-text-dark">
                     Payment Method <span className="ml-0.5 text-primary-pink">*</span>
                   </label>
                   <label className="flex items-center gap-2 rounded-2xl border border-gray-200 bg-soft-bg px-4 py-3 text-sm">
@@ -626,7 +626,7 @@ export default function CheckoutPage() {
                         </svg>
                       )}
                     </div>
-                    <span className="font-poppins text-sm text-text-dark">
+                    <span className="font-body text-sm text-text-dark">
                       Create an account
                     </span>
                   </label>
@@ -671,7 +671,7 @@ export default function CheckoutPage() {
                       whileHover={{ y: -2 }}
                       whileTap={{ scale: 0.97 }}
                       onClick={handleSaveInfo}
-                      className="flex-1 rounded-2xl bg-gradient-primary py-3 font-poppins font-semibold text-white shadow-button transition-all hover:shadow-hover"
+                      className="flex-1 rounded-2xl bg-gradient-primary py-3 font-body font-semibold text-white shadow-button transition-all hover:shadow-hover"
                     >
                       Save Info
                     </motion.button>
@@ -684,7 +684,7 @@ export default function CheckoutPage() {
                       whileTap={{ scale: 0.97 }}
                       onClick={handleCreateAccount}
                       className={cn(
-                        "flex-1 rounded-2xl border-2 border-primary-pink py-3 font-poppins font-semibold transition-all",
+                        "flex-1 rounded-2xl border-2 border-primary-pink py-3 font-body font-semibold transition-all",
                         "text-primary-pink hover:bg-primary-pink hover:text-white",
                       )}
                     >
@@ -701,7 +701,7 @@ export default function CheckoutPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.55, delay: 0.1, ease: [0.4, 0, 0.2, 1] }}
             >
-              <h2 className="mb-5 font-poppins text-xl font-semibold text-text-dark">
+              <h2 className="mb-5 font-display text-xl font-semibold text-text-dark">
                 Order Summary
               </h2>
 
@@ -718,15 +718,15 @@ export default function CheckoutPage() {
                       />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="line-clamp-2 font-poppins text-sm font-semibold leading-snug text-text-dark">
+                      <p className="line-clamp-2 font-body text-sm font-semibold leading-snug text-text-dark">
                         {item.name}
                       </p>
                       {item.variantLabel && (
-                        <p className="mt-0.5 font-poppins text-xs text-text-muted">{item.variantLabel}</p>
+                        <p className="mt-0.5 font-body text-xs text-text-muted">{item.variantLabel}</p>
                       )}
-                      <p className="mt-0.5 font-poppins text-xs text-text-muted">x{item.qty}</p>
+                      <p className="mt-0.5 font-body text-xs text-text-muted">x{item.qty}</p>
                     </div>
-                    <p className="font-poppins text-sm font-bold text-primary-pink shrink-0">
+                    <p className="font-body text-sm font-bold text-primary-pink shrink-0">
                       ৳{(item.unitPrice * item.qty).toLocaleString()}
                     </p>
                   </div>
@@ -737,14 +737,14 @@ export default function CheckoutPage() {
 
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
-                  <span className="font-poppins text-sm text-text-muted">Subtotal</span>
-                  <span className="font-poppins font-semibold text-text-dark">
+                  <span className="font-body text-sm text-text-muted">Subtotal</span>
+                  <span className="font-body font-semibold text-text-dark">
                     ৳{subtotal.toLocaleString()}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="font-poppins text-sm text-text-muted">Shipping</span>
-                  <span className="font-poppins font-semibold text-text-dark">
+                  <span className="font-body text-sm text-text-muted">Shipping</span>
+                  <span className="font-body font-semibold text-text-dark">
                     {deliveryCharge === 0 ? "Free" : `৳${deliveryCharge.toLocaleString()}`}
                   </span>
                 </div>
@@ -756,8 +756,8 @@ export default function CheckoutPage() {
               </div>
 
               <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-4">
-                <span className="font-poppins text-lg font-bold text-text-dark">Total</span>
-                <span className="font-poppins text-2xl font-bold text-primary-pink">
+                <span className="font-body text-lg font-bold text-text-dark">Total</span>
+                <span className="font-body text-2xl font-bold text-primary-pink">
                   ৳{total.toLocaleString()}
                 </span>
               </div>
@@ -769,7 +769,7 @@ export default function CheckoutPage() {
                 whileTap={canSubmit ? { scale: 0.97 } : {}}
                 transition={{ duration: 0.2 }}
                 className={cn(
-                  "mt-5 flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 font-poppins font-semibold shadow-button transition-shadow",
+                  "mt-5 flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 font-body font-semibold shadow-button transition-shadow",
                   canSubmit
                     ? "bg-gradient-primary text-white"
                     : "cursor-not-allowed bg-gray-200 text-gray-400",
@@ -779,7 +779,7 @@ export default function CheckoutPage() {
                 Confirm Purchase
               </motion.button>
 
-              <p className="mt-3 flex items-center justify-center gap-1.5 text-center font-poppins text-xs text-text-muted">
+              <p className="mt-3 flex items-center justify-center gap-1.5 text-center font-body text-xs text-text-muted">
                 <FiLock size={12} className="shrink-0" />
                 Secure &amp; encrypted checkout
               </p>
@@ -803,7 +803,7 @@ export default function CheckoutPage() {
               className="w-full max-w-sm rounded-3xl bg-white p-6 text-center shadow-hover"
             >
               <div className="mx-auto mb-4 h-12 w-12 rounded-full border-4 border-primary-pink/20 border-t-primary-pink animate-spin" />
-              <p className="font-poppins text-sm text-text-muted">{LOADING_STEPS[loadingStep]}</p>
+              <p className="font-body text-sm text-text-muted">{LOADING_STEPS[loadingStep]}</p>
             </motion.div>
           </motion.div>
         )}

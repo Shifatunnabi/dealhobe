@@ -37,7 +37,7 @@ export default async function ProductsPage(props: {
     <Suspense
       fallback={
         <div className="min-h-screen bg-soft-bg pt-6 md:pt-8 flex items-center justify-center">
-          <span className="font-poppins text-xl text-text-muted">Loading…</span>
+          <span className="font-body text-xl text-text-muted">Loading…</span>
         </div>
       }
     >

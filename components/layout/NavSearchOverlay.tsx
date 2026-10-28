@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FiSearch, FiX } from "react-icons/fi";
+import AnimatedPlaceholder from "./AnimatedPlaceholder";
 
 interface SearchResult {
   _id: string;
@@ -20,7 +21,7 @@ interface SearchResult {
 const MIN_QUERY_LENGTH = 2;
 const DEBOUNCE_MS = 300;
 
-export default function NavSearchOverlay({ onClose }: { onClose: () => void }) {
+export default function NavSearchOverlay({ onClose, placeholders = [] }: { onClose: () => void; placeholders?: string[] }) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -102,15 +103,20 @@ export default function NavSearchOverlay({ onClose }: { onClose: () => void }) {
       >
         <div className="flex w-full items-center gap-3 rounded-2xl bg-soft-bg px-4 py-2.5">
           <FiSearch size={18} className="shrink-0 text-text-muted" />
-          <input
-            ref={inputRef}
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search products..."
-            className="w-full bg-transparent font-poppins text-sm text-text-dark outline-none placeholder:text-text-muted md:text-base"
-            autoComplete="off"
-          />
+          <div className="relative min-w-0 flex-1">
+            {!query && (
+              <AnimatedPlaceholder terms={placeholders} className="absolute inset-0 flex text-sm text-text-muted md:text-base" />
+            )}
+            <input
+              ref={inputRef}
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              aria-label="Search products"
+              className="relative w-full bg-transparent font-body text-sm text-text-dark outline-none md:text-base"
+              autoComplete="off"
+            />
+          </div>
           {query && (
             <button
               type="button"
@@ -118,7 +124,7 @@ export default function NavSearchOverlay({ onClose }: { onClose: () => void }) {
                 setQuery("");
                 inputRef.current?.focus();
               }}
-              className="shrink-0 font-poppins text-sm font-medium text-primary-pink hover:underline"
+              className="shrink-0 font-body text-sm font-medium text-primary-pink hover:underline"
             >
               Clear
             </button>
@@ -145,7 +151,7 @@ export default function NavSearchOverlay({ onClose }: { onClose: () => void }) {
             ) : results.length === 0 ? (
               <div className="flex flex-col items-center gap-4 px-4 py-10 text-center">
                 <div>
-                  <p className="font-poppins text-base font-semibold text-text-dark">
+                  <p className="font-body text-base font-semibold text-text-dark">
                     No results found for &quot;{trimmedQuery}&quot;
                   </p>
                   <p className="mt-1 text-sm text-text-muted">
@@ -155,7 +161,7 @@ export default function NavSearchOverlay({ onClose }: { onClose: () => void }) {
                 <button
                   type="button"
                   onClick={goToFullSearch}
-                  className="rounded-2xl bg-gradient-primary px-6 py-2.5 font-poppins text-sm font-semibold text-white shadow-button hover:shadow-hover"
+                  className="rounded-2xl bg-gradient-primary px-6 py-2.5 font-body text-sm font-semibold text-white shadow-button hover:shadow-hover"
                 >
                   Search More for &quot;{trimmedQuery}&quot;
                 </button>
@@ -175,9 +181,9 @@ export default function NavSearchOverlay({ onClose }: { onClose: () => void }) {
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate font-poppins text-sm font-medium text-text-dark">{product.name}</p>
+                      <p className="truncate font-body text-sm font-medium text-text-dark">{product.name}</p>
                       <div className="mt-0.5 flex items-center gap-1.5">
-                        <span className="font-poppins text-sm font-semibold text-primary-pink">
+                        <span className="font-body text-sm font-semibold text-primary-pink">
                           {product.hasVariants && <span className="mr-1 text-xs font-medium text-text-muted">From</span>}
                           ৳{(product.salePrice || product.price).toLocaleString()}
                         </span>
@@ -194,7 +200,7 @@ export default function NavSearchOverlay({ onClose }: { onClose: () => void }) {
                   <button
                     type="button"
                     onClick={goToFullSearch}
-                    className="rounded-2xl bg-gradient-primary px-6 py-2.5 font-poppins text-sm font-semibold text-white shadow-button hover:shadow-hover"
+                    className="rounded-2xl bg-gradient-primary px-6 py-2.5 font-body text-sm font-semibold text-white shadow-button hover:shadow-hover"
                   >
                     Search More for &quot;{trimmedQuery}&quot;
                   </button>

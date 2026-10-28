@@ -70,6 +70,30 @@ export default function StorefrontEditor() {
       </section>
 
       <section className="admin-card hb-card">
+        <h2 className="hb-card-title">Search bar suggestions</h2>
+        <p className="hb-hint">Rotate in the search bar as “Search for …”, one every few seconds. Use short, popular searches.</p>
+        <div className="hb-term-list">
+          {sf.searchPlaceholders.map((term, i) => (
+            <span className="hb-term" key={i}>
+              <input
+                className="admin-input"
+                value={term}
+                maxLength={60}
+                onChange={(e) => setSf({ ...sf, searchPlaceholders: sf.searchPlaceholders.map((x, j) => (j === i ? e.target.value : x)) })}
+                aria-label={`Search suggestion ${i + 1}`}
+              />
+              <button type="button" className="hb-icon-btn hb-danger" onClick={() => setSf({ ...sf, searchPlaceholders: sf.searchPlaceholders.filter((_, j) => j !== i) })} aria-label="Remove suggestion"><FiTrash2 size={15} /></button>
+            </span>
+          ))}
+        </div>
+        {sf.searchPlaceholders.length < 20 && (
+          <button type="button" className="btn-admin-secondary" onClick={() => setSf({ ...sf, searchPlaceholders: [...sf.searchPlaceholders, ''] })}>
+            <FiPlus size={14} /> Add suggestion
+          </button>
+        )}
+      </section>
+
+      <section className="admin-card hb-card">
         <h2 className="hb-card-title">Trust badges</h2>
         <p className="hb-hint">Shown by the “Trust badges” homepage section.</p>
         {sf.trustBadges.map((b, i) => (

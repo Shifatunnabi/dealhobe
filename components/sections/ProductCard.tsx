@@ -75,7 +75,7 @@ export default function ProductCard({ product }: { product: GridProduct }) {
               imgClassName="transition-transform duration-500 hover:scale-105"
             />
             {offerBadgeText && (
-              <span className="absolute left-2 top-2 z-10 rounded-full bg-gradient-yellow px-2.5 py-0.5 text-xs font-poppins font-semibold text-text-dark shadow-sm">
+              <span className="absolute left-2 top-2 z-10 rounded-full bg-gradient-yellow px-2.5 py-0.5 text-xs font-body font-semibold text-text-dark shadow-sm">
                 {offerBadgeText}
               </span>
             )}
@@ -83,11 +83,11 @@ export default function ProductCard({ product }: { product: GridProduct }) {
         </div>
 
         <div className="flex flex-1 flex-col px-3 pt-2.5 pb-3">
-          <h3 className="truncate font-poppins text-sm font-semibold text-gray-900 transition-colors hover:text-primary-pink">
+          <h3 className="truncate font-body text-sm font-semibold text-gray-900 transition-colors hover:text-primary-pink">
             {product.name}
           </h3>
           <div className="mt-auto flex items-baseline justify-start gap-1.5 whitespace-nowrap">
-            <p className="font-poppins text-lg font-bold text-primary-pink">
+            <p className="font-body text-lg font-bold text-primary-pink">
               {hasVariants && <span className="mr-1 text-xs font-medium text-text-muted">From</span>}
               ৳{unitPrice.toLocaleString()}.00
             </p>
