@@ -175,8 +175,6 @@ function CategoryRowWithFlyout({
 export default function Navbar({ storefront }: { storefront: NavStorefront }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [visible, setVisible]           = useState(true);
-  const lastScrollY                     = useRef(0);
   const [topbarTexts, setTopbarTexts]   = useState<string[]>([]);
   const [topbarIndex, setTopbarIndex]   = useState(0);
   const [isLoggedIn, setIsLoggedIn]     = useState(false);
@@ -206,37 +204,6 @@ export default function Navbar({ storefront }: { storefront: NavStorefront }) {
     { label: "Menu",       type: "menu",                                     icon: FiGrid   },
   ];
 
-  /*
-   * Hide on scroll-down, reveal on scroll-up. Reads are batched to once per
-   * animation frame and direction only flips past a small threshold — firing
-   * setVisible on every raw scroll event (no rAF, no threshold) let tiny
-   * momentum-scroll jitter flip it back and forth rapidly, each flip
-   * restarting the slide animation and re-rendering, which is what made
-   * scrolling feel like it was stuttering/breaking.
-   */
-  useEffect(() => {
-    const DIRECTION_THRESHOLD = 8;
-    let ticking = false;
-
-    const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      window.requestAnimationFrame(() => {
-        const y = window.scrollY;
-        if (y < 50) {
-          setVisible(true);
-        } else {
-          const delta = y - lastScrollY.current;
-          if (delta > DIRECTION_THRESHOLD) setVisible(false);
-          else if (delta < -DIRECTION_THRESHOLD) setVisible(true);
-        }
-        lastScrollY.current = y;
-        ticking = false;
-      });
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   useEffect(() => {
     let alive = true;
@@ -387,12 +354,8 @@ export default function Navbar({ storefront }: { storefront: NavStorefront }) {
 
   return (
     <>
-      {/* Animated wrapper — slides up on scroll-down, slides back on scroll-up */}
-      <motion.div
-        className="fixed inset-x-0 top-0 z-50"
-        animate={{ y: visible ? 0 : "calc(-100% - 40px)" }}
-        transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-      >
+      {/* Always-visible header: announcement bar, main row and category pills stay pinned while scrolling. */}
+      <div className="fixed inset-x-0 top-0 z-50 shadow-[0_6px_20px_rgba(59,13,46,0.06)]">
         {/* ── Top Bar ─────────────────────────────────────────────── */}
         <div className="h-9 bg-plum text-white text-xs flex items-center">
           <div className="shell flex items-center justify-between gap-3">
@@ -504,7 +467,7 @@ export default function Navbar({ storefront }: { storefront: NavStorefront }) {
             <PillRow pills={storefront.navPills} />
           </div>
         )}
-      </motion.div>
+      </div>
 
       {/* ── Sidebar ─────────────────────────────────────────────── */}
       <AnimatePresence>
