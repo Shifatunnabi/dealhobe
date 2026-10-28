@@ -377,7 +377,7 @@ export default function CheckoutPage() {
             <span className="shrink-0 text-right text-[13px] font-bold tabular-nums text-text-dark">
               {money(item.unitPrice * item.qty)}
               {compareAt[cartLineId(item)] ? (
-                <s className="block text-[11px] font-normal text-[#9a8b94]">{money(compareAt[cartLineId(item)] * item.qty)}</s>
+                <s className="block text-[11px] font-normal text-[#7B6A76]">{money(compareAt[cartLineId(item)] * item.qty)}</s>
               ) : null}
             </span>
           </li>

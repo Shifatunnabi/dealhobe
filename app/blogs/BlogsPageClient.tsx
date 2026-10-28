@@ -176,6 +176,7 @@ export default function BlogsPageClient({ blogs = [] }: { blogs?: BlogSummary[] 
                           alt=""
                           fill
                           priority
+                          fetchPriority="high"
                           className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
                           sizes="(max-width: 1024px) 100vw, 800px"
                         />

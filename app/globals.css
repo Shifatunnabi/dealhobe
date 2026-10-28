@@ -27,7 +27,7 @@
   --plum:                    #3B0D2E;
   --plum-soft:               #F4E9F0;
   --gold:                    #D8B26E;
-  --gold-dark:               #A9823F;
+  --gold-dark:               #85601F; /* darkened for 4.5:1 text contrast on white */
   --ivory:                   #FFF8F1;
   --blush:                   #F7D6DF;
 

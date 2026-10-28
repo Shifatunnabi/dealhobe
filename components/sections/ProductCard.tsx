@@ -109,7 +109,7 @@ export default function ProductCard({ product, priority = false }: { product: Gr
           <span className="mt-1.5 flex flex-wrap items-baseline gap-x-1.5">
             {product.hasVariants && <span className="text-[11px] font-medium text-text-muted">From</span>}
             <span className="text-base font-extrabold text-primary-pink md:text-lg">{money(price)}</span>
-            {saving > 0 && <s className="text-xs text-[#9a8b94]">{money(product.price)}</s>}
+            {saving > 0 && <s className="text-xs text-[#7B6A76]">{money(product.price)}</s>}
           </span>
           {(saving > 0 || (!outOfStock && qty <= LOW_STOCK)) && (
             <span className="mt-auto flex flex-wrap items-center justify-between gap-1 pt-2 text-[11px] font-bold md:text-xs">

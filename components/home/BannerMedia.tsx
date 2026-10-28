@@ -32,7 +32,7 @@ export default function BannerMedia({ src, mobileSrc, alt, ratio, mobileRatio, s
     media = isVideo(src)
       ? <LazyVideo src={src} label={alt} eager={priority} />
       // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text -- getImageProps already optimizes; alt is in the props
-      : <img {...imageProps(src)} loading={loading} style={undefined} />;
+      : <img {...imageProps(src)} loading={loading} fetchPriority={priority ? "high" : undefined} style={undefined} />;
   } else if (!isVideo(src) && !isVideo(mobileSrc)) {
     // Art direction: the browser downloads only the image that matches the screen.
     const desktop = imageProps(src);
@@ -40,7 +40,7 @@ export default function BannerMedia({ src, mobileSrc, alt, ratio, mobileRatio, s
       <picture>
         <source media="(min-width: 768px)" srcSet={desktop.srcSet} sizes={desktop.sizes} />
         {/* eslint-disable-next-line jsx-a11y/alt-text -- getImageProps already optimizes; alt is in the props */}
-        <img {...imageProps(mobileSrc)} loading={loading} style={undefined} />
+        <img {...imageProps(mobileSrc)} loading={loading} fetchPriority={priority ? "high" : undefined} style={undefined} />
       </picture>
     );
   } else {

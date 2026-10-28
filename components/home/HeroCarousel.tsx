@@ -69,7 +69,7 @@ export default function HeroCarousel({ children, count, autoplayMs = 6000 }: { c
           <div className="mt-3 flex justify-center gap-1.5">
             {Array.from({ length: count }, (_, i) => (
               <button key={i} type="button" onClick={() => goTo(i)} aria-label={`Go to slide ${i + 1}`} aria-current={i === index}
-                className="flex h-6 items-center px-0.5">
+                className="flex h-6 min-w-6 items-center justify-center">
                 <span className={`block h-1.5 rounded-full transition-all duration-300 ${i === index ? "w-7 bg-primary-pink" : "w-1.5 bg-primary-pink/25"}`} />
               </button>
             ))}

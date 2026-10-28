@@ -303,7 +303,7 @@ export default function ProductDetailPageClient({
               {money(displayPrice)}
             </span>
             {displayOriginal && (
-              <s className="text-lg font-medium text-[#9a8b94]" aria-label={`Regular price ${money(displayOriginal)}`}>
+              <s className="text-lg font-medium text-[#7B6A76]" aria-label={`Regular price ${money(displayOriginal)}`}>
                 {money(displayOriginal)}
               </s>
             )}
@@ -392,7 +392,7 @@ export default function ProductDetailPageClient({
                           >
                             <span className="relative block aspect-square w-full overflow-hidden rounded-lg bg-white">
                               <ProductPhoto src={photo} alt="" requestWidth={140} className="p-0.5" />
-                              {!available && <span className="absolute inset-0 bg-[linear-gradient(to_top_right,transparent_calc(50%-1px),#9a8b94_50%,transparent_calc(50%+1px))]" aria-hidden />}
+                              {!available && <span className="absolute inset-0 bg-[linear-gradient(to_top_right,transparent_calc(50%-1px),#7B6A76_50%,transparent_calc(50%+1px))]" aria-hidden />}
                             </span>
                             <span className={cn("max-w-full truncate text-[11px] font-semibold", active ? "text-plum" : "text-text-muted")}>{val}</span>
                           </button>
@@ -598,7 +598,7 @@ export default function ProductDetailPageClient({
             <span className="block truncate text-xs font-medium text-text-muted">{variantLabel || product.name}</span>
             <span className="flex items-baseline gap-1.5">
               <span className="text-base font-extrabold text-primary-pink">{fromLabel && <span className="mr-1 text-[10px] font-semibold text-text-muted">From</span>}{money(displayPrice)}</span>
-              {displayOriginal && <s className="text-[11px] text-[#9a8b94]">{money(displayOriginal)}</s>}
+              {displayOriginal && <s className="text-[11px] text-[#7B6A76]">{money(displayOriginal)}</s>}
             </span>
           </span>
           <button

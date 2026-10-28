@@ -103,7 +103,7 @@ export function BagLine({
             )}
             <p className="mt-1 flex flex-wrap items-baseline gap-x-1.5 text-xs text-text-muted">
               <span className="font-semibold text-text-dark">{money(item.unitPrice)}</span>
-              {compareAt ? <s className="text-[#9a8b94]">{money(compareAt)}</s> : null}
+              {compareAt ? <s className="text-[#7B6A76]">{money(compareAt)}</s> : null}
               <span>each</span>
             </p>
           </div>
@@ -291,7 +291,7 @@ export function UpsellRow({
                 <span className="mt-1 flex items-baseline gap-1">
                   {p.hasVariants && <span className="text-[10px] text-text-muted">From</span>}
                   <span className="text-[13px] font-extrabold text-primary-pink">{money(price)}</span>
-                  {price < p.price && <s className="text-[10px] text-[#9a8b94]">{money(p.price)}</s>}
+                  {price < p.price && <s className="text-[10px] text-[#7B6A76]">{money(p.price)}</s>}
                 </span>
               </span>
             </Link>

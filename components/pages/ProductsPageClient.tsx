@@ -307,6 +307,7 @@ export default function ProductsPageClient({ items, facets, initialQuery, basePa
           </aside>
 
           <div className="min-w-0 flex-1" ref={gridTop} style={{ scrollMarginTop: "11rem" }}>
+            <h2 className="sr-only">Products</h2>
             {shown.length ? (
               <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4 xl:grid-cols-4">
                 {shown.map((p, i) => <li key={p._id}><ProductCard product={p} priority={i < 4} /></li>)}
