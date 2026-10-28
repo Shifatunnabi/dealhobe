@@ -377,13 +377,17 @@
   }
 }
 
-/* Search placeholder term: slides up into place each time it changes. */
-.search-term-in { animation: search-term-in 0.45s var(--ease-smooth) both; }
-@keyframes search-term-in {
-  from { transform: translateY(100%); opacity: 0; }
-  to   { transform: translateY(0); opacity: 1; }
+/* Typewriter caret for the search placeholder. */
+.typing-caret {
+  display: inline-block;
+  width: 1.5px;
+  height: 1.05em;
+  margin-left: 1px;
+  vertical-align: -0.15em;
+  background: currentColor;
+  animation: caret-blink 0.9s steps(1) infinite;
 }
-@media (prefers-reduced-motion: reduce) { .search-term-in { animation: none; } }
+@keyframes caret-blink { 50% { opacity: 0; } }
 
 .marquee-track { animation: marquee var(--marquee-dur, 30s) linear infinite; }
 .group:hover > .marquee-track,
