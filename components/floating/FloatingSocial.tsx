@@ -3,9 +3,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+import { usePathname } from "next/navigation";
 import { FiX, FiSend, FiMessageCircle } from "react-icons/fi";
 
-const BRAND_BLUE = "#3DA7E4";
+const HEADER_BG = "linear-gradient(135deg, #3B0D2E 0%, #5A1640 100%)";
+const POPUP_CLS =
+  "absolute bottom-full right-0 mb-3 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-[22px] border border-[#EFE3E8] bg-white shadow-[0_24px_60px_rgba(59,13,46,0.22)]";
 const AUTH_TOKEN_KEY = "dealhobe_auth_token_v1";
 const GUEST_ID_KEY = "dealhobe_chat_guest_id_v1";
 const GUEST_NAME_KEY = "dealhobe_chat_guest_name_v1";
@@ -329,7 +332,7 @@ function ChatPopup({ onClose }: { onClose: () => void }) {
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 30, scale: 0.95 }}
         transition={{ duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
-        className="absolute bottom-full right-0 mb-4 w-80 overflow-hidden rounded-3xl bg-white shadow-hover"
+        className={POPUP_CLS}
       >
         <div className="relative px-6 py-8 text-center">
           <button
@@ -340,9 +343,11 @@ function ChatPopup({ onClose }: { onClose: () => void }) {
             <FiX size={14} />
           </button>
 
-          <p className="font-body text-base font-semibold text-text-dark">
-            Please fill the information
-          </p>
+          <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-plum text-[#F2D9A6]">
+            <FiMessageCircle size={20} aria-hidden />
+          </span>
+          <p className="mt-3 font-display text-xl font-semibold text-text-dark">Chat with DealHobe</p>
+          <p className="mt-1 font-body text-xs text-text-muted">Tell us who you are and we&apos;ll reply here.</p>
 
           <div className="mt-5 flex flex-col gap-3">
             <input
@@ -350,7 +355,7 @@ function ChatPopup({ onClose }: { onClose: () => void }) {
               value={guestName}
               onChange={(e) => setGuestName(e.target.value)}
               placeholder="Your name"
-              className="w-full rounded-2xl border border-gray-200 bg-soft-bg px-4 py-2.5 font-body text-sm text-text-dark placeholder:text-text-muted outline-none focus:border-[#3DA7E4]"
+              className="w-full rounded-2xl border border-gray-200 bg-soft-bg px-4 py-2.5 font-body text-sm text-text-dark placeholder:text-text-muted outline-none focus:border-primary-pink"
             />
             <input
               type="tel"
@@ -358,12 +363,12 @@ function ChatPopup({ onClose }: { onClose: () => void }) {
               onChange={(e) => setGuestMobile(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") handleGuestName(); }}
               placeholder="Your mobile number"
-              className="w-full rounded-2xl border border-gray-200 bg-soft-bg px-4 py-2.5 font-body text-sm text-text-dark placeholder:text-text-muted outline-none focus:border-[#3DA7E4]"
+              className="w-full rounded-2xl border border-gray-200 bg-soft-bg px-4 py-2.5 font-body text-sm text-text-dark placeholder:text-text-muted outline-none focus:border-primary-pink"
             />
             <button
               onClick={handleGuestName}
               disabled={!guestName.trim() || loading}
-              className="rounded-2xl bg-[#3DA7E4] py-2.5 font-body text-sm font-semibold text-white shadow-button disabled:opacity-60"
+              className="rounded-full bg-primary-pink py-3 font-body text-sm font-bold text-white shadow-button transition-colors hover:bg-[#8E1712] disabled:opacity-60"
             >
               {loading ? "Starting..." : "Start messaging"}
             </button>
@@ -379,19 +384,19 @@ function ChatPopup({ onClose }: { onClose: () => void }) {
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 30, scale: 0.95 }}
       transition={{ duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
-      className="absolute bottom-full right-0 mb-4 w-80 overflow-hidden rounded-3xl bg-white shadow-hover"
+      className={POPUP_CLS}
     >
       <div
         className="flex items-center justify-between px-4 py-3 text-white"
-        style={{ background: BRAND_BLUE }}
+        style={{ background: HEADER_BG }}
       >
-        <div className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-full bg-white/20 flex items-center justify-center">
+        <div className="flex items-center gap-2.5">
+          <div className="relative flex h-9 w-9 items-center justify-center rounded-full bg-white ring-2 ring-gold/60">
             <Image src={logoUrl} alt="DealHobe" width={24} height={24} />
           </div>
           <div>
             <p className="font-body text-base font-semibold">DealHobe Support</p>
-            <p className="font-body text-xs opacity-90">We reply as soon as possible</p>
+            <p className="flex items-center gap-1.5 font-body text-xs text-white/75"><span className="h-1.5 w-1.5 rounded-full bg-[#4ADE80]" aria-hidden />We reply as soon as possible</p>
           </div>
         </div>
         <motion.button
@@ -418,8 +423,8 @@ function ChatPopup({ onClose }: { onClose: () => void }) {
               <div
                 className={`max-w-[70%] rounded-2xl px-3 py-2 text-sm leading-snug ${
                   msg.sender === "customer"
-                    ? "bg-[#3DA7E4] text-white rounded-tr-sm"
-                    : "bg-soft-bg text-text-dark rounded-tl-sm"
+                    ? "bg-primary-pink text-white rounded-tr-sm"
+                    : "bg-[#F6EEF2] text-text-dark rounded-tl-sm"
                 }`}
               >
                 <p className="font-body">{msg.text}</p>
@@ -441,12 +446,11 @@ function ChatPopup({ onClose }: { onClose: () => void }) {
             if (e.key === "Enter") sendMessage();
           }}
           placeholder="Type a message..."
-          className="flex-1 rounded-2xl border border-gray-200 bg-soft-bg px-3 py-2.5 font-body text-sm text-text-dark placeholder:text-text-muted outline-none focus:border-[#3DA7E4] transition-colors"
+          className="flex-1 rounded-full border border-gray-200 bg-soft-bg px-4 py-2.5 font-body text-sm text-text-dark placeholder:text-text-muted outline-none focus:border-primary-pink transition-colors"
         />
         <motion.button
           whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl text-white shadow-button"
-          style={{ background: BRAND_BLUE }}
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-pink text-white shadow-button"
           aria-label="Send message"
           onClick={sendMessage}
         >
@@ -458,25 +462,41 @@ function ChatPopup({ onClose }: { onClose: () => void }) {
 }
 
 /* ── Floating Chat Button ────────────────────────────────────── */
+// Cart/checkout have a full-width sticky totals bar above the bottom nav on phones; sit above it there.
+// (The product page's buy bar is laid out beside this button, so it keeps the default position.)
+const RAISED_ROUTES = ["/cart", "/checkout"];
+
 export default function FloatingSocial() {
   const [chatOpen, setChatOpen] = useState(false);
+  const pathname = usePathname() || "";
+  const raised = RAISED_ROUTES.some((r) => pathname.startsWith(r));
 
   return (
-    <div className="fixed right-4 bottom-[calc(5.4rem+env(safe-area-inset-bottom))] md:bottom-6 z-40 flex flex-col items-end">
+    <div
+      className={`fixed right-4 z-40 flex flex-col items-end md:bottom-6 md:right-6 ${
+        raised ? "bottom-[calc(11.5rem+env(safe-area-inset-bottom))]" : "bottom-[calc(5.25rem+env(safe-area-inset-bottom))]"
+      }`}
+    >
       <AnimatePresence>
         {chatOpen && <ChatPopup onClose={() => setChatOpen(false)} />}
       </AnimatePresence>
 
       <motion.button
-        whileHover={{ scale: 1.06, y: -2 }}
+        whileHover={{ y: -2 }}
         whileTap={{ scale: 0.94 }}
         transition={{ duration: 0.2, ease: [0.34, 1.56, 0.64, 1] }}
         onClick={() => setChatOpen((v) => !v)}
-        aria-label="Chat with DealHobe"
-        className="flex h-12 w-12 items-center justify-center rounded-full text-white shadow-button transition-shadow hover:shadow-hover"
-        style={{ background: BRAND_BLUE }}
+        aria-label={chatOpen ? "Close chat" : "Chat with DealHobe"}
+        aria-expanded={chatOpen}
+        className="group relative flex h-12 w-12 items-center justify-center rounded-full bg-plum text-white shadow-[0_10px_28px_rgba(59,13,46,0.35)] ring-1 ring-gold/50 transition-shadow hover:shadow-[0_14px_34px_rgba(59,13,46,0.45)] md:h-14 md:w-14"
       >
-        <FiMessageCircle size={18} aria-hidden />
+        {chatOpen ? <FiX size={20} aria-hidden /> : <FiMessageCircle size={20} aria-hidden />}
+        {!chatOpen && (
+          <span className="absolute right-0.5 top-0.5 h-3 w-3 rounded-full border-2 border-plum bg-primary-pink" aria-hidden />
+        )}
+        <span className="pointer-events-none absolute right-full mr-3 hidden whitespace-nowrap rounded-full bg-white px-3 py-1.5 text-xs font-bold text-plum opacity-0 shadow-tile transition-opacity group-hover:opacity-100 md:block">
+          Chat with us
+        </span>
       </motion.button>
     </div>
   );

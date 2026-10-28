@@ -63,7 +63,6 @@ export const DEFAULT_SECTIONS: Seed[] = [
   ]),
   section('product-rail', 'Best sellers', { source: 'top', limit: 12, viewAllLink: '/products' }),
   section('brand-marquee', 'Brands we love', {}),
-  section('reviews', 'Loved by our customers', {}),
   section('trust-badges', 'Why DealHobe', {}),
 ];
 

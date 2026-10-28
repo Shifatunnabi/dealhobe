@@ -1,7 +1,5 @@
-"use client";
-
-import Loader from "@/components/layout/Loader";
+import { OffersPageSkeleton } from "@/components/layout/Loader";
 
 export default function Loading() {
-  return <Loader />;
+  return <OffersPageSkeleton />;
 }

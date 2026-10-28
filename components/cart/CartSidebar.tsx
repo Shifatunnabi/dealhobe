@@ -1,175 +1,157 @@
 "use client";
 
-import Image from "next/image";
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiX, FiTrash2, FiMinus, FiPlus, FiArrowRight, FiShoppingBag } from "react-icons/fi";
+import { FiX, FiArrowRight, FiLock } from "react-icons/fi";
 import { useCart, cartLineId } from "./CartProvider";
+import { BagLine, EmptyBag, FreeDeliveryProgress, TrustRow, UpsellRow } from "@/components/checkout/BagParts";
+import { useCartInsights, useFreeDeliveryThreshold } from "@/components/checkout/useCartInsights";
+import { money } from "@/components/checkout/money";
 
 export default function CartSidebar() {
-  const { items, sidebarOpen, closeSidebar, updateQty, removeItem, subtotal } = useCart();
+  const { items, itemCount, sidebarOpen, closeSidebar, updateQty, removeItem, subtotal } = useCart();
+  const threshold = useFreeDeliveryThreshold(sidebarOpen);
+  const gap = threshold > 0 ? Math.max(0, threshold - subtotal) : 0;
+  const { compareAt, savings, suggestions } = useCartInsights(items, { enabled: sidebarOpen, freeDeliveryGap: gap });
+  const closeRef = useRef<HTMLButtonElement>(null);
+
+  // Escape closes; lock page scroll and move focus into the drawer while open.
+  useEffect(() => {
+    if (!sidebarOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && closeSidebar();
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKey);
+    closeRef.current?.focus({ preventScroll: true });
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [sidebarOpen, closeSidebar]);
 
   return (
     <AnimatePresence>
       {sidebarOpen && (
         <>
-          {/* Backdrop */}
           <motion.div
             key="cart-backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[200] bg-black/30 backdrop-blur-sm hidden md:block"
+            className="fixed inset-0 z-[200] bg-plum/30 backdrop-blur-[2px]"
             onClick={closeSidebar}
           />
 
-          {/* Sidebar panel */}
           <motion.aside
             key="cart-sidebar"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Shopping bag"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ duration: 0.32, ease: [0.4, 0, 0.2, 1] }}
-            className="fixed right-0 top-0 z-[201] hidden h-full w-[380px] flex-col bg-white shadow-hover md:flex"
+            className="fixed right-0 top-0 z-[201] flex h-full w-full max-w-[440px] flex-col bg-soft-bg shadow-[-24px_0_60px_rgba(59,13,46,0.18)]"
           >
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
-              <h2 className="font-display text-lg font-semibold text-text-dark">Your Cart</h2>
+            <div className="flex items-center justify-between gap-3 border-b border-[#F1E6EA] bg-white px-5 py-3.5">
+              <h2 className="font-display text-[22px] font-semibold leading-none text-text-dark">
+                Your bag
+                {itemCount > 0 && (
+                  <span className="ml-2 align-middle font-body text-sm font-semibold text-text-muted">
+                    {itemCount} item{itemCount !== 1 ? "s" : ""}
+                  </span>
+                )}
+              </h2>
               <button
+                ref={closeRef}
                 onClick={closeSidebar}
-                aria-label="Close cart"
-                className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 text-text-muted transition-colors hover:border-primary-pink hover:text-primary-pink"
+                aria-label="Close bag"
+                className="-mr-2 flex h-11 w-11 items-center justify-center rounded-full text-text-dark transition-colors hover:bg-plum-soft/70"
               >
-                <FiX size={16} />
+                <FiX size={20} />
               </button>
             </div>
 
-            {/* Items */}
-            <div className="flex-1 overflow-y-auto px-5 py-4">
-              {items.length === 0 ? (
-                <div className="flex flex-col items-center justify-center gap-4 py-20 text-center">
-                  <FiShoppingBag size={40} className="text-gray-200" />
-                  <p className="font-body text-sm text-text-muted">Your cart is empty</p>
-                </div>
-              ) : (
-                <AnimatePresence initial={false}>
-                  <div className="flex flex-col gap-3">
-                    {items.map((item) => {
-                      const rowTotal = item.unitPrice * item.qty;
-                      return (
-                        <motion.div
+            {items.length === 0 ? (
+              <div className="flex flex-1 items-center justify-center overflow-y-auto bg-white">
+                <EmptyBag onNavigate={closeSidebar} compact />
+              </div>
+            ) : (
+              <>
+                <div className="flex-1 overflow-y-auto overscroll-contain">
+                  {threshold > 0 && (
+                    <div className="bg-white px-5 pb-1 pt-4">
+                      <FreeDeliveryProgress subtotal={subtotal} threshold={threshold} />
+                    </div>
+                  )}
+
+                  <ul className="bg-white px-5">
+                    <AnimatePresence initial={false}>
+                      {items.map((item) => (
+                        <motion.li
                           key={cartLineId(item)}
                           layout
-                          initial={{ opacity: 0, y: -10 }}
+                          initial={{ opacity: 0, y: -8 }}
                           animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, x: 24, height: 0, marginBottom: 0 }}
+                          exit={{ opacity: 0, x: 24, height: 0, paddingTop: 0, paddingBottom: 0 }}
                           transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
-                          className="relative overflow-hidden rounded-2xl border border-gray-100 bg-soft-bg p-3"
+                          className="overflow-hidden border-b border-[#F4ECEF] py-4 last:border-b-0"
                         >
-                          {/* Delete button — top right */}
-                          <button
-                            onClick={() => removeItem(cartLineId(item))}
-                            aria-label={`Remove ${item.name}`}
-                            className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-300 transition-colors hover:border-red-300 hover:text-red-400"
-                          >
-                            <FiTrash2 size={13} />
-                          </button>
+                          <BagLine
+                            item={item}
+                            compareAt={compareAt[cartLineId(item)]}
+                            onQty={(q) => updateQty(cartLineId(item), q)}
+                            onRemove={() => removeItem(cartLineId(item))}
+                            onNavigate={closeSidebar}
+                            dense
+                          />
+                        </motion.li>
+                      ))}
+                    </AnimatePresence>
+                  </ul>
 
-                          <div className="flex gap-3 pr-8">
-                            {/* Image */}
-                            <Link href={`/product/${item.slug}`} onClick={closeSidebar} className="shrink-0">
-                              <div className="relative h-16 w-16 overflow-hidden rounded-xl bg-white shadow-soft">
-                                <Image
-                                  src={item.image}
-                                  alt={item.name}
-                                  fill
-                                  className="object-cover"
-                                  sizes="64px"
-                                />
-                              </div>
-                            </Link>
-
-                            {/* Name + price */}
-                            <div className="min-w-0 flex-1">
-                              <Link href={`/product/${item.slug}`} onClick={closeSidebar}>
-                                <p className="line-clamp-2 font-body text-sm font-semibold leading-snug text-text-dark hover:text-primary-pink transition-colors">
-                                  {item.name}
-                                </p>
-                              </Link>
-                              {item.variantLabel && (
-                                <p className="mt-0.5 font-body text-xs text-text-muted">{item.variantLabel}</p>
-                              )}
-                              <p className="mt-0.5 font-body text-xs text-text-muted">
-                                ৳{item.unitPrice.toLocaleString()} each
-                              </p>
-                            </div>
-                          </div>
-
-                          {/* Qty stepper + row total — bottom right */}
-                          <div className="mt-2.5 flex items-center justify-between">
-                            <div className="inline-flex items-center overflow-hidden rounded-xl border border-gray-200 bg-white">
-                              <button
-                                onClick={() => updateQty(cartLineId(item), item.qty - 1)}
-                                className="flex h-7 w-7 items-center justify-center text-text-muted transition-colors hover:text-primary-pink"
-                                aria-label="Decrease"
-                              >
-                                <FiMinus size={12} />
-                              </button>
-                              <span className="flex h-7 w-8 items-center justify-center border-x border-gray-200 font-body text-xs font-bold text-text-dark tabular-nums">
-                                {item.qty}
-                              </span>
-                              <button
-                                onClick={() => updateQty(cartLineId(item), item.qty + 1)}
-                                disabled={item.maxQty !== undefined && item.qty >= item.maxQty}
-                                className="flex h-7 w-7 items-center justify-center text-text-muted transition-colors hover:text-primary-pink disabled:opacity-40"
-                                aria-label="Increase"
-                              >
-                                <FiPlus size={12} />
-                              </button>
-                            </div>
-                            <p className="font-body text-sm font-bold text-primary-pink">
-                              ৳{rowTotal.toLocaleString()}
-                            </p>
-                          </div>
-                        </motion.div>
-                      );
-                    })}
-                  </div>
-                </AnimatePresence>
-              )}
-            </div>
-
-            {/* Footer — subtotal + checkout */}
-            {items.length > 0 && (
-              <div className="border-t border-gray-100 px-5 py-4">
-                <div className="mb-4 flex items-center justify-between">
-                  <span className="font-body text-sm text-text-muted">Subtotal</span>
-                  <span className="font-body text-lg font-bold text-text-dark">
-                    ৳{subtotal.toLocaleString()}
-                  </span>
+                  <UpsellRow products={suggestions} freeDeliveryGap={gap} onNavigate={closeSidebar} className="px-5 pb-5 pt-5" />
                 </div>
 
-                <Link href="/checkout" onClick={closeSidebar}>
-                  <motion.div
-                    whileHover={{ y: -2, boxShadow: "0 16px 48px rgba(164, 27, 21, 0.28)" }}
-                    whileTap={{ scale: 0.97 }}
-                    transition={{ duration: 0.2 }}
-                    className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-gradient-primary py-3.5 font-body font-semibold text-white shadow-button transition-shadow"
-                  >
-                    Proceed to Checkout
-                    <FiArrowRight size={16} />
-                  </motion.div>
-                </Link>
+                {/* Footer */}
+                <div className="border-t border-[#F1E6EA] bg-white px-5 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-4 shadow-[0_-10px_30px_rgba(59,13,46,0.06)]">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <span className="text-sm font-semibold text-text-dark">
+                      Subtotal
+                      {savings > 0 && <span className="ml-2 text-xs font-bold text-[#1F8A4C]">You save {money(savings)}</span>}
+                    </span>
+                    <span className="text-xl font-extrabold tabular-nums text-text-dark">{money(subtotal)}</span>
+                  </div>
+                  <p className="mt-0.5 text-xs text-text-muted">
+                    {threshold > 0 && gap === 0 ? (
+                      <span className="font-semibold text-[#1F8A4C]">Free delivery included</span>
+                    ) : (
+                      "Delivery calculated at checkout · Cash on delivery"
+                    )}
+                  </p>
 
-                <Link
-                  href="/cart"
-                  onClick={closeSidebar}
-                  className="mt-3 flex items-center justify-center font-body text-xs text-text-muted transition-colors hover:text-primary-pink"
-                >
-                  View full cart
-                </Link>
-              </div>
+                  <Link
+                    href="/checkout"
+                    onClick={closeSidebar}
+                    className="mt-3 flex min-h-[52px] w-full items-center justify-center gap-2 rounded-full bg-primary-pink px-6 text-[15px] font-semibold text-white shadow-button transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-hover active:translate-y-0"
+                  >
+                    <FiLock size={15} />
+                    Checkout securely
+                    <FiArrowRight size={16} />
+                  </Link>
+                  <Link
+                    href="/cart"
+                    onClick={closeSidebar}
+                    className="mt-1 flex min-h-11 items-center justify-center text-[13px] font-semibold text-text-muted underline-offset-4 transition-colors hover:text-primary-pink hover:underline"
+                  >
+                    View full bag
+                  </Link>
+                  <TrustRow compact inline className="mt-0.5" />
+                </div>
+              </>
             )}
           </motion.aside>
         </>
