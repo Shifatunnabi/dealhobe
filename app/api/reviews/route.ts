@@ -28,7 +28,15 @@ export async function GET(req: NextRequest) {
   }
 
   const reviews = await Review.find(query).sort({ createdAt: -1 }).lean();
-  return NextResponse.json(reviews);
+  // Public endpoint: never expose customer emails or ids. A signed-in shopper's own review is flagged
+  // with `mine` so the product page can tell they have already reviewed.
+  const customer = await getCustomerFromRequest(req).catch(() => null);
+  return NextResponse.json(
+    reviews.map(({ customerEmail, customerId, ...r }) => ({
+      ...r,
+      mine: !!customer && (customerId === String(customer._id) || customerEmail === customer.email),
+    })),
+  );
 }
 
 export async function POST(req: NextRequest) {
