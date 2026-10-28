@@ -18,19 +18,15 @@ import {
   getTopSellerProducts,
   getFeaturedReviews,
   getOffers,
+  getProductRatings,
 } from '@/lib/data';
 import { applyOffersToProducts, isOfferActive } from '@/lib/offers';
-import { getProductCoverImage } from '@/lib/product-images';
+import { toCardProduct, cardContext, type CardContext } from '@/lib/product-card';
 import { isSectionLive, type HomeSection, type ProductSource } from '@/lib/homepage/types';
 
-// Only serialize the fields the product cards render. Variants are dropped to keep the
-// payload small, so the card photo (main photo, else the first variant photo) is resolved here.
-function slim(products: GridProduct[], limit: number): GridProduct[] {
-  return products.slice(0, limit).map((p) => {
-    const { _id, slug, name, price, salePrice, quantity, hasVariants, offerDiscountType, offerDiscountAmount } = p;
-    const cover = getProductCoverImage(p as Parameters<typeof getProductCoverImage>[0]);
-    return { _id, slug, name, images: cover ? [cover] : [], price, salePrice, quantity, hasVariants, offerDiscountType, offerDiscountAmount };
-  });
+// Only serialize what the product cards render (variants etc. are dropped to keep the payload small).
+function slim(products: Parameters<typeof toCardProduct>[0][], limit: number, ctx: CardContext): GridProduct[] {
+  return products.slice(0, limit).map((p) => toCardProduct(p, ctx));
 }
 
 const SOURCES: Record<Exclude<ProductSource, 'offer'>, () => Promise<GridProduct[]>> = {
@@ -47,11 +43,13 @@ export default async function Home() {
   const rails = sections.filter((s) => s.type === 'product-rail');
 
   // Fetch only what the live sections need; every query is cached with its own TTL.
-  const [brands, reviews, offers] = await Promise.all([
-    has('brand-marquee') ? getBrands() : [],
+  const [brands, reviews, offers, ratings] = await Promise.all([
+    has('brand-marquee') || rails.length ? getBrands() : [],
     has('reviews') ? getFeaturedReviews() : [],
     rails.length ? getOffers() : [],
+    rails.length ? getProductRatings() : {},
   ]);
+  const ctx = cardContext(brands, ratings);
   const activeOffers = offers.filter((o) => isOfferActive(o));
 
   const products: SectionData['products'] = {};
@@ -68,7 +66,7 @@ export default async function Home() {
     } else {
       list = await SOURCES[source]();
     }
-    products[s._id] = slim(applyOffersToProducts(list, activeOffers), limit);
+    products[s._id] = slim(applyOffersToProducts(list, activeOffers) as Parameters<typeof toCardProduct>[0][], limit, ctx);
   }));
 
   const data: SectionData = { products, brands, reviews, storefront };

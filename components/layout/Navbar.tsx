@@ -26,6 +26,7 @@ export type NavStorefront = Pick<Storefront, "navPills" | "contact" | "socials" 
 import { useCart } from "@/components/cart/CartProvider";
 import NavSearchOverlay from "./NavSearchOverlay";
 import AnimatedPlaceholder from "./AnimatedPlaceholder";
+import PillRow from "./PillRow";
 
 const navLinks = [
   { label: "Home",     href: "/"         },
@@ -500,18 +501,7 @@ export default function Navbar({ storefront }: { storefront: NavStorefront }) {
         {/* ── Category pills (edited in Admin › Homepage Builder › Storefront) ── */}
         {storefront.navPills.length > 0 && (
           <div className="h-11 border-b border-black/5 bg-white/95 backdrop-blur-md">
-            <div className="shell no-scrollbar flex h-full items-center gap-2 overflow-x-auto [mask-image:linear-gradient(90deg,#000_92%,transparent)]">
-              {storefront.navPills.map((pill) => (
-                <Link
-                  key={pill.label + pill.link}
-                  href={pill.link}
-                  className="shrink-0 rounded-full px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wide text-white transition-transform hover:-translate-y-0.5 md:text-[13px]"
-                  style={{ backgroundColor: pill.color }}
-                >
-                  {pill.label}
-                </Link>
-              ))}
-            </div>
+            <PillRow pills={storefront.navPills} />
           </div>
         )}
       </motion.div>

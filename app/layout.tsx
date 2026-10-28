@@ -134,6 +134,19 @@ async function loadStorefront() {
   }
 }
 
+// WebSite + SearchAction: lets search engines show a sitelinks search box that lands on /products?q=…
+const websiteJsonLd = {
+  "@type": "WebSite",
+  name: "DealHobe",
+  url: siteUrl,
+  inLanguage: ["en-BD", "bn-BD"],
+  potentialAction: {
+    "@type": "SearchAction",
+    target: { "@type": "EntryPoint", urlTemplate: `${siteUrl}/products?q={search_term_string}` },
+    "query-input": "required name=search_term_string",
+  },
+};
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -147,7 +160,7 @@ export default async function RootLayout({
       >
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@graph": [jsonLd, websiteJsonLd] }).replace(/</g, "\\u003c") }}
         />
         <ScrollReset />
 

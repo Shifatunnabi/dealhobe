@@ -1,55 +1,39 @@
-// This page is inherently dynamic (reads searchParams), so Next.js renders it
-// on every request.  The DB queries below are served from the Next.js Data Cache
-// via unstable_cache() in lib/data.ts — no database hit unless the TTL has
-// expired or a revalidateTag('products') call has fired.
+// Dynamic (reads searchParams) but cheap: every DB query is served from the Next.js Data Cache via
+// unstable_cache() in lib/data.ts, and only slim card data is sent to the browser.
 export const dynamic = 'force-dynamic';
 
-import { Suspense } from "react";
-import { getProducts, getCategories, getSubCategories, getBrands, getOffers } from '@/lib/data';
+import type { Metadata } from 'next';
 import ProductsPageClient from '@/components/pages/ProductsPageClient';
-import { applyOffersToProducts, isOfferActive } from '@/lib/offers';
+import { catalogSearch, catalogSeo, filterAndSort, parseCatalogQuery, PER_PAGE } from '@/lib/catalog';
+import { catalogJsonLd, loadCatalog } from '@/lib/catalog-server';
 
-export default async function ProductsPage(props: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}) {
-  const searchParams  = await props.searchParams;
-  const offerParam    = typeof searchParams.offer  === 'string' ? searchParams.offer  : undefined;
-  const searchQuery   = typeof searchParams.q      === 'string' ? searchParams.q      : undefined;
+type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 
-  // All cached — parallel fetch from Next.js Data Cache or MongoDB
-  const [products, categories, subCategories, brands, offers] = await Promise.all([
-    getProducts(),
-    getCategories(),
-    getSubCategories(),
-    getBrands(),
-    getOffers(),
-  ]);
+export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
+  const query = parseCatalogQuery(await searchParams);
+  const { items, facets } = await loadCatalog();
+  const seo = catalogSeo(query, facets, filterAndSort(items, query, facets).length);
+  return {
+    title: { absolute: seo.title },
+    description: seo.description,
+    alternates: { canonical: seo.canonical },
+    robots: seo.noindex ? { index: false, follow: true } : undefined,
+    openGraph: { title: seo.title, description: seo.description, url: seo.canonical, type: 'website' },
+  };
+}
 
-  // Hidden categories (and their sub-categories) don't appear in storefront filters.
-  const hiddenCategoryIds = new Set(categories.filter((c) => c.isHidden).map((c) => c._id));
-  const visibleCategories = categories.filter((c) => !c.isHidden);
-  const visibleSubCategories = subCategories.filter((s) => !hiddenCategoryIds.has(s.category));
-
-  const activeOffers   = offers.filter((o) => isOfferActive(o));
-  const pricedProducts = applyOffersToProducts(products, activeOffers);
+export default async function ProductsPage({ searchParams }: Props) {
+  const query = parseCatalogQuery(await searchParams);
+  const { items, facets } = await loadCatalog();
+  const results = filterAndSort(items, query, facets);
+  const seo = catalogSeo(query, facets, results.length);
+  const jsonLd = catalogJsonLd({ h1: seo.h1, description: seo.description, path: seo.canonical, items: results.slice(0, PER_PAGE) });
 
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen bg-soft-bg pt-6 md:pt-8 flex items-center justify-center">
-          <span className="font-body text-xl text-text-muted">Loading…</span>
-        </div>
-      }
-    >
-      <ProductsPageClient
-        products={pricedProducts}
-        categories={visibleCategories}
-        subCategories={visibleSubCategories}
-        brands={brands}
-        offers={activeOffers}
-        offerParam={offerParam}
-        searchQuery={searchQuery}
-      />
-    </Suspense>
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
+      {/* Remount when a server navigation changes the query (e.g. a navbar category link while already here). */}
+      <ProductsPageClient key={catalogSearch(query)} items={items} facets={facets} initialQuery={query} basePath="/products" />
+    </>
   );
 }

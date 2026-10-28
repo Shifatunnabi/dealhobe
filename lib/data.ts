@@ -31,6 +31,7 @@ import Review from './models/Review';
 import Blog from './models/Blog';
 import HomeSectionModel from './models/HomeSection';
 import Settings from './models/Settings';
+import Order from './models/Order';
 import type { HomeSection, Storefront } from './homepage/types';
 import { defaultSections, DEFAULT_STOREFRONT } from './homepage/defaults';
 import mongoose from 'mongoose';
@@ -479,3 +480,40 @@ const _getStorefront = unstable_cache(
 );
 /** Storefront chrome settings merged over defaults. Cached 1 h, tag: settings. */
 export const getStorefront = cache(_getStorefront);
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PRODUCT RATINGS (for product cards)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export type RatingSummary = { avg: number; count: number };
+
+const _getProductRatings = unstable_cache(
+  async (): Promise<Record<string, RatingSummary>> => {
+    await connectDB();
+    const rows = await Review.aggregate<{ _id: string; avg: number; count: number }>([
+      { $match: { isApproved: true, productId: { $ne: '' } } },
+      { $group: { _id: '$productId', avg: { $avg: '$rating' }, count: { $sum: 1 } } },
+    ]);
+    return Object.fromEntries(rows.map((r) => [String(r._id), { avg: Math.round(r.avg * 10) / 10, count: r.count }]));
+  },
+  ['product-ratings'],
+  { revalidate: 3600, tags: ['reviews'] }
+);
+/** Average approved rating and review count per product id. Cached 1 h, tag: reviews. */
+export const getProductRatings = cache(_getProductRatings);
+
+const _getSoldCounts = unstable_cache(
+  async (): Promise<Record<string, number>> => {
+    await connectDB();
+    const rows = await Order.aggregate<{ _id: string; sold: number }>([
+      { $match: { status: { $ne: 'Cancelled' } } },
+      { $unwind: '$items' },
+      { $group: { _id: '$items.productId', sold: { $sum: '$items.qty' } } },
+    ]);
+    return Object.fromEntries(rows.map((r) => [String(r._id), r.sold]));
+  },
+  ['product-sold-counts'],
+  { revalidate: 3600, tags: ['orders'] }
+);
+/** Units sold per product id across non-cancelled orders ("Best selling" sort). Cached 1 h. */
+export const getSoldCounts = cache(_getSoldCounts);
