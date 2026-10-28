@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { FiChevronDown, FiChevronLeft, FiChevronRight, FiFilter, FiSearch, FiX } from "react-icons/fi";
+import { FiChevronDown, FiFilter, FiSearch, FiX } from "react-icons/fi";
 import ProductCard from "@/components/sections/ProductCard";
 import {
   PER_PAGE, PRICE_BANDS, SORTS, catalogSearch, catalogSeo, filterAndSort, parseCatalogQuery, resolveQuery,
@@ -190,16 +190,32 @@ export default function ProductsPageClient({ items, facets, initialQuery, basePa
     const url = `${basePath}${catalogSearch(next, fixedOffer)}`;
     if (opts.push) window.history.pushState(null, "", url); else window.history.replaceState(null, "", url);
     setQuery(next);
-    if (opts.scroll) gridTop.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    // A filter/sort change while scrolled deep into the list jumps back to the top of the results.
+    const scrolledPast = patch.page === undefined && (gridTop.current?.getBoundingClientRect().top ?? 0) < 0;
+    if (opts.scroll || scrolledPast) gridTop.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [query, basePath, fixedOffer]);
 
   const results = useMemo(() => filterAndSort(items, query, facets), [items, query, facets]);
   const seo = useMemo(() => catalogSeo(query, facets, results.length, basePath), [query, facets, results.length, basePath]);
   useEffect(() => { document.title = seo.title; }, [seo.title]);
 
+  // Infinite scroll: `page` is how many batches are shown (1..page), kept in the URL so reloads,
+  // shared links and the back button restore the same position.
   const pages = Math.max(1, Math.ceil(results.length / PER_PAGE));
   const page = Math.min(query.page, pages);
-  const shown = results.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+  const shown = results.slice(0, page * PER_PAGE);
+  const hasMore = page < pages;
+  const sentinel = useRef<HTMLDivElement>(null);
+  const loadMore = useCallback(() => { if (hasMore) set({ page: page + 1 }); }, [hasMore, page, set]);
+
+  useEffect(() => {
+    const el = sentinel.current;
+    if (!el || !hasMore) return;
+    // Start the next batch well before the shopper reaches the end, so scrolling never stalls.
+    const io = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) loadMore(); }, { rootMargin: "900px 0px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [hasMore, loadMore]);
 
   useEffect(() => {
     document.body.style.overflow = sheet ? "hidden" : "";
@@ -218,8 +234,7 @@ export default function ProductsPageClient({ items, facets, initialQuery, basePa
     ...(query.instock ? [{ label: "In stock", clear: { instock: false } }] : []),
   ];
   const clearAll = () => set({ ...EMPTY, offer: fixedOffer ? query.offer : "" });
-  const hrefFor = (p: number) => `${basePath}${catalogSearch({ ...query, page: p }, fixedOffer)}`;
-  const goPage = (n: number) => (e: React.MouseEvent) => { e.preventDefault(); set({ page: n }, { push: true, scroll: true }); };
+  const nextHref = `${basePath}${catalogSearch({ ...query, page: page + 1 }, fixedOffer)}`;
 
   const panel = <FilterPanel query={query} facets={facets} items={items} fixedOffer={fixedOffer} set={(p) => set(p)} />;
 
@@ -294,7 +309,7 @@ export default function ProductsPageClient({ items, facets, initialQuery, basePa
           <div className="min-w-0 flex-1" ref={gridTop} style={{ scrollMarginTop: "11rem" }}>
             {shown.length ? (
               <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4 xl:grid-cols-4">
-                {shown.map((p, i) => <li key={p._id}><ProductCard product={p} priority={page === 1 && i < 4} /></li>)}
+                {shown.map((p, i) => <li key={p._id}><ProductCard product={p} priority={i < 4} /></li>)}
               </ul>
             ) : (
               <div className="rounded-2xl border border-dashed border-[#E6D6DD] bg-white px-6 py-16 text-center">
@@ -304,24 +319,23 @@ export default function ProductsPageClient({ items, facets, initialQuery, basePa
               </div>
             )}
 
-            {pages > 1 && (
-              <nav aria-label="Pagination" className="mt-8 flex flex-wrap items-center justify-center gap-1.5">
-                {page > 1 && (
-                  <a href={hrefFor(page - 1)} rel="prev" onClick={goPage(page - 1)} aria-label="Previous page"
-                    className="flex h-10 w-10 items-center justify-center rounded-full border border-[#EBDDE3] bg-white text-text-dark hover:border-primary-pink"><FiChevronLeft /></a>
-                )}
-                {Array.from({ length: pages }, (_, i) => i + 1).map((n) => (
-                  <a key={n} href={hrefFor(n)} aria-current={n === page ? "page" : undefined} onClick={goPage(n)}
-                    className={`flex h-10 min-w-10 items-center justify-center rounded-full px-3 text-sm font-bold ${n === page ? "bg-primary-pink text-white shadow-button" : "border border-[#EBDDE3] bg-white text-text-dark hover:border-primary-pink"}`}>
-                    {n}
-                  </a>
-                ))}
-                {page < pages && (
-                  <a href={hrefFor(page + 1)} rel="next" onClick={goPage(page + 1)} aria-label="Next page"
-                    className="flex h-10 w-10 items-center justify-center rounded-full border border-[#EBDDE3] bg-white text-text-dark hover:border-primary-pink"><FiChevronRight /></a>
-                )}
-              </nav>
-            )}
+            <div ref={sentinel} aria-hidden />
+            <div className="mt-8 flex flex-col items-center gap-3" aria-live="polite">
+              <p className="text-sm text-text-muted">Showing {shown.length} of {results.length} products</p>
+              {results.length > 0 && (
+                <span className="h-1 w-48 overflow-hidden rounded-full bg-[#F1E7EB]">
+                  <span className="block h-full rounded-full bg-primary-pink transition-[width] duration-500" style={{ width: `${(shown.length / results.length) * 100}%` }} />
+                </span>
+              )}
+              {hasMore && (
+                // A real link to the next batch: crawlers follow it, keyboard users can press it, and it is the
+                // fallback if automatic loading is unavailable.
+                <a href={nextHref} rel="next" onClick={(e) => { e.preventDefault(); loadMore(); }}
+                  className="rounded-full border border-[#EBDDE3] bg-white px-6 py-2.5 text-sm font-bold text-text-dark transition-colors hover:border-primary-pink hover:text-primary-pink">
+                  Load more products
+                </a>
+              )}
+            </div>
           </div>
         </div>
       </div>

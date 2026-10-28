@@ -190,7 +190,8 @@ export function catalogSeo(q: CatalogQuery, f: CatalogFacets, count: number, bas
   const noindex = !!q.q || facetsUsed > 1 || q.min > 0 || q.max > 0 || q.rating > 0 || q.instock;
   const c = canonical.toString();
 
-  return { h1, title, description, canonical: `${basePath}${c ? `?${c}` : ''}${q.page > 1 && !noindex ? `${c ? '&' : '?'}page=${q.page}` : ''}`, noindex };
+  // Infinite scroll shows batches 1..page, so deeper ?page= URLs repeat earlier products: canonicalise without it.
+  return { h1, title, description, canonical: `${basePath}${c ? `?${c}` : ''}`, noindex };
 }
 
 /* ── Filtering + sorting (shared by server and client so both agree) ──────── */
