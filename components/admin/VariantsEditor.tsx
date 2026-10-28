@@ -1,5 +1,7 @@
 'use client';
 
+import { uploadImageFile } from '@/lib/upload-image-client';
+
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { FiPlus, FiTrash2, FiX } from 'react-icons/fi';
@@ -171,26 +173,12 @@ export default function VariantsEditor({ options, variants, defaults, mainImage,
   const removeValue = (i: number, value: string) =>
     update(options.map((o, idx) => (idx === i ? { ...o, values: o.values.filter(v => v !== value) } : o)));
 
-  const readAsDataUrl = (file: File) =>
-    new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = () => reject(reader.error);
-      reader.readAsDataURL(file);
-    });
-
   /** Upload one image for a variant (from the file picker or a drop) and switch it to its own photo. */
   const uploadVariantImage = async (key: string, file: File) => {
     if (!file.type.startsWith('image/')) { toast.error('Only image files can be uploaded'); return; }
     setUploadingKeys(prev => new Set(prev).add(key));
     try {
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data: await readAsDataUrl(file), folder: 'dealhobe/products' }),
-      });
-      const data = await res.json();
-      if (!res.ok || !data.url) throw new Error(data.error || 'Upload failed');
+      const data = await uploadImageFile(file, 'dealhobe/products');
       const cur = latest.current;
       const next = cur.variants.map(v => (v.key === key ? { ...v, image: data.url, imagePublicId: data.publicId, useMainImage: false } : v));
       latest.current = { ...cur, variants: next }; // several drops can finish before the next render

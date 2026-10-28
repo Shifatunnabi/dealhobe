@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
   await connectDB();
   const productId = req.nextUrl.searchParams.get("productId") || "";
 
-  const query: Record<string, any> = { isApproved: true };
+  const query: { isApproved: boolean; productId?: string } = { isApproved: true };
   if (productId) {
     query.productId = productId;
   }
@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
   return NextResponse.json(
     reviews.map(({ customerEmail, customerId, ...r }) => ({
       ...r,
-      mine: !!customer && (customerId === String(customer._id) || customerEmail === customer.email),
+      mine: !!customer && (customerId === String(customer._id) || (!!customer.email && customerEmail === customer.email)),
     })),
   );
 }

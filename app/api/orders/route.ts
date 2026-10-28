@@ -1,8 +1,9 @@
+import { revalidateTag } from 'next/cache';
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 import connectDB from "@/lib/mongodb";
-import Product from "@/lib/models/Product";
-import Order from "@/lib/models/Order";
+import Product, { type IVariant } from "@/lib/models/Product";
+import Order, { type OrderItem } from "@/lib/models/Order";
 import Offer from "@/lib/models/Offer";
 import { applyOffersToProduct, isOfferActive } from "@/lib/offers";
 import Settings from "@/lib/models/Settings";
@@ -32,7 +33,7 @@ export async function POST(req: NextRequest) {
   await connectDB();
 
   const body = await req.json();
-  const items = Array.isArray(body?.items) ? body.items : [];
+  const items: { productId?: unknown; qty?: unknown; variantKey?: unknown }[] = Array.isArray(body?.items) ? body.items : [];
   const delivery = body?.delivery || {};
 
   if (!items.length) {
@@ -52,21 +53,21 @@ export async function POST(req: NextRequest) {
   }
 
   const tokenPayload = parseAuthToken(req);
-  let userId: string | undefined = tokenPayload?.userId;
-  let checkoutMethod: "guest" | "account" = tokenPayload ? "account" : "guest";
+  const userId: string | undefined = tokenPayload?.userId;
+  const checkoutMethod: "guest" | "account" = tokenPayload ? "account" : "guest";
 
   const productIds = items
-    .map((item: any) => item?.productId)
-    .filter((id: any) => typeof id === "string");
+    .map((item) => item?.productId)
+    .filter((id): id is string => typeof id === "string");
 
   const products = await Product.find({ _id: { $in: productIds } }).select('+costPrice +variants.costPrice').lean();
   // Charge what the storefront showed: active offers are applied here too, not just in the UI.
-  const offers = (await Offer.find().lean()).filter((o: any) => isOfferActive(o));
+  const offers = (await Offer.find().lean()).filter((o) => isOfferActive(o));
   const productMap = new Map(
-    products.map((p: any) => [String(p._id), applyOffersToProduct(p, offers as any[]) as any]),
+    products.map((p) => [String(p._id), applyOffersToProduct(p, offers)] as const),
   );
 
-  const orderItems = [] as any[];
+  const orderItems: OrderItem[] = [];
   let subtotal = 0;
 
   for (const item of items) {
@@ -80,9 +81,9 @@ export async function POST(req: NextRequest) {
     }
 
     // Variant products: price, stock, image and SKU all come from the chosen variant.
-    let variant: any = null;
+    let variant: IVariant | null | undefined = null;
     if (product.hasVariants) {
-      variant = item.variantKey ? (product.variants || []).find((v: any) => v.key === item.variantKey) : null;
+      variant = item.variantKey ? (product.variants || []).find((v) => v.key === item.variantKey) : null;
       if (!variant) {
         return NextResponse.json(
           {
@@ -96,7 +97,7 @@ export async function POST(req: NextRequest) {
     }
     const available = variant ? variant.quantity : product.quantity;
     if (available < qty) {
-      const label = variant ? ` (${variant.options.map((o: any) => o.value).join(" / ")})` : "";
+      const label = variant ? ` (${variant.options.map((o) => o.value).join(" / ")})` : "";
       return NextResponse.json({ error: `${product.name}${label} is out of stock.` }, { status: 400 });
     }
 
@@ -111,7 +112,7 @@ export async function POST(req: NextRequest) {
       ...(variant
         ? {
             variantKey: variant.key,
-            variantLabel: variant.options.map((o: any) => o.value).join(" / "),
+            variantLabel: variant.options.map((o) => o.value).join(" / "),
             ...(variant.sku ? { variantSku: variant.sku } : {}),
           }
         : {}),
@@ -178,6 +179,9 @@ export async function POST(req: NextRequest) {
     await Order.findByIdAndDelete(order._id);
     return NextResponse.json({ error: "Stock changed while placing order. Please try again." }, { status: 409 });
   }
+
+  revalidateTag('products', { expire: 0 });
+  revalidateTag('orders', { expire: 0 });
 
   if (delivery.email) {
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL || "";

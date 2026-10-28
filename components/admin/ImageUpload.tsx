@@ -3,6 +3,8 @@
 import { useState, useRef, useCallback } from 'react';
 import { FiUploadCloud } from 'react-icons/fi';
 import Image from 'next/image';
+import toast from 'react-hot-toast';
+import { uploadImageFile } from '@/lib/upload-image-client';
 
 interface ImageUploadProps {
   value?: string;         // current image URL (from Cloudinary)
@@ -27,20 +29,13 @@ export default function ImageUpload({
     if (!file.type.startsWith('image/')) return;
     setUploading(true);
     try {
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        const base64 = reader.result as string;
-        const res    = await fetch('/api/upload', {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ data: base64, folder }),
-        });
-        const data = await res.json();
-        if (data.url) onChange(data.url, data.publicId);
-      };
-      reader.readAsDataURL(file);
+      const data = await uploadImageFile(file, folder);
+      onChange(data.url, data.publicId);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Upload failed');
     } finally {
       setUploading(false);
+      if (inputRef.current) inputRef.current.value = '';
     }
   }, [folder, onChange]);
 

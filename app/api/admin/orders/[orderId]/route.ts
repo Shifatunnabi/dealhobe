@@ -1,3 +1,4 @@
+import { revalidateTag } from 'next/cache';
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import connectDB from "@/lib/mongodb";
@@ -33,7 +34,7 @@ export async function PATCH(
   const wasCancelled = current.status === "Cancelled";
   const willCancel = status === "Cancelled";
   if (wasCancelled && !willCancel) {
-    const ok = await moveStock(current.items as any[], -1);
+    const ok = await moveStock(current.items, -1);
     if (!ok) {
       return NextResponse.json({ error: "Not enough stock to re-open this order." }, { status: 409 });
     }
@@ -45,12 +46,15 @@ export async function PATCH(
     { new: true },
   ).lean();
   if (!updated) {
-    if (wasCancelled && !willCancel) await moveStock(current.items as any[], 1); // undo the re-open deduction
+    if (wasCancelled && !willCancel) await moveStock(current.items, 1); // undo the re-open deduction
     return NextResponse.json({ error: "Order changed, please retry." }, { status: 409 });
   }
   if (!wasCancelled && willCancel) {
-    await moveStock(current.items as any[], 1);
+    await moveStock(current.items, 1);
   }
+
+  revalidateTag('products', { expire: 0 });
+  revalidateTag('orders', { expire: 0 });
 
   return NextResponse.json({ success: true, status: updated.status });
 }

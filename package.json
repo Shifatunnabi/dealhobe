@@ -10,7 +10,8 @@
     "test:scroll": "playwright test",
     "seed": "node scripts/seed.js",
     "seed:reset": "node scripts/seed.js --reset",
-    "seed:verify": "node scripts/verify-seed.js"
+    "seed:verify": "node scripts/verify-seed.js",
+    "test:e2e": "playwright test --config tests/e2e/playwright.config.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

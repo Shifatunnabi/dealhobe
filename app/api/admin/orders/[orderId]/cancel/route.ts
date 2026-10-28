@@ -1,3 +1,4 @@
+import { revalidateTag } from 'next/cache';
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import connectDB from "@/lib/mongodb";
@@ -28,7 +29,10 @@ export async function POST(
   ).lean();
   if (!flipped) return NextResponse.json({ error: "Order is already cancelled." }, { status: 400 });
 
-  await moveStock(order.items as any[], 1);
+  await moveStock(order.items, 1);
+
+  revalidateTag('products', { expire: 0 });
+  revalidateTag('orders', { expire: 0 });
 
   return NextResponse.json({ success: true });
 }

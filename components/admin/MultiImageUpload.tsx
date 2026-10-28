@@ -4,6 +4,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
 import { FiUploadCloud } from 'react-icons/fi';
+import { uploadImageFile } from '@/lib/upload-image-client';
 
 interface MultiImageUploadProps {
   images: { url: string; publicId: string }[];
@@ -11,14 +12,6 @@ interface MultiImageUploadProps {
   folder?: string;
   label?: string;
 }
-
-const readAsDataUrl = (file: File) =>
-  new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(file);
-  });
 
 export default function MultiImageUpload({
   images,
@@ -41,15 +34,7 @@ export default function MultiImageUpload({
   }, [images, onChange]);
 
   const uploadOne = useCallback(async (file: File) => {
-    const base64 = await readAsDataUrl(file);
-    const res = await fetch('/api/upload', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ data: base64, folder }),
-    });
-    const data = await res.json();
-    if (!res.ok || !data.url) throw new Error(data.error || 'Upload failed');
-    return { url: data.url as string, publicId: data.publicId as string };
+    return uploadImageFile(file, folder);
   }, [folder]);
 
   const handleFiles = useCallback(async (fileList: FileList | File[]) => {

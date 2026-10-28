@@ -17,7 +17,7 @@ const ReviewSchema = new Schema<IReview>(
   {
     customerName: { type: String, required: true },
     customerId:   { type: String, required: true },
-    customerEmail: { type: String, required: true },
+    customerEmail: { type: String, default: '' },
     rating:       { type: Number, min: 1, max: 5, default: 5 },
     review:       { type: String, required: true },
     productId:    { type: String, default: '' },
