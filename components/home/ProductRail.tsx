@@ -14,7 +14,9 @@ export default function ProductRail({ products }: { products: GridProduct[] }) {
 
   return (
     <div className="group relative">
-      <div ref={track} className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 md:mx-0 md:gap-4 md:px-0">
+      {/* The padding (cancelled by negative margins) is room for the cards' hover lift and shadow, which a
+          scrolling container would otherwise clip. */}
+      <div ref={track} className="no-scrollbar -mx-4 -mb-9 -mt-3 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-9 pt-3 md:-mx-5 md:scroll-px-5 md:gap-4 md:px-5">
         {products.map((p) => (
           <div key={p._id} className="w-[46%] shrink-0 snap-start sm:w-[31%] md:w-[23.5%] lg:w-[calc((100%-5*1rem)/6)]">
             <ProductCard product={p} />
@@ -22,11 +24,11 @@ export default function ProductRail({ products }: { products: GridProduct[] }) {
         ))}
       </div>
       <button type="button" onClick={() => scroll(-1)} aria-label="Scroll left"
-        className="absolute -left-4 top-1/3 z-10 hidden h-10 w-10 items-center justify-center rounded-full bg-white text-text-dark shadow-card transition hover:text-primary-pink md:flex">
+        className="absolute -left-4 top-[38%] z-10 hidden h-10 w-10 items-center justify-center rounded-full bg-white text-text-dark shadow-card transition hover:text-primary-pink md:flex">
         <FiChevronLeft size={20} />
       </button>
       <button type="button" onClick={() => scroll(1)} aria-label="Scroll right"
-        className="absolute -right-4 top-1/3 z-10 hidden h-10 w-10 items-center justify-center rounded-full bg-white text-text-dark shadow-card transition hover:text-primary-pink md:flex">
+        className="absolute -right-4 top-[38%] z-10 hidden h-10 w-10 items-center justify-center rounded-full bg-white text-text-dark shadow-card transition hover:text-primary-pink md:flex">
         <FiChevronRight size={20} />
       </button>
     </div>

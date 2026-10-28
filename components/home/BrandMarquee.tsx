@@ -10,7 +10,7 @@ export default function BrandMarquee({ brands }: { brands: PlainBrand[] }) {
   const loop = brands.length < 8 ? [...brands, ...brands, ...brands] : brands;
   const duration = `${Math.max(20, loop.length * 3)}s`;
   return (
-    <div className="group relative overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_6%,#000_94%,transparent)]">
+    <div className="group relative -my-3 overflow-hidden py-3 [mask-image:linear-gradient(90deg,transparent,#000_6%,#000_94%,transparent)]">
       <ul className="marquee-track flex w-max gap-3 md:gap-4" style={{ "--marquee-dur": duration } as React.CSSProperties}>
         {[0, 1].map((copy) => loop.map((b, i) => (
           <li key={`${copy}-${b._id}-${i}`} aria-hidden={copy === 1 || undefined}>
