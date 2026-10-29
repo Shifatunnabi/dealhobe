@@ -273,8 +273,15 @@ export default function SectionEditor({ initial, links, offers, saving, onSave, 
                       <option value="featured">Featured products</option>
                       <option value="top">Top sellers</option>
                       <option value="offer">Products in an offer</option>
+                      <option value="picks">Hand-picked products</option>
                     </select>
                   </div>
+                  {st.source === 'picks' && (
+                    <div className="admin-field" style={{ flexBasis: '100%' }}>
+                      <label className="admin-label">Product slugs, one per line (the last part of a product&apos;s page address), shown in this order</label>
+                      <textarea className="admin-textarea" rows={4} value={(st.productSlugs ?? []).join('\n')} onChange={(e) => setSettings({ productSlugs: e.target.value.split('\n').map((x) => x.trim()) })} />
+                    </div>
+                  )}
                   {st.source === 'offer' && (
                     <div className="admin-field">
                       <label className="admin-label">Offer</label>
