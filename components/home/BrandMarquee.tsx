@@ -38,7 +38,10 @@ export default function BrandMarquee({ brands }: { brands: PlainBrand[] }) {
     const el = ref.current;
     if (!el || !brands.length) return;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const oneCopy = () => el.scrollWidth / COPIES;
+    let copyW = el.scrollWidth / COPIES;               // cached: reading scrollWidth every frame forces layout
+    const oneCopy = () => copyW;
+    const ro = new ResizeObserver(() => { copyW = el.scrollWidth / COPIES; });
+    ro.observe(el);
     el.scrollLeft = oneCopy();                       // start in the middle copy so both directions have room
 
     const touch = () => { last.current = performance.now(); };
@@ -70,6 +73,7 @@ export default function BrandMarquee({ brands }: { brands: PlainBrand[] }) {
     let raf = 0, prev = performance.now(), pos = el.scrollLeft, set = el.scrollLeft;
     const tick = (now: number) => {
       const dt = Math.min(64, now - prev); prev = now;
+      if (!visible || document.hidden) { raf = requestAnimationFrame(tick); return; }   // off-screen: no layout reads at all
       const idle = now - last.current > IDLE_MS && !hovered.current && !el.contains(document.activeElement) && visible && !document.hidden && !reduced;
       if (Math.abs(el.scrollLeft - set) > 1.5) pos = el.scrollLeft;
       if (idle) {
@@ -85,7 +89,7 @@ export default function BrandMarquee({ brands }: { brands: PlainBrand[] }) {
     };
     raf = requestAnimationFrame(tick);
     return () => {
-      cancelAnimationFrame(raf); window.clearTimeout(settle); io.disconnect();
+      cancelAnimationFrame(raf); window.clearTimeout(settle); io.disconnect(); ro.disconnect();
       events.forEach(([n, f]) => el.removeEventListener(n, f));
       el.removeEventListener("mouseenter", enter); el.removeEventListener("mouseleave", leave);
     };
