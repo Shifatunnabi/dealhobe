@@ -28,7 +28,7 @@ const navItems: NavItem[] = [
   { href: '/admin/cancelled-orders', icon: FiSlash,       label: 'Cancelled Orders' },
   { href: '/admin/sales-report',   icon: FiBarChart2,     label: 'Sales Report' },
   { href: '/admin/homepage',       icon: FiLayout,        label: 'Homepage Builder' },
-  { href: '/admin/hero',           icon: FiImage,         label: 'Top Bar & Hero' },
+  { href: '/admin/hero',           icon: FiImage,         label: 'Top Bar' },
   { href: '/admin/offers',         icon: FiGift,          label: 'Offer Management' },
   { href: '/admin/blogs',          icon: FiFileText,      label: 'Blogs' },
   { href: '/admin/chat',           icon: FiMessageCircle, label: 'Chat' },

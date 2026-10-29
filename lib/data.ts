@@ -11,7 +11,7 @@
  *   'categories' category list
  *   'brands'     brand list
  *   'offers'     offer list
- *   'hero'       hero slides
+ *   'hero'       top bar texts
  *   'reviews'    approved reviews (homepage + product detail)
  *   'blogs'      blog list + individual posts
  *   'homepage'   homepage builder sections
@@ -26,7 +26,6 @@ import Category from './models/Category';
 import SubCategory from './models/SubCategory';
 import Brand from './models/Brand';
 import Offer from './models/Offer';
-import HeroSlide from './models/HeroSlide';
 import Review from './models/Review';
 import Blog from './models/Blog';
 import HomeSectionModel from './models/HomeSection';
@@ -126,22 +125,6 @@ export type PlainOffer = {
   selectedProducts: string[];
   isActive: boolean;
   endingDate?: string | null;
-  createdAt: string;
-  updatedAt: string;
-};
-
-export type PlainHeroSlide = {
-  _id: string;
-  imageUrl: string;
-  imagePublicId: string;
-  mobileImageUrl?: string;
-  mobileImagePublicId?: string;
-  ctaText: string;
-  ctaLink: string;
-  ctaColor: string;
-  ctaTextColor: string;
-  order: number;
-  isActive: boolean;
   createdAt: string;
   updatedAt: string;
 };
@@ -358,21 +341,6 @@ const _getAllOfferSlugs = unstable_cache(
 /** All offer slugs — used by generateStaticParams. Cached 1 h. */
 export const getAllOfferSlugs = cache(_getAllOfferSlugs);
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// HERO SLIDES
-// ═══════════════════════════════════════════════════════════════════════════════
-
-const _getActiveHeroSlides = unstable_cache(
-  async (): Promise<PlainHeroSlide[]> => {
-    await connectDB();
-    const docs = await HeroSlide.find({ isActive: true }).sort({ order: 1 }).lean();
-    return s(docs) as unknown as PlainHeroSlide[];
-  },
-  ['hero-slides'],
-  { revalidate: 3600, tags: ['hero'] }
-);
-/** Active hero slides. Cached 1 h, tag: hero. */
-export const getActiveHeroSlides = cache(_getActiveHeroSlides);
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // REVIEWS

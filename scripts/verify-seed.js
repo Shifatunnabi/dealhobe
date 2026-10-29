@@ -12,7 +12,6 @@ const mongoose = require('mongoose');
   const c = (n) => db.collection(n);
 
   console.log('Homepage queries (lib/data.ts):');
-  console.log('  getActiveHeroSlides ', await c('heroslides').countDocuments({ isActive: true }));
   console.log('  getCategories       ', await c('categories').countDocuments());
   console.log('  getSubCategories    ', await c('subcategories').countDocuments());
   console.log('  getBrands           ', await c('brands').countDocuments());

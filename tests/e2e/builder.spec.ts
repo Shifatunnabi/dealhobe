@@ -67,17 +67,13 @@ test('Storefront nav pills, animated suggestions, trust badges and contact updat
   } finally { expect((await page.request.put('/api/admin/homepage/storefront', { data: original })).ok()).toBeTruthy(); }
 });
 
-test('Top Bar and Hero create, edit and delete', async ({ page, audit }) => {
+test('Top Bar create, edit and delete', async ({ page, audit }) => {
   await adminLogin(page); const name = unique();
-  await page.goto('/admin/hero'); await page.getByRole('button', { name: 'Top Bar Texts', exact: true }).click(); await page.getByRole('button', { name: '+ Add Text', exact: true }).click();
+  await page.goto('/admin/hero'); await page.getByRole('button', { name: '+ Add Text', exact: true }).click();
   let dialog = page.getByRole('dialog'); await field(dialog, 'Announcement Text').fill(name); await field(dialog, 'Order').fill('0'); await page.getByRole('button', { name: 'Add Text', exact: true }).click(); await expect(dialog).toHaveCount(0);
   let card = page.locator('.admin-card').filter({ hasText: name }); await expect(card).toBeVisible(); await card.getByRole('button', { name: 'Edit', exact: true }).click(); await field(dialog, 'Announcement Text').fill(`${name} edited`); await dialog.getByRole('button', { name: 'Update', exact: true }).click(); await expect(dialog).toHaveCount(0); await expect(card).toContainText('edited'); await audit.check();
   await page.goto('/'); await expect(page.getByText(`${name} edited`, { exact: true })).toBeVisible();
-  await page.goto('/admin/hero'); await page.getByRole('button', { name: 'Top Bar Texts', exact: true }).click(); page.once('dialog', d => d.accept()); await card.getByRole('button', { name: 'Delete', exact: true }).click(); await expect(card).toHaveCount(0);
-  await page.getByRole('button', { name: 'Hero Slides', exact: true }).click(); await page.getByRole('button', { name: '+ Add Slide', exact: true }).click(); dialog = page.getByRole('dialog'); await field(dialog, 'Button Text').fill(name); await upload(dialog);
-  const response = page.waitForResponse(r => r.url().endsWith('/api/admin/hero/slides') && r.request().method() === 'POST'); await dialog.getByRole('button', { name: 'Add Slide', exact: true }).click(); const res = await response; expect(res.ok(), await res.text()).toBeTruthy(); const slide = await res.json(); await expect(dialog).toHaveCount(0);
-  card = page.locator('.admin-item-card').filter({ hasText: name }); await card.getByRole('button', { name: 'Edit', exact: true }).click(); await field(dialog, 'Button Text').fill(`${name} edited`); await dialog.getByRole('button', { name: 'Update', exact: true }).click(); await expect(dialog).toHaveCount(0); await expect(card).toContainText('edited'); await audit.check();
-  await page.request.put('/api/admin/hero/slides', { data: { id: slide._id, imagePublicId: '', mobileImagePublicId: '' } }); page.once('dialog', d => d.accept()); await card.getByRole('button', { name: 'Delete', exact: true }).click(); await expect(card).toHaveCount(0);
+  await page.goto('/admin/hero'); page.once('dialog', d => d.accept()); await card.getByRole('button', { name: 'Delete', exact: true }).click(); await expect(card).toHaveCount(0);
 });
 
 test('Settings delivery threshold and logo save and update storefront and checkout', async ({ page, audit, isMobile }) => {

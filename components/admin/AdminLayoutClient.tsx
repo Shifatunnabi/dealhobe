@@ -15,7 +15,7 @@ const PAGE_TITLES: [prefix: string, title: string][] = [
   ['/admin/orders',           'Orders'],
   ['/admin/sales-report',     'Sales Report'],
   ['/admin/homepage',         'Homepage Builder'],
-  ['/admin/hero',             'Top Bar & Hero'],
+  ['/admin/hero',             'Top Bar'],
   ['/admin/offers',           'Offers'],
   ['/admin/blogs',            'Blogs'],
   ['/admin/chat',             'Chat'],
