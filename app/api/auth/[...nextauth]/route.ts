@@ -10,12 +10,17 @@ const handler = NextAuth({
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        const adminEmail    = process.env.ADMIN_EMAIL;
-        const adminPassword = process.env.ADMIN_PASSWORD;
+        // Env values pasted into a dashboard often carry stray spaces or a trailing newline, and phone keyboards
+        // capitalise the first letter of an email, so trim both sides and compare the email case-insensitively.
+        const adminEmail    = process.env.ADMIN_EMAIL?.trim();
+        const adminPassword = process.env.ADMIN_PASSWORD?.trim();
+        const email         = credentials?.email?.trim();
+        const password      = credentials?.password;
 
         if (
-          credentials?.email    === adminEmail &&
-          credentials?.password === adminPassword
+          adminEmail && adminPassword && email && password &&
+          email.toLowerCase() === adminEmail.toLowerCase() &&
+          password.trim() === adminPassword
         ) {
           return {
             id:    '1',
