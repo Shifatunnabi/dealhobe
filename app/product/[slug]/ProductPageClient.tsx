@@ -107,11 +107,9 @@ export default function ProductDetailPageClient({
   const urlVariant = urlVariantKey ? variantList.find((v) => v.key === urlVariantKey) : undefined;
   const selectedOptions: Record<string, string> = userOptions ?? optionsOf(urlVariant ?? defaultVariant);
 
-  // The default variant's own photo leads the gallery, so the first paint (and the LCP image) match the
-  // preselected shade. The order is fixed from the default, so it never reshuffles while shopping.
-  const galleryImages = getProductImages(product);
-  const leadPhoto = defaultVariant && !defaultVariant.useMainImage && defaultVariant.image ? defaultVariant.image : null;
-  const ordered = leadPhoto ? [leadPhoto, ...galleryImages.filter((src) => src !== leadPhoto)] : galleryImages;
+  // The gallery always opens on the product's main photo; a variant's own photo is shown only after the shopper
+  // picks that variant (or arrives on a link that names one).
+  const ordered = getProductImages(product);
   const photos: string[] = ordered.length > 0 ? ordered : ["/placeholder.png"];
   const allOptionsChosen = variantOptions.every((o) => !!selectedOptions[o.name]);
   const selectedVariant: Variant | null =
@@ -159,7 +157,7 @@ export default function ProductDetailPageClient({
   const qty = outOfStock ? 1 : Math.min(Math.max(1, selectedQty), availableQty);
 
   // Jump to the selected variant's photo in the gallery; back to the first photo otherwise.
-  const variantPhotoIndex = variantImage ? Math.max(0, photos.indexOf(variantImage)) : 0;
+  const variantPhotoIndex = variantImage && (userOptions || urlVariant) ? Math.max(0, photos.indexOf(variantImage)) : 0;
 
   // Phone sticky buy bar: shown once the main buttons have scrolled up behind the header.
   useEffect(() => {
