@@ -8,6 +8,8 @@ const ph = (name: string) => `/banners/placeholders/${name}.svg`;
 const real = (name: string) => `/banners/${name}.mp4`;
 const poster = (name: string) => `/banners/${name}.poster.webp`;
 const tile = (name: string, link: string, alt: string, extra: Partial<Tile> = {}): Tile => ({ image: ph(name), link, alt, ...extra });
+/** A tile backed by a rendered banner (scripts/banners): MP4 + poster. */
+const art = (name: string, link: string, alt: string): Tile => ({ image: real(name), poster: poster(name), link, alt });
 
 const R = (w: number, h: number): Ratio => ({ w, h });
 
@@ -29,8 +31,8 @@ const section = (type: HomeSection['type'], title: string, settings: SectionSett
   type, title, subtitle, isActive: true, startsAt: null, endsAt: null, tiles, settings,
 });
 
-const cat = (slug: string, name: string) => tile(`cat-${slug}`, `/products?category=${encodeURIComponent(name)}`, name);
-const concern = (slug: string, label: string, q: string) => tile(`concern-${slug}`, `/products?q=${encodeURIComponent(q)}`, label);
+const catArt = (slug: string, name: string, alt: string) => art(`cat-${slug}`, `/products?category=${encodeURIComponent(name)}`, alt);
+const concern = (slug: string, label: string, q: string) => art(`concern-${slug}`, `/products?q=${encodeURIComponent(q)}`, label);
 
 export const DEFAULT_SECTIONS: Seed[] = [
   section('hero', 'Hero', { ratio: R(16, 5), mobileRatio: R(1, 1), autoplayMs: 6000 }, [
@@ -52,17 +54,26 @@ export const DEFAULT_SECTIONS: Seed[] = [
     { image: real('deal-4'), poster: poster('deal-4'), link: '/products?q=gift', alt: 'Gift sets' },
   ]),
   section('image-grid', 'Top brands and offers', { ratio: R(2, 1), cols: { mobile: 1, tablet: 2, desktop: 3 }, mobileLayout: 'scroll', accent: '#3B0D2E' },
-    [1, 2, 3, 4, 5, 6].map((n) => tile(`brand-${n}`, '/offers', `Brand offer ${n}`))),
+    [
+      art('brand-1', '/products?brand=KODOMO', 'Kodomo baby care: gentle care for little ones'),
+      art('brand-2', '/products?brand=FENNEL&category=Makeup', 'Fennel makeup: colour, best price in Bangladesh guaranteed'),
+      art('brand-3', '/products?brand=FENNEL&category=Skin%20Care', 'Fennel skincare: serums and face washes, best price in Bangladesh guaranteed'),
+      art('brand-4', '/products?brand=GDM', 'GDM skin and hair care'),
+      art('brand-5', '/products?brand=KIDLON', 'Kidlon baby essentials and gift sets'),
+      art('brand-6', '/products?brand=MISTINE', 'Mistine Acne Clear facial foam'),
+    ]),
   section('product-rail', 'Flash sale', { source: 'trending', limit: 12, viewAllLink: '/offers', countdownTo: null, accent: '#A41B15' }, [], 'Grab them before the timer runs out'),
   section('image-grid', 'Limited time offers', { ratio: R(5, 2), cols: { mobile: 2, tablet: 4, desktop: 4 }, mobileLayout: 'grid', accent: '#D8B26E' }, [
-    tile('offer-bogo', '/offers', 'Buy 1 Get 1'),
-    tile('offer-combo', '/offers', 'Combo deals'),
-    tile('offer-offers', '/offers', 'All offers'),
-    tile('offer-clearance', '/offers', 'Clearance sale'),
+    // Art is deliberately neutral (no deal mechanics): "Gift sets", "Combos", "Offers", "New in". Names keep the old file ids.
+    art('offer-bogo', '/products?q=gift', 'Gift sets'),
+    art('offer-combo', '/products?q=combo', 'Combos'),
+    art('offer-offers', '/offers', 'Current offers, best price in Bangladesh guaranteed'),
+    art('offer-clearance', '/products', 'New in, best price in Bangladesh guaranteed'),
   ]),
-  section('image-grid', 'Shop by category', { ratio: R(3, 2), cols: { mobile: 2, tablet: 4, desktop: 4 }, mobileLayout: 'grid', accent: '#A41B15' }, [
-    cat('makeup', 'Makeup'), cat('skin', 'Skin Care'), cat('hair', 'Hair Care'), cat('k-beauty', 'K-Beauty'),
-    cat('fragrance', 'Fragrance'), cat('bath-body', 'Bath & Body'), cat('tools', 'Tools & Accessories'), cat('mom-baby', 'Mom & Baby'),
+  section('image-grid', 'Shop by category', { ratio: R(3, 2), cols: { mobile: 2, tablet: 3, desktop: 3 }, mobileLayout: 'grid', accent: '#A41B15' }, [
+    // The six real catalogue categories. K-Beauty, Fragrance and Tools have no products yet, so no tiles (placeholders cat-k-beauty/-fragrance/-tools remain on disk).
+    catArt('makeup', 'Makeup', 'Makeup'), catArt('skin', 'Skin Care', 'Skin care'), catArt('hair', 'Hair Care', 'Hair care'),
+    catArt('bath-body', 'Bath & Body', 'Bath and body'), catArt('mom-baby', 'Baby & Kids Care', 'Mom and baby'), catArt('personal-care', 'Personal Care', 'Personal care'),
   ]),
   section('product-rail', 'New arrivals', { source: 'new', limit: 12, viewAllLink: '/products' }),
   section('image-grid', 'Shop by concern', { ratio: R(1, 1), cols: { mobile: 3, tablet: 5, desktop: 5 }, mobileLayout: 'grid', accent: '#3B0D2E' }, [

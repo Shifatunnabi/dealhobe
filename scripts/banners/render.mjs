@@ -32,6 +32,7 @@ const CONCURRENCY = 3;
 
 const args = process.argv.slice(2);
 const still = args.includes('--still');
+const noGif = args.includes('--nogif');   // skip the (slow, git-ignored) GIF deliverable while iterating
 const filters = args.filter((a) => !a.startsWith('--'));
 const names = Object.keys(BANNERS).filter((n) => !filters.length || filters.some((f) => n === f || n.startsWith(f)));
 
@@ -77,9 +78,10 @@ async function renderOne(browser, name) {
     ff(...input, '-c:v', 'libx264', '-preset', 'slow', '-crf', String(b.crf ?? 21), '-pix_fmt', 'yuv420p',
       '-vf', 'scale=trunc(iw/2)*2:trunc(ih/2)*2', '-movflags', '+faststart', '-an', path.join(OUT, `${name}.mp4`));
     // Poster: frame 0 at full resolution, high quality — what the page shows (and measures as LCP) before the video starts.
-    ff('-i', path.join(dir, '0000.jpg'), '-frames:v', '1', '-c:v', 'libwebp', '-quality', '84', path.join(OUT, `${name}.poster.webp`));
+    ff('-i', path.join(dir, '0000.jpg'), '-frames:v', '1', '-c:v', 'libwebp', '-quality', String(b.posterQ ?? 84), path.join(OUT, `${name}.poster.webp`));
     // GIF deliverable: GIF can't take smooth full-frame motion (every pixel changing balloons the file), so it is
     // captured separately at 12 fps with the slow background drift frozen, at a capped width.
+    if (!noGif) {
     await page.addStyleTag({ content: '.kb{animation:none!important}' });
     const gdir = path.join(dir, 'gif');
     fs.mkdirSync(gdir, { recursive: true });
@@ -90,7 +92,8 @@ async function renderOne(browser, name) {
     }
     const gifW = Math.min(width, width >= 2000 ? 1200 : width >= 1000 ? 720 : width);
     ff('-framerate', String(gfps), '-i', path.join(gdir, '%04d.jpg'), '-vf', `scale=${gifW}:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=192:stats_mode=diff[p];[b][p]paletteuse=dither=bayer:bayer_scale=4:diff_mode=rectangle`, '-loop', '0', path.join(GIFS, `${name}.gif`));
-    console.log(`${name}: ${width}×${Math.round(b.H * b.scale)}, ${total} frames @ ${b.fps} fps — mp4 ${kb(path.join(OUT, `${name}.mp4`))} KB, poster ${kb(path.join(OUT, `${name}.poster.webp`))} KB, gif ${kb(path.join(GIFS, `${name}.gif`))} KB`);
+    }
+    console.log(`${name}: ${width}×${Math.round(b.H * b.scale)}, ${total} frames @ ${b.fps} fps — mp4 ${kb(path.join(OUT, `${name}.mp4`))} KB, poster ${kb(path.join(OUT, `${name}.poster.webp`))} KB, gif ${noGif ? '-' : kb(path.join(GIFS, `${name}.gif`)) + ' KB'}`);
     fs.rmSync(dir, { recursive: true, force: true });
   }
   await page.close();

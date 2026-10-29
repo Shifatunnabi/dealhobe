@@ -4,6 +4,7 @@
 // Fennel carries "best price in Bangladesh, guaranteed".
 
 import { COLORS as C, arrow, blendLayer, cta, floatProd, layoutRow, lines, page, podium, prod, row } from './lib.mjs';
+import { EXTRA_BANNERS } from './designs-extra.mjs';
 
 const HERO_D = { W: 1600, H: 500, scale: 1.5 };  // 2400×750 (16:5)
 const HERO_M = { W: 900, H: 900, scale: 1.2 };   // 1080×1080 (1:1)
@@ -216,6 +217,7 @@ export const BANNERS = {
   'hero-7-desktop': () => heroGraphic(false), 'hero-7-mobile': () => heroGraphic(true),
   'strip-desktop': () => strip(false), 'strip-mobile': () => strip(true),
   'deal-1': () => deal(1), 'deal-2': () => deal(2), 'deal-3': () => deal(3), 'deal-4': () => deal(4),
+  ...EXTRA_BANNERS,   // brand / offer / category / concern tiles (designs-extra.mjs)
 };
 
 export const build = (name) => {
