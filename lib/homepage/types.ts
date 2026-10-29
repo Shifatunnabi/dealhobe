@@ -18,6 +18,8 @@ export type Tile = {
   _id?: string;
   image: string;          // desktop (or only) image — GIF, WebP, PNG, JPG or MP4
   imagePublicId?: string;
+  poster?: string;        // still frame shown first for a video (derived automatically for Cloudinary videos)
+  mobilePoster?: string;
   mobileImage?: string;   // optional phone-only image (hero, strip)
   mobileImagePublicId?: string;
   link: string;

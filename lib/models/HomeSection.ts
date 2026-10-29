@@ -19,6 +19,8 @@ const TileSchema = new Schema<Tile>(
   {
     image:               { type: String, required: true },
     imagePublicId:       { type: String, default: '' },
+    poster:              { type: String, default: '' },
+    mobilePoster:        { type: String, default: '' },
     mobileImage:         { type: String, default: '' },
     mobileImagePublicId: { type: String, default: '' },
     link:                { type: String, default: '' },

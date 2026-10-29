@@ -5,8 +5,8 @@
 
 import { COLORS as C, arrow, cta, lines, page, row } from './lib.mjs';
 
-const HERO_D = { W: 1600, H: 500, scale: 1 };    // 1600×500 (16:5)
-const HERO_M = { W: 900, H: 900, scale: 0.72 };  // 648×648 (1:1): shown ~360 CSS px wide
+const HERO_D = { W: 1600, H: 500, scale: 1.5 };  // 2400×750 (16:5)
+const HERO_M = { W: 900, H: 900, scale: 1.2 };   // 1080×1080 (1:1)
 
 // Per-colourway backdrop + palette. `wide` is a 3:2 photo cropped to the banner, `sq` a square photo.
 const SETS = {
@@ -20,24 +20,33 @@ const SETS = {
 /** Text column: absolutely placed flex column. */
 const column = (m, inner) =>
   m
-    ? `<div class="abs" style="left:64px;right:64px;top:62px;display:flex;flex-direction:column;align-items:flex-start">${inner}</div>`
+    ? `<div class="abs" style="left:64px;right:64px;top:40px;display:flex;flex-direction:column;align-items:flex-start">${inner}</div>`
     : `<div class="abs" style="left:96px;top:0;bottom:0;width:640px;display:flex;flex-direction:column;justify-content:center;align-items:flex-start">${inner}</div>`;
 
-const eyebrow = (text, color, size, d = 0.05) =>
-  `<div class="eyebrow" style="color:${color};font-size:${size}px;--d:${d}s"><i></i><span class="in" style="--d:${d}s;--dy:10px">${text}</span></div>`;
+// Masthead lockup: DealHobe logo (mark + wordmark on a white pill), hairline divider, brand label — one row
+// sharing the text column's left edge, so the logo reads as part of the layout rather than a sticker.
+const eyebrow = (text, color, size, d = 0.05) => {
+  const m = size > 20;
+  const pill = m ? 84 : 58, mark = m ? 60 : 41, word = m ? 34 : 23;
+  return `<div class="in" style="--d:${d}s;--dy:10px;display:flex;align-items:center;gap:${m ? 24 : 16}px">
+    <div style="flex:none;height:${pill}px;padding:0 ${m ? 28 : 20}px 0 ${m ? 20 : 14}px;border-radius:999px;background:#fff;display:flex;align-items:center;gap:${m ? 14 : 10}px;box-shadow:0 6px 18px rgba(15,4,12,.22)"><img src="assets/dealhobe-mark.png" style="height:${mark}px;width:auto;display:block"><img src="assets/dealhobe-word.png" style="height:${word}px;width:auto;display:block"></div>
+    <div style="flex:none;width:2px;height:${Math.round(pill * 0.5)}px;background:${color};opacity:.55"></div>
+    <div class="eyebrow" style="color:${color};font-size:${size}px">${text}</div>
+  </div>`;
+};
 
 function hero(n, m) {
   const S = m ? HERO_M : HERO_D;
   const set = SETS[['sky', 'plum', 'blush', 'red'][n - 1]];
-  const headSize = m ? 84 : 70;
-  const subSize = m ? 34 : 22;
+  const headSize = m ? 80 : 70;
+  const subSize = m ? 32 : 22;
   const head = (arr, color, size = headSize) => `<h2 class="d" style="font-size:${size}px;line-height:1;color:${color};margin-top:${m ? 22 : 20}px;text-shadow:0 1px 0 rgba(255,255,255,0)">${lines(arr)}</h2>`;
   const sub = (txt) => `<p class="in" style="--d:.55s;--dy:14px;margin-top:${m ? 22 : 20}px;font-size:${subSize}px;line-height:1.4;font-weight:600;color:${set.sub};max-width:${m ? 700 : 500}px">${txt}</p>`;
   const ctaWrap = (html) => `<div style="margin-top:${m ? 30 : 30}px">${html}</div>`;
   const ctaOpts = (bg, color) => ({ bg, color, size: m ? 78 : 56, font: m ? 30 : 18, pad: m ? 44 : 30, d: 1.05 });
   const photo = m ? { photo: set.sq, photoSize: 'cover', photoPos: 'center' } : { photo: set.wide, photoSize: `${S.W}px auto`, photoPos: `0 -${set.offY}px` };
-  const shelf = m ? { x0: 40, x1: 860, gy: 92 } : { x0: 770, x1: 1490, gy: 62 };
-  const H = (d, mm) => (m ? Math.round(mm * 0.86) : Math.round(d * 1.12));   // pick desktop (a touch larger) / mobile heights
+  const shelf = m ? { x0: 40, x1: 860, gy: 78 } : { x0: 770, x1: 1490, gy: 62 };
+  const H = (d, mm) => (m ? Math.round(mm * 0.78) : Math.round(d * 1.12));   // pick desktop (a touch larger) / mobile heights
 
   let products, text, extra = '';
   if (n === 1) {
@@ -85,11 +94,11 @@ function strip(m) {
     <div id="track" style="position:absolute;left:0;top:0;bottom:0;display:flex;align-items:center;white-space:nowrap;text-transform:uppercase;font-weight:800;letter-spacing:.12em;font-size:${size}px;color:${C.ivory}">${block}${block}${block}</div>`;
   const loop = 8;
   const script = `document.fonts.ready.then(()=>{const t=document.getElementById('track');const w=t.querySelector('.blk').getBoundingClientRect().width;t.animate([{transform:'translateX(0)'},{transform:'translateX(-'+w+'px)'}],{duration:${loop * 1000},easing:'linear',fill:'both'});window.__ready=true;});`;
-  return { ...S, bg: C.plum, body, loop, fps: 8, script, quality: 42, startAt: 0 };  // flat colour + text: low quality is plenty
+  return { ...S, bg: C.plum, body, loop, fps: 24, script, startAt: 0 };  // flat colour + text: low quality is plenty
 }
 
 function deal(n) {
-  const S = { W: 500, H: 500, scale: 1 }; // 500×500 (shown ≤ ~330 CSS px)
+  const S = { W: 500, H: 500, scale: 1.2 }; // 600×600
   const set = SETS[['plum', 'sky', 'blush', 'cream'][n - 1]];
   const gy = 34;
   const head = (eb, title, sub, accent = set.accent) => `
@@ -129,5 +138,5 @@ export const BANNERS = {
 
 export const build = (name) => {
   const b = BANNERS[name]();
-  return { name, loop: 4, fps: 8, startAt: 1.95, ...b, html: page({ W: b.W, H: b.H, bg: b.bg, body: b.body, script: b.script, photo: b.photo, photoPos: b.photoPos, photoSize: b.photoSize, veil: b.veil, veilDir: b.veilDir }) };
+  return { name, loop: 4, fps: 24, startAt: 1.95, ...b, html: page({ W: b.W, H: b.H, bg: b.bg, body: b.body, script: b.script, photo: b.photo, photoPos: b.photoPos, photoSize: b.photoSize, veil: b.veil, veilDir: b.veilDir }) };
 };

@@ -4,8 +4,9 @@ import type { HomeSection, Ratio, SectionSettings, Storefront, Tile } from './ty
 // (public/banners/placeholders) that prints its recommended upload size, so swapping in real art is obvious.
 
 const ph = (name: string) => `/banners/placeholders/${name}.svg`;
-/** Real animated banners rendered by scripts/banners (animated WebP; the matching GIFs are for uploading via admin). */
-const real = (name: string) => `/banners/${name}.webp`;
+/** Real animated banners rendered by scripts/banners: smooth MP4 + a sharp poster still (GIFs are for uploading via admin). */
+const real = (name: string) => `/banners/${name}.mp4`;
+const poster = (name: string) => `/banners/${name}.poster.webp`;
 const tile = (name: string, link: string, alt: string, extra: Partial<Tile> = {}): Tile => ({ image: ph(name), link, alt, ...extra });
 
 const R = (w: number, h: number): Ratio => ({ w, h });
@@ -33,19 +34,19 @@ const concern = (slug: string, label: string, q: string) => tile(`concern-${slug
 
 export const DEFAULT_SECTIONS: Seed[] = [
   section('hero', 'Hero', { ratio: R(16, 5), mobileRatio: R(1, 1), autoplayMs: 6000 }, [
-    { image: real('hero-1-desktop'), mobileImage: real('hero-1-mobile'), link: '/products?brand=KODOMO', alt: 'Kodomo baby care: gentle care for little ones' },
-    { image: real('hero-2-desktop'), mobileImage: real('hero-2-mobile'), link: '/products?brand=FENNEL&category=Makeup', alt: 'Fennel makeup: find your colour, best price in Bangladesh guaranteed' },
-    { image: real('hero-3-desktop'), mobileImage: real('hero-3-mobile'), link: '/products?brand=FENNEL&category=Skin%20Care', alt: 'Fennel skincare: serums and face washes, best price in Bangladesh guaranteed' },
-    { image: real('hero-4-desktop'), mobileImage: real('hero-4-mobile'), link: '/products', alt: 'Authentic beauty, delivered across Bangladesh' },
+    { image: real('hero-1-desktop'), poster: poster('hero-1-desktop'), mobileImage: real('hero-1-mobile'), mobilePoster: poster('hero-1-mobile'), link: '/products?brand=KODOMO', alt: 'Kodomo baby care: gentle care for little ones' },
+    { image: real('hero-2-desktop'), poster: poster('hero-2-desktop'), mobileImage: real('hero-2-mobile'), mobilePoster: poster('hero-2-mobile'), link: '/products?brand=FENNEL&category=Makeup', alt: 'Fennel makeup: find your colour, best price in Bangladesh guaranteed' },
+    { image: real('hero-3-desktop'), poster: poster('hero-3-desktop'), mobileImage: real('hero-3-mobile'), mobilePoster: poster('hero-3-mobile'), link: '/products?brand=FENNEL&category=Skin%20Care', alt: 'Fennel skincare: serums and face washes, best price in Bangladesh guaranteed' },
+    { image: real('hero-4-desktop'), poster: poster('hero-4-desktop'), mobileImage: real('hero-4-mobile'), mobilePoster: poster('hero-4-mobile'), link: '/products', alt: 'Authentic beauty, delivered across Bangladesh' },
   ]),
   section('strip', 'Promise strip', { ratio: R(25, 1), mobileRatio: R(10, 1) }, [
-    { image: real('strip-desktop'), mobileImage: real('strip-mobile'), link: '/products', alt: 'Best price in Bangladesh, guaranteed. 100% authentic. Cash on delivery. Nationwide delivery.' },
+    { image: real('strip-desktop'), poster: poster('strip-desktop'), mobileImage: real('strip-mobile'), mobilePoster: poster('strip-mobile'), link: '/products', alt: 'Best price in Bangladesh, guaranteed. 100% authentic. Cash on delivery. Nationwide delivery.' },
   ]),
   section('image-grid', 'Shop our favourites', { ratio: R(1, 1), cols: { mobile: 2, tablet: 4, desktop: 4 }, mobileLayout: 'grid', accent: '#A41B15' }, [
-    { image: real('deal-1'), link: '/products?brand=FENNEL&category=Makeup', alt: 'Fennel makeup, best price in Bangladesh guaranteed' },
-    { image: real('deal-2'), link: '/products?brand=KODOMO', alt: 'Kodomo baby care' },
-    { image: real('deal-3'), link: '/products?sort=best-selling', alt: 'Bestsellers' },
-    { image: real('deal-4'), link: '/products?q=gift', alt: 'Gift sets' },
+    { image: real('deal-1'), poster: poster('deal-1'), link: '/products?brand=FENNEL&category=Makeup', alt: 'Fennel makeup, best price in Bangladesh guaranteed' },
+    { image: real('deal-2'), poster: poster('deal-2'), link: '/products?brand=KODOMO', alt: 'Kodomo baby care' },
+    { image: real('deal-3'), poster: poster('deal-3'), link: '/products?sort=best-selling', alt: 'Bestsellers' },
+    { image: real('deal-4'), poster: poster('deal-4'), link: '/products?q=gift', alt: 'Gift sets' },
   ]),
   section('image-grid', 'Top brands and offers', { ratio: R(2, 1), cols: { mobile: 1, tablet: 2, desktop: 3 }, mobileLayout: 'scroll', accent: '#3B0D2E' },
     [1, 2, 3, 4, 5, 6].map((n) => tile(`brand-${n}`, '/offers', `Brand offer ${n}`))),

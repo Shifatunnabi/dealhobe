@@ -26,6 +26,8 @@ export function sanitizeTile(t: unknown): Tile | null {
   return {
     image,
     imagePublicId: str(o.imagePublicId),
+    poster: str(o.poster, 1000),
+    mobilePoster: str(o.mobilePoster, 1000),
     mobileImage: str(o.mobileImage, 1000),
     mobileImagePublicId: str(o.mobileImagePublicId),
     link: str(o.link, 1000),

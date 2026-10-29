@@ -32,6 +32,8 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;-webkit-font-smoothing
 .abs{position:absolute}
 .disc{position:absolute;border-radius:50%}
 .band{position:absolute;left:0;right:0;bottom:0}
+@keyframes kb{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
+.kb{animation:kb 4s ease-in-out infinite;transform-origin:62% 70%}
 .d{font-family:Fraunces,Georgia,serif;font-weight:700;letter-spacing:-.02em}
 .d em{font-style:italic;font-weight:700}
 
@@ -125,8 +127,12 @@ export function row(items, { x0, x1, gy, gap = 18, d0 = 0.5, step = 0.12, dy = 6
   }).join('');
 }
 
+/** DealHobe logo on a white rounded chip (reads on every backdrop). */
+export const logoChip = ({ m, d = 0.15 }) =>
+  `<div class="abs in" style="--d:${d}s;--dy:-12px;${m ? 'right:48px;top:40px' : 'left:96px;top:24px'};background:#fff;border-radius:${m ? 20 : 16}px;padding:${m ? 9 : 6}px;box-shadow:0 8px 22px rgba(15,4,12,.24);line-height:0"><img src="assets/dealhobe-logo.png" style="height:${m ? 66 : 50}px;width:auto;display:block"></div>`;
+
 export function page({ W, H, bg, body, script = '', photo = '', photoPos = 'center', photoSize = 'cover', veil = '', veilDir = '90deg' }) {
-  const layer = photo ? `<div class="abs" style="inset:0;background:url('backdrops/${photo}') ${photoPos}/${photoSize} no-repeat"></div>` : '';
+  const layer = photo ? `<div class="abs kb" style="inset:0;background:url('backdrops/${photo}') ${photoPos}/${photoSize} no-repeat"></div>` : '';
   const veilLayer = veil ? `<div class="abs" style="inset:0;background:linear-gradient(${veilDir},${veil},rgba(255,255,255,0) 62%)"></div>` : '';
   return `<!doctype html><html><head><meta charset="utf-8">${FONT_LINK}<style>${css(W, H)}</style></head>
 <body><div class="stage" style="background:${bg}">${layer}${veilLayer}${body}</div>${script ? `<script>${script}</script>` : ''}</body></html>`;

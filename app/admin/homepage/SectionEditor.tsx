@@ -91,15 +91,15 @@ function TileRow({ tile, index, count, settings, withMobile, links, onChange, on
       <div className="hb-tile-media">
         <div>
           <TilePreview src={tile.image} ratio={settings.ratio} label={withMobile ? 'Desktop' : 'Image'} />
-          <MediaUpload compact label={tile.image ? 'Replace' : 'Upload'} onUploaded={(m) => set({ image: m.url, imagePublicId: m.publicId })} />
+          <MediaUpload compact label={tile.image ? 'Replace' : 'Upload'} onUploaded={(m) => set({ image: m.url, imagePublicId: m.publicId, poster: '' })} />
         </div>
         {withMobile && (
           <div>
             <TilePreview src={tile.mobileImage || tile.image} ratio={settings.mobileRatio ?? settings.ratio} label={tile.mobileImage ? 'Mobile' : 'Mobile (uses desktop)'} />
             <div className="hb-inline">
-              <MediaUpload compact label={tile.mobileImage ? 'Replace' : 'Upload'} onUploaded={(m) => set({ mobileImage: m.url, mobileImagePublicId: m.publicId })} />
+              <MediaUpload compact label={tile.mobileImage ? 'Replace' : 'Upload'} onUploaded={(m) => set({ mobileImage: m.url, mobileImagePublicId: m.publicId, mobilePoster: '' })} />
               {tile.mobileImage && (
-                <button type="button" className="btn-admin-secondary hb-upload-compact" onClick={() => set({ mobileImage: '', mobileImagePublicId: '' })}>Clear</button>
+                <button type="button" className="btn-admin-secondary hb-upload-compact" onClick={() => set({ mobileImage: '', mobileImagePublicId: '', mobilePoster: '' })}>Clear</button>
               )}
             </div>
           </div>
