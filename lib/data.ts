@@ -14,6 +14,8 @@
  *   'hero'       hero slides
  *   'reviews'    approved reviews (homepage + product detail)
  *   'blogs'      blog list + individual posts
+ *   'homepage'   homepage builder sections
+ *   'settings'   storefront settings (nav pills, trust badges, contact, socials)
  */
 
 import { cache } from 'react';
@@ -27,6 +29,11 @@ import Offer from './models/Offer';
 import HeroSlide from './models/HeroSlide';
 import Review from './models/Review';
 import Blog from './models/Blog';
+import HomeSectionModel from './models/HomeSection';
+import Settings from './models/Settings';
+import Order from './models/Order';
+import type { HomeSection, Storefront } from './homepage/types';
+import { defaultSections, DEFAULT_STOREFRONT } from './homepage/defaults';
 import mongoose from 'mongoose';
 
 // ─── Plain serializable types ─────────────────────────────────────────────────
@@ -436,3 +443,77 @@ const _getAllBlogIds = unstable_cache(
 );
 /** All blog IDs — used by generateStaticParams. Cached 1 h. */
 export const getAllBlogIds = cache(_getAllBlogIds);
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// HOMEPAGE BUILDER + STOREFRONT SETTINGS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const _getHomeSections = unstable_cache(
+  async (): Promise<HomeSection[]> => {
+    await connectDB();
+    const docs = await HomeSectionModel.find().sort({ order: 1, createdAt: 1 }).lean();
+    // Nothing saved yet: show the starter layout so the homepage is never empty.
+    return docs.length ? (s(docs) as unknown as HomeSection[]) : defaultSections();
+  },
+  ['home-sections'],
+  { revalidate: 3600, tags: ['homepage'] }
+);
+/** Every homepage section (active or not) in display order. Cached 1 h, tag: homepage. */
+export const getHomeSections = cache(_getHomeSections);
+
+const _getStorefront = unstable_cache(
+  async (): Promise<Storefront & { logoUrl: string; freeDeliveryThreshold: number }> => {
+    await connectDB();
+    const doc = await Settings.findOne({ key: 'global' }).lean();
+    const saved = (doc?.storefront ?? {}) as Partial<Storefront>;
+    return s({
+      ...DEFAULT_STOREFRONT,
+      ...saved,
+      contact: { ...DEFAULT_STOREFRONT.contact, ...saved.contact },
+      socials: { ...DEFAULT_STOREFRONT.socials, ...saved.socials },
+      logoUrl: doc?.logoUrl || '/logo/main-logo.png',
+      freeDeliveryThreshold: doc?.freeDeliveryThreshold || 0,
+    });
+  },
+  ['storefront-v2'], // bump when the Storefront shape changes so stale cached objects aren't served
+  { revalidate: 3600, tags: ['settings'] }
+);
+/** Storefront chrome settings merged over defaults. Cached 1 h, tag: settings. */
+export const getStorefront = cache(_getStorefront);
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PRODUCT RATINGS (for product cards)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export type RatingSummary = { avg: number; count: number };
+
+const _getProductRatings = unstable_cache(
+  async (): Promise<Record<string, RatingSummary>> => {
+    await connectDB();
+    const rows = await Review.aggregate<{ _id: string; avg: number; count: number }>([
+      { $match: { isApproved: true, productId: { $ne: '' } } },
+      { $group: { _id: '$productId', avg: { $avg: '$rating' }, count: { $sum: 1 } } },
+    ]);
+    return Object.fromEntries(rows.map((r) => [String(r._id), { avg: Math.round(r.avg * 10) / 10, count: r.count }]));
+  },
+  ['product-ratings'],
+  { revalidate: 3600, tags: ['reviews'] }
+);
+/** Average approved rating and review count per product id. Cached 1 h, tag: reviews. */
+export const getProductRatings = cache(_getProductRatings);
+
+const _getSoldCounts = unstable_cache(
+  async (): Promise<Record<string, number>> => {
+    await connectDB();
+    const rows = await Order.aggregate<{ _id: string; sold: number }>([
+      { $match: { status: { $ne: 'Cancelled' } } },
+      { $unwind: '$items' },
+      { $group: { _id: '$items.productId', sold: { $sum: '$items.qty' } } },
+    ]);
+    return Object.fromEntries(rows.map((r) => [String(r._id), r.sold]));
+  },
+  ['product-sold-counts'],
+  { revalidate: 3600, tags: ['orders'] }
+);
+/** Units sold per product id across non-cancelled orders ("Best selling" sort). Cached 1 h. */
+export const getSoldCounts = cache(_getSoldCounts);

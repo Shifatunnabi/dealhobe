@@ -50,7 +50,7 @@ export default function AdminLoginPage() {
               id="admin-email"
               type="email"
               className="login-input"
-              placeholder="admin@dealhobe.com"
+              placeholder="admin@example.com"
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
@@ -64,7 +64,7 @@ export default function AdminLoginPage() {
               id="admin-password"
               type="password"
               className="login-input"
-              placeholder="••••••••"
+              placeholder="Your password"
               value={password}
               onChange={e => setPassword(e.target.value)}
               required

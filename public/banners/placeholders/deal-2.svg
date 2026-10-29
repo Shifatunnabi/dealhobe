@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#B9822F"/><stop offset="1" stop-color="#E9C27A"/></linearGradient></defs>
+<rect width="600" height="600" fill="url(#g)"/>
+<circle cx="528" cy="90" r="270" fill="#fff" opacity=".08"/>
+<circle cx="48" cy="570" r="210" fill="#fff" opacity=".06"/>
+<rect x="36" y="36" width="528" height="528" rx="21.599999999999998" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="2.88" stroke-dasharray="14.4 10.799999999999999"/>
+<text x="50%" y="294.3" text-anchor="middle" font-family="Poppins, Arial, sans-serif" font-weight="700" font-size="45" fill="#fff">Bestsellers</text>
+<text x="50%" y="324.7" text-anchor="middle" font-family="Poppins, Arial, sans-serif" font-size="19" fill="#fff" fill-opacity=".8">600 × 600 · GIF / WebP / MP4</text>
+</svg>

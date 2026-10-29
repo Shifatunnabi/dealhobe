@@ -15,7 +15,9 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  // Public: customers submit reviews
+  const session = await getServerSession();
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
   await connectDB();
   const body   = await req.json();
   const review = await Review.create(body);

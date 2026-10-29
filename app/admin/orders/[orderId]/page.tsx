@@ -31,7 +31,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
 
   return (
     <div>
-      <div className="admin-page-header">
+      <div className="admin-page-header order-detail-header">
         <div>
           <h1 className="admin-page-title"><span className="page-icon"><FiFileText size={20} /></span> Order {order.orderNumber}</h1>
           <p className="admin-page-subtitle">Review items, customer details, and download receipt.</p>
@@ -41,56 +41,56 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
 
       <div className="admin-card">
         <div className="admin-card-header">Customer Details</div>
-        <div className="admin-card-body" style={{ display: "grid", gap: "0.5rem" }}>
-          <div><strong>Name:</strong> {order.delivery.fullName}</div>
-          <div><strong>Phone:</strong> {order.delivery.phone}</div>
-          {order.delivery.email && <div><strong>Email:</strong> {order.delivery.email}</div>}
-          <div><strong>Address:</strong> {order.delivery.address}</div>
+        <div className="admin-card-body">
+          <dl className="admin-dl">
+            <dt>Name</dt><dd>{order.delivery.fullName}</dd>
+            <dt>Phone</dt><dd>{order.delivery.phone}</dd>
+            {order.delivery.email && <><dt>Email</dt><dd>{order.delivery.email}</dd></>}
+            <dt>Address</dt><dd>{order.delivery.address}</dd>
+          </dl>
         </div>
       </div>
 
       <div className="admin-card" style={{ marginTop: "1rem" }}>
         <div className="admin-card-header">Order Items</div>
         <div className="admin-card-body">
-          <div className="admin-table-wrap">
-            <table className="admin-table">
+          <div className="admin-table-wrap admin-table-wrap--stack">
+            <table className="admin-table admin-table--stack">
               <thead>
                 <tr>
                   <th>Serial</th>
                   <th>Product</th>
                   <th>Qty</th>
-                  <th style={{ textAlign: "right" }}>Unit Price</th>
-                  <th style={{ textAlign: "right" }}>Total</th>
+                  <th className="num">Unit Price</th>
+                  <th className="num">Total</th>
                 </tr>
               </thead>
               <tbody>
                 {order.items.map((item: any, index: number) => (
                   <tr key={`${item.productId}-${item.variantKey || index}`}>
-                    <td>{index + 1}</td>
-                    <td>{item.name}{item.variantLabel ? ` (${item.variantLabel})` : ""}{item.variantSku && <div style={{ fontSize: "0.7rem", color: "var(--text-muted)", fontFamily: "monospace" }}>{item.variantSku}</div>}</td>
-                    <td>{item.qty}</td>
-                    <td style={{ textAlign: "right" }}>৳{item.unitPrice}</td>
-                    <td style={{ textAlign: "right" }}>৳{item.lineTotal}</td>
+                    <td className="hide-stacked">{index + 1}</td>
+                    <td className="cell-head"><div><span className="cell-title">{item.name}{item.variantLabel ? ` (${item.variantLabel})` : ""}</span>{item.variantSku && <div className="cell-mono">{item.variantSku}</div>}</div></td>
+                    <td data-label="Qty">{item.qty}</td>
+                    <td data-label="Unit Price" className="num">৳{item.unitPrice}</td>
+                    <td data-label="Total" className="num">৳{item.lineTotal}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
 
-          <div style={{ marginTop: "1rem", display: "flex", justifyContent: "flex-end" }}>
-            <div style={{ minWidth: 240, display: "grid", gap: "0.35rem" }}>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span>Subtotal</span>
-                <strong style={{ textAlign: "right", minWidth: 90 }}>৳{order.subtotal}</strong>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span>Delivery Charge</span>
-                <strong style={{ textAlign: "right", minWidth: 90 }}>৳{order.deliveryCharge}</strong>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between", borderTop: "1px solid rgba(0,0,0,0.08)", paddingTop: "0.5rem" }}>
-                <span>Total</span>
-                <strong style={{ color: "var(--primary-pink, #A41B15)", textAlign: "right", minWidth: 90 }}>৳{order.total}</strong>
-              </div>
+          <div className="order-totals">
+            <div>
+              <span>Subtotal</span>
+              <strong>৳{order.subtotal}</strong>
+            </div>
+            <div>
+              <span>Delivery Charge</span>
+              <strong>৳{order.deliveryCharge}</strong>
+            </div>
+            <div className="is-grand">
+              <span>Total</span>
+              <strong>৳{order.total}</strong>
             </div>
           </div>
         </div>

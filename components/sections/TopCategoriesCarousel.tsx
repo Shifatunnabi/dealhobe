@@ -79,7 +79,7 @@ function CategoryCard({ cat }: { cat: PlainCategory }) {
 
       <Link
         href={`/products?category=${encodeURIComponent(cat.name)}`}
-        className="font-poppins text-base font-semibold text-text-dark md:text-lg"
+        className="font-body text-base font-semibold text-text-dark md:text-lg"
       >
         {cat.name}
       </Link>

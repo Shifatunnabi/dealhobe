@@ -145,19 +145,19 @@ export default function OffersPage() {
         <div className="admin-empty">
           <div className="empty-icon"><FiGift size={40} /></div>
           <h3>No Offers Yet</h3>
-          <p>Click "Create New Offer" to start your first campaign.</p>
+          <p>Click &quot;Create New Offer&quot; to start your first campaign.</p>
         </div>
       ) : (
-        <div className="admin-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
+        <div className="admin-grid admin-grid--wide">
             {offers.map(o => {
             const endingDate = o.endingDate ? new Date(o.endingDate) : null;
             const isClosed = !o.isActive || (endingDate && endingDate < new Date());
             return (
               <div key={o._id} className="admin-item-card">
-                  <div style={{ position: 'relative', height: 160 }}>
-                      <Image src={o.thumbnailUrl} alt={o.title} fill style={{ objectFit: 'cover' }} />
-                  <span className={`badge ${isClosed ? 'badge-red' : 'badge-green'}`} style={{ position: 'absolute', top: 8, right: 8 }}>
-                    {isClosed ? 'Inactive' : 'Active'}
+                  <div className="admin-item-image admin-item-image--wide">
+                      <Image src={o.thumbnailUrl} alt={o.title} fill sizes="(max-width: 640px) 100vw, 400px" style={{ objectFit: 'cover' }} />
+                      <span className={`admin-media-badge top-right ${isClosed ? '' : 'is-gold'}`}>
+                        {isClosed ? 'Inactive' : 'Active'}
                       </span>
                   </div>
                   <div className="admin-item-body">
@@ -171,9 +171,9 @@ export default function OffersPage() {
                             Ends: {new Date(o.endingDate).toLocaleDateString()}
                           </div>
                         )}
-                      <div className="admin-item-actions" style={{ marginTop: '0.75rem' }}>
-                          <button className="btn-admin-edit" onClick={() => openEdit(o)}><FiEdit2 size={13} /> Edit</button>
-                          <button className="btn-admin-danger" onClick={() => handleDelete(o._id)}><FiTrash2 size={13} /> Del</button>
+                      <div className="admin-item-actions" style={{ paddingTop: '0.5rem' }}>
+                          <button className="btn-admin-edit btn-sm" onClick={() => openEdit(o)}><FiEdit2 size={13} /> Edit</button>
+                          <button className="btn-admin-danger btn-sm" onClick={() => handleDelete(o._id)}><FiTrash2 size={13} /> Delete</button>
                       </div>
                   </div>
               </div>
@@ -185,12 +185,12 @@ export default function OffersPage() {
       {/* Modal */}
       {modal && (
         <div className="modal-overlay">
-          <div className="modal-box modal-lg" style={{ maxWidth: 800 }}>
+          <div className="modal-box modal-lg" role="dialog" aria-modal="true" aria-label={editing ? 'Edit Offer' : 'Create New Offer'}>
             <div className="modal-header">
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
                 {editing ? <FiEdit2 size={16} /> : <FiPlus size={16} />} {editing ? 'Edit Offer' : 'Create New Offer'}
               </span>
-              <button className="modal-close" onClick={() => setModal(false)}><FiX size={16} /></button>
+              <button className="modal-close" aria-label="Close" onClick={() => setModal(false)}><FiX size={18} /></button>
             </div>
             <div className="modal-body">
               <div className="admin-form">
@@ -207,11 +207,11 @@ export default function OffersPage() {
 
                 <div className="admin-field">
                     <label className="admin-label">Discount Type</label>
-                    <div style={{display:'flex', gap:'1rem'}}>
-                       <label style={{display:'flex', alignItems:'center', gap:'0.5rem', cursor:'pointer'}}>
+                    <div className="admin-radio-group">
+                       <label>
                            <input type="radio" value="percentage" checked={form.discountType === 'percentage'} onChange={e => setForm((f:any) => ({...f, discountType: e.target.value}))} /> Percentage
                        </label>
-                       <label style={{display:'flex', alignItems:'center', gap:'0.5rem', cursor:'pointer'}}>
+                       <label>
                            <input type="radio" value="flat" checked={form.discountType === 'flat'} onChange={e => setForm((f:any) => ({...f, discountType: e.target.value}))} /> Flat Amount
                        </label>
                     </div>
@@ -241,33 +241,37 @@ export default function OffersPage() {
 
                  <div className="admin-field">
                     <label className="admin-label">Product Selection</label>
-                    <div style={{display:'flex', gap:'1rem'}}>
-                       <label style={{display:'flex', alignItems:'center', gap:'0.5rem', cursor:'pointer'}}>
+                    <div className="admin-radio-group">
+                       <label>
                            <input type="radio" value="all" checked={form.productSelection === 'all'} onChange={e => setForm((f:any) => ({...f, productSelection: e.target.value, selectedProducts: []}))} /> All Products
                        </label>
-                       <label style={{display:'flex', alignItems:'center', gap:'0.5rem', cursor:'pointer'}}>
+                       <label>
                            <input type="radio" value="selected" checked={form.productSelection === 'selected'} onChange={e => setForm((f:any) => ({...f, productSelection: e.target.value}))} /> Selected Products Only
                        </label>
                     </div>
                 </div>
 
                 {form.productSelection === 'selected' && (
-                    <div className="admin-field" style={{background: 'rgba(0,0,0,0.03)', padding: '1rem', borderRadius: 8}}>
+                    <div className="admin-field admin-subpanel">
                          <label className="admin-label">Select Products</label>
-                         <input className="admin-input" style={{marginBottom: '0.5rem'}} placeholder="Search products..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
-                         <div style={{height: 200, overflowY: 'auto', border: '1px solid #ddd', borderRadius: 4, background: '#fff'}}>
+                         <input className="admin-input" type="search" style={{marginBottom: '0.5rem'}} placeholder="Search products..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
+                         <div className="check-list">
                              {filteredProducts.map(p => (
-                                 <label key={p._id} style={{display:'flex', alignItems:'center', justifyContent: 'space-between', padding: '0.5rem', borderBottom: '1px solid #f0f0f0', cursor:'pointer', background: form.selectedProducts.includes(p._id) ? '#f0f9ff' : 'transparent'}}>
-                                     <div style={{display:'flex', alignItems:'center', gap:'0.5rem'}}>
-                                         {getProductCoverImage(p) && <Image src={getProductCoverImage(p) as string} alt={p.name} width={30} height={30} style={{objectFit:'cover', borderRadius:4}}/>}
-                                         <span style={{fontSize:'0.9rem'}}>{p.name} - {p.hasVariants ? 'from ' : ''}৳{withLowestVariantPrice(p).salePrice || withLowestVariantPrice(p).price}</span>
+                                 <label key={p._id} className={`check-list-row ${form.selectedProducts.includes(p._id) ? 'is-checked' : ''}`}>
+                                     <div>
+                                         {getProductCoverImage(p) && (
+                                           <span className="admin-thumb">
+                                             <Image src={getProductCoverImage(p) as string} alt="" fill sizes="34px" style={{objectFit:'cover'}}/>
+                                           </span>
+                                         )}
+                                         <span>{p.name} - {p.hasVariants ? 'from ' : ''}৳{withLowestVariantPrice(p).salePrice || withLowestVariantPrice(p).price}</span>
                                      </div>
-                                     <input type="checkbox" checked={form.selectedProducts.includes(p._id)} onChange={() => toggleProduct(p._id)} />
+                                     <input type="checkbox" className="admin-checkbox" checked={form.selectedProducts.includes(p._id)} onChange={() => toggleProduct(p._id)} />
                                  </label>
                              ))}
-                             {filteredProducts.length === 0 && <div style={{padding:'1rem', textAlign:'center', color:'#999'}}>No products found</div>}
+                             {filteredProducts.length === 0 && <div className="picker-state">No products found</div>}
                          </div>
-                         <div style={{marginTop:'0.5rem', fontSize:'0.8rem', color:'var(--text-muted)'}}>{form.selectedProducts.length} product(s) selected</div>
+                         <div className="admin-hint" style={{marginTop:'0.5rem'}}>{form.selectedProducts.length} product(s) selected</div>
                     </div>
                 )}
 

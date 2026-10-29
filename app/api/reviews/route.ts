@@ -22,13 +22,21 @@ export async function GET(req: NextRequest) {
   await connectDB();
   const productId = req.nextUrl.searchParams.get("productId") || "";
 
-  const query: Record<string, any> = { isApproved: true };
+  const query: { isApproved: boolean; productId?: string } = { isApproved: true };
   if (productId) {
     query.productId = productId;
   }
 
   const reviews = await Review.find(query).sort({ createdAt: -1 }).lean();
-  return NextResponse.json(reviews);
+  // Public endpoint: never expose customer emails or ids. A signed-in shopper's own review is flagged
+  // with `mine` so the product page can tell they have already reviewed.
+  const customer = await getCustomerFromRequest(req).catch(() => null);
+  return NextResponse.json(
+    reviews.map(({ customerEmail, customerId, ...r }) => ({
+      ...r,
+      mine: !!customer && (customerId === String(customer._id) || (!!customer.email && customerEmail === customer.email)),
+    })),
+  );
 }
 
 export async function POST(req: NextRequest) {

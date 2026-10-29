@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
+import ImageUpload from "@/components/admin/ImageUpload";
 import { FiSettings, FiTruck } from "react-icons/fi";
 
 export default function AdminSettingsPage() {
@@ -50,8 +51,8 @@ export default function AdminSettingsPage() {
       setLogoUrl(data?.logoUrl || "");
       setLogoPublicId(data?.logoPublicId || "");
       toast.success("Settings updated.");
-    } catch (err: any) {
-      toast.error(err?.message || "Failed to save settings.");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Failed to save settings.");
     } finally {
       setSaving(false);
     }
@@ -72,7 +73,13 @@ export default function AdminSettingsPage() {
       {loading ? (
         <div className="admin-empty"><div className="spinner" style={{ margin: "0 auto 1rem" }} /><p>Loading…</p></div>
       ) : (
-        <div className="admin-grid" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))" }}>
+        <div className="admin-grid admin-grid--wide">
+          <div className="admin-card">
+            <div className="admin-card-header">Store logo</div>
+            <div className="admin-card-body">
+              <ImageUpload label="Logo" value={logoUrl} folder="dealhobe/settings" onChange={(url, publicId) => { setLogoUrl(url); setLogoPublicId(publicId); }} />
+            </div>
+          </div>
           <div className="admin-card">
             <div className="admin-card-header"><span style={{display:"inline-flex",alignItems:"center",gap:"0.5rem"}}><FiTruck size={16} /> Free Delivery</span></div>
             <div className="admin-card-body">
@@ -85,7 +92,7 @@ export default function AdminSettingsPage() {
                   onChange={(e) => setFreeDeliveryThreshold(Number(e.target.value) || 0)}
                   min={0}
                 />
-                <p className="admin-item-meta" style={{ marginTop: "0.5rem" }}>
+                <p className="admin-hint" style={{ marginTop: "0.25rem" }}>
                   Orders with subtotal greater than or equal to this amount will get free delivery.
                 </p>
               </div>

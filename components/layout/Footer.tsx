@@ -1,159 +1,98 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { INFORMATION_LINKS } from "@/lib/information-pages";
-import { FiFacebook, FiYoutube, FiMail, FiPhone, FiMapPin, FiShield } from "react-icons/fi";
+import { FiMail, FiPhone, FiMapPin } from "react-icons/fi";
+import { FaFacebookF, FaInstagram, FaYoutube, FaTiktok, FaWhatsapp } from "react-icons/fa";
+import type { Storefront } from "@/lib/homepage/types";
+
+export type FooterStorefront = Pick<Storefront, "contact" | "socials" | "footerAbout"> & { logoUrl: string };
 
 const QUICK_LINKS = [
   { label: "Home", href: "/" },
-  { label: "Products", href: "/products" },
+  { label: "All products", href: "/products" },
   { label: "Offers", href: "/offers" },
-  { label: "Blogs", href: "/blogs" },
+  { label: "Beauty blog", href: "/blogs" },
+  { label: "My account", href: "/profile" },
 ];
 
-export default function Footer() {
-  const [logoUrl, setLogoUrl] = useState("/logo/main-logo.png");
+const PAYMENTS = ["Cash on delivery", "bKash", "Nagad", "Visa", "Mastercard"];
 
-  useEffect(() => {
-    let alive = true;
-    const loadLogo = async () => {
-      try {
-        const res = await fetch("/api/settings");
-        const data = await res.json();
-        if (!alive) return;
-        if (res.ok && data?.logoUrl) setLogoUrl(data.logoUrl);
-      } catch {
-        if (alive) setLogoUrl("/logo/main-logo.png");
-      }
-    };
-
-    loadLogo();
-    return () => {
-      alive = false;
-    };
-  }, []);
+export default function Footer({ storefront }: { storefront: FooterStorefront }) {
+  const { contact, socials } = storefront;
+  const socialLinks = [
+    { href: socials.facebook, label: "Facebook", Icon: FaFacebookF },
+    { href: socials.instagram, label: "Instagram", Icon: FaInstagram },
+    { href: socials.youtube, label: "YouTube", Icon: FaYoutube },
+    { href: socials.tiktok, label: "TikTok", Icon: FaTiktok },
+    { href: contact.whatsapp ? `https://wa.me/${contact.whatsapp.replace(/\D/g, "")}` : "", label: "WhatsApp", Icon: FaWhatsapp },
+  ].filter((s) => s.href);
 
   return (
-    <footer className="bg-[#0f172a] text-text-light">
-      <div className="mx-auto max-w-7xl px-4 pt-16 pb-24 md:px-8 md:pb-8">
+    <footer className="mt-auto border-t-4 border-primary-pink bg-plum text-text-light">
 
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-[1.2fr_0.7fr_1fr_1.2fr] lg:gap-8">
-
-          {/* ── Brand column ────────────────────────────── */}
-          <div className="lg:col-span-1">
-            <Image
-              src={logoUrl}
-              alt="DealHobe"
-              width={120}
-              height={44}
-              className="h-11 w-auto object-contain brightness-0 invert mb-4"
-            />
-            <p className="font-poppins text-sm leading-relaxed text-text-light/70 max-w-60">
-              Premium cosmetics and beauty essentials for every woman in Bangladesh. Bringing global beauty home since 2022.
-            </p>
-
-            {/* Social icons */}
-            <div className="mt-5 flex items-center gap-3">
-              {[
-                { icon: FiFacebook, href: "#", label: "Facebook" },
-                { icon: FiYoutube,  href: "#", label: "YouTube"   },
-              ].map(({ icon: Icon, href, label }) => (
-                <a
-                  key={label}
-                  href={href}
-                  aria-label={label}
-                  className="flex h-9 w-9 items-center justify-center rounded-2xl bg-white/10 text-text-light/70 transition-all hover:bg-primary-pink hover:text-white"
-                >
-                  <Icon size={16} />
-                </a>
-              ))}
-            </div>
+      <div className="shell pt-14 pb-28 md:pb-10">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-[1.4fr_0.8fr_1fr_1.3fr] lg:gap-10">
+          <div className="col-span-2 lg:col-span-1">
+            <Image src={storefront.logoUrl} alt="DealHobe" width={120} height={44} className="mb-4 h-12 w-auto object-contain brightness-0 invert" />
+            <p className="max-w-xs text-sm leading-relaxed text-white/70">{storefront.footerAbout}</p>
+            {socialLinks.length > 0 && (
+              <div className="mt-5 flex flex-wrap items-center gap-2.5">
+                {socialLinks.map(({ href, label, Icon }) => (
+                  <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label}
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white/80 transition-colors hover:bg-gold hover:text-plum">
+                    <Icon size={15} />
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* ── Quick Links ─────────────────────────────── */}
           <div>
-            <h3 className="font-poppins text-lg font-semibold text-text-light mb-4">Quick Links</h3>
+            <h3 className="mb-4 font-display text-lg font-semibold text-gold">Shop</h3>
             <ul className="flex flex-col gap-2.5">
               {QUICK_LINKS.map((link) => (
-                <li key={link.label}>
-                  <Link
-                    href={link.href}
-                    className="font-poppins text-sm text-text-light/60 transition-colors hover:text-primary-pink"
-                  >
-                    {link.label}
-                  </Link>
+                <li key={link.href}>
+                  <Link href={link.href} className="text-sm text-white/70 transition-colors hover:text-white">{link.label}</Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* ── Contact ─────────────────────────────────── */}
           <div>
-            <h3 className="font-poppins text-lg font-semibold text-text-light mb-4">Information</h3>
+            <h3 className="mb-4 font-display text-lg font-semibold text-gold">Help</h3>
             <ul className="flex flex-col gap-2.5">
               {INFORMATION_LINKS.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className="font-poppins text-sm text-text-light/60 transition-colors hover:text-primary-pink">
-                    {link.label}
-                  </Link>
+                  <Link href={link.href} className="text-sm text-white/70 transition-colors hover:text-white">{link.label}</Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          <div>
-            <h3 className="font-poppins text-lg font-semibold text-text-light mb-4">Contact Us</h3>
-            <ul className="flex flex-col gap-3">
-              <li className="flex items-start gap-2.5">
-                <FiMapPin size={15} className="mt-0.5 shrink-0 text-primary-pink" />
-                <span className="font-poppins text-sm text-text-light/60 leading-snug">
-                  House 1/10, Block #A, Road #5, Lalmatia, Dhaka
-                </span>
-              </li>
-              <li>
-                <a
-                  href="tel:+8801338886611"
-                  className="flex items-center gap-2.5 font-poppins text-sm text-text-light/60 hover:text-primary-pink transition-colors"
-                >
-                  <FiPhone size={15} className="shrink-0 text-primary-pink" />
-                  01338886611
-                </a>
-              </li>
-              <li>
-                <a
-                  href="mailto:dealhobe26@gmail.com"
-                  className="flex items-center gap-2.5 font-poppins text-sm text-text-light/60 hover:text-primary-pink transition-colors"
-                >
-                  <FiMail size={15} className="shrink-0 text-primary-pink" />
-                  dealhobe26@gmail.com
-                </a>
-              </li>
+          <div className="col-span-2 lg:col-span-1">
+            <h3 className="mb-4 font-display text-lg font-semibold text-gold">Contact us</h3>
+            <ul className="flex flex-col gap-3 text-sm text-white/70">
+              {contact.address && (
+                <li className="flex items-start gap-2.5"><FiMapPin size={15} className="mt-0.5 shrink-0 text-gold" />{contact.address}</li>
+              )}
+              {contact.phone && (
+                <li><a href={`tel:${contact.phone}`} className="flex items-center gap-2.5 transition-colors hover:text-white"><FiPhone size={15} className="shrink-0 text-gold" />{contact.phone}</a></li>
+              )}
+              {contact.email && (
+                <li><a href={`mailto:${contact.email}`} className="flex items-center gap-2.5 break-all transition-colors hover:text-white"><FiMail size={15} className="shrink-0 text-gold" />{contact.email}</a></li>
+              )}
             </ul>
-
-            {/* Trust badge */}
-            <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-              <p className="flex items-center gap-1.5 font-poppins text-sm font-semibold text-primary-pink">
-                <FiShield size={15} className="shrink-0" />
-                Secure Shopping
-              </p>
-              <p className="font-poppins text-xs text-text-light/50 mt-0.5">SSL encrypted · COD available</p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              {PAYMENTS.map((p) => (
+                <span key={p} className="rounded-md border border-white/15 bg-white/5 px-2.5 py-1 text-[11px] font-semibold text-white/75">{p}</span>
+              ))}
             </div>
           </div>
         </div>
 
-        {/* Bottom bar */}
-        <div className="mt-12 flex flex-col-reverse items-center gap-2 border-t border-white/8 pt-6 text-center md:flex-row md:justify-between">
-          <p className="font-poppins text-xs text-text-light/40">
-            © {new Date().getFullYear()} DealHobe Bangladesh. All rights reserved.
-          </p>
-          <a
-            href="https://seltiv.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-poppins text-xs text-text-light/40 hover:text-primary-pink transition-colors"
-          >
+        <div className="mt-12 flex flex-col-reverse items-center gap-2 border-t border-white/10 pt-6 text-center md:flex-row md:justify-between">
+          <p className="text-xs text-white/50">© {new Date().getFullYear()} DealHobe Bangladesh. All rights reserved.</p>
+          <a href="https://seltiv.com" target="_blank" rel="noopener noreferrer" className="text-xs text-white/50 transition-colors hover:text-gold">
             Developed by <span className="font-semibold">SELTIV</span>
           </a>
         </div>

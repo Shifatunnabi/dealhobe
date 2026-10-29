@@ -23,12 +23,9 @@ function BrandCard({ brand, onEdit, onDelete }: { brand: Brand; onEdit: () => vo
   const { setNodeRef, style, isDragging, handle } = useSortableItem(brand._id);
   return (
     <div ref={setNodeRef} style={style} className={`admin-item-card${isDragging ? ' is-dragging' : ''}`}>
-      <div
-        className="admin-item-image"
-        style={{ position: 'relative', height: 120, background: 'rgba(45,27,78,0.04)' }}
-      >
-        <Image src={brand.logoUrl} alt={brand.name} fill style={{ objectFit: 'contain', padding: '1rem' }} />
-        <div style={{ position: 'absolute', top: 8, left: 8, background: 'rgba(255,255,255,0.9)', borderRadius: 8, padding: '0.25rem' }}>
+      <div className="admin-item-image admin-item-image--logo admin-item-image--contain">
+        <Image src={brand.logoUrl} alt={brand.name} fill sizes="(max-width: 640px) 100vw, 260px" style={{ objectFit: 'contain' }} />
+        <div className="admin-media-handle">
           <DragHandle handle={handle} />
         </div>
       </div>
@@ -36,8 +33,8 @@ function BrandCard({ brand, onEdit, onDelete }: { brand: Brand; onEdit: () => vo
         <div className="admin-item-title">{brand.name}</div>
         <div className="admin-item-meta">Order: {brand.order}</div>
         <div className="admin-item-actions">
-          <button className="btn-admin-edit"   onClick={onEdit}><FiEdit2 size={13} /> Edit</button>
-          <button className="btn-admin-danger" onClick={onDelete}><FiTrash2 size={13} /> Delete</button>
+          <button className="btn-admin-edit btn-sm"   onClick={onEdit}><FiEdit2 size={13} /> Edit</button>
+          <button className="btn-admin-danger btn-sm" onClick={onDelete}><FiTrash2 size={13} /> Delete</button>
         </div>
       </div>
     </div>
@@ -126,12 +123,12 @@ export default function BrandsPage() {
 
       {modal && (
         <div className="modal-overlay">
-          <div className="modal-box">
+          <div className="modal-box" role="dialog" aria-modal="true" aria-label={editing ? 'Edit Brand' : 'Add Brand'}>
             <div className="modal-header">
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
                 {editing ? <FiEdit2 size={16} /> : <FiPlus size={16} />} {editing ? 'Edit Brand' : 'Add Brand'}
               </span>
-              <button className="modal-close" onClick={() => setModal(false)}><FiX size={16} /></button>
+              <button className="modal-close" aria-label="Close" onClick={() => setModal(false)}><FiX size={18} /></button>
             </div>
             <div className="modal-body">
               <div className="admin-form">

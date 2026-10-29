@@ -10,7 +10,7 @@
 
 export type LiveRevalidateType =
   | 'product' | 'listing' | 'categories' | 'ages' | 'brands' | 'offers'
-  | 'hero' | 'reviews' | 'tips' | 'blogs' | 'all';
+  | 'hero' | 'reviews' | 'tips' | 'blogs' | 'homepage' | 'settings' | 'all';
 
 export async function notifyLiveSite(type: LiveRevalidateType, slug?: string): Promise<void> {
   const base = (process.env.LIVE_SITE_URL || '').trim().replace(/\/+$/, '');

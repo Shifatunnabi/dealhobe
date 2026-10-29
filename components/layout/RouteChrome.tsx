@@ -1,11 +1,10 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import Footer from "@/components/layout/Footer";
+import Footer, { type FooterStorefront } from "@/components/layout/Footer";
 import FloatingSocial from "@/components/floating/FloatingSocial";
-import FloatingCart from "@/components/floating/FloatingCart";
 
-export default function RouteChrome() {
+export default function RouteChrome({ storefront }: { storefront: FooterStorefront }) {
   const pathname = usePathname();
   const isAdminRoute = pathname?.startsWith("/admin");
 
@@ -13,9 +12,8 @@ export default function RouteChrome() {
 
   return (
     <>
-      <FloatingCart />
       <FloatingSocial />
-      <Footer />
+      <Footer storefront={storefront} />
     </>
   );
 }

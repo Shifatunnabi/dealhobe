@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3B0D2E"/><stop offset="1" stop-color="#8E3B74"/></linearGradient></defs>
+<rect width="400" height="400" fill="url(#g)"/>
+<circle cx="352" cy="60" r="180" fill="#fff" opacity=".08"/>
+<circle cx="32" cy="380" r="140" fill="#fff" opacity=".06"/>
+<rect x="24" y="24" width="352" height="352" rx="14.399999999999999" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="2" stroke-dasharray="9.600000000000001 7.199999999999999"/>
+<text x="50%" y="196.1" text-anchor="middle" font-family="Poppins, Arial, sans-serif" font-weight="700" font-size="30" fill="#fff">Anti-ageing</text>
+<text x="50%" y="216.9" text-anchor="middle" font-family="Poppins, Arial, sans-serif" font-size="13" fill="#fff" fill-opacity=".8">400 × 400 · GIF / WebP / MP4</text>
+</svg>

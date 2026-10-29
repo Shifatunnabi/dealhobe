@@ -222,10 +222,9 @@ export default function ProductsPage() {
         </div>
       ) : (
         <>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center', marginBottom: '1rem' }}>
+        <div className="admin-toolbar">
           <input
             className="admin-input"
-            style={{ flex: '1 1 260px', maxWidth: 420 }}
             type="search"
             placeholder="Search products by name…"
             value={search}
@@ -233,7 +232,6 @@ export default function ProductsPage() {
           />
           <select
             className="admin-select"
-            style={{ flex: '0 1 220px' }}
             value={brandFilter}
             onChange={e => { setBrandFilter(e.target.value); setPage(1); }}
             aria-label="Filter by brand"
@@ -247,7 +245,7 @@ export default function ProductsPage() {
               Clear
             </button>
           )}
-          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginLeft: 'auto' }}>
+          <span className="admin-toolbar-meta">
             {filteredProducts.length === products.length
               ? `${products.length} products`
               : `${filteredProducts.length} of ${products.length} products`}
@@ -260,8 +258,8 @@ export default function ProductsPage() {
             <p>Try a different word or brand.</p>
           </div>
         ) : (
-        <div className="admin-table-wrap">
-          <table className="admin-table">
+        <div className="admin-table-wrap admin-table-wrap--stack">
+          <table className="admin-table admin-table--stack">
             <thead>
               <tr>
                 <th>Product</th>
@@ -278,20 +276,25 @@ export default function ProductsPage() {
                   const subCat = subCategories.find(s => s._id === p.subCategory)?.name;
                   return (
                       <tr key={p._id}>
-                        <td style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                            {getProductCoverImage(p) && (
-                                <div style={{width: 40, height: 40, position: 'relative', borderRadius: 4, overflow: 'hidden'}}>
-                                    <Image src={getProductCoverImage(p) as string} alt={p.name} fill style={{objectFit:'cover'}} />
-                                </div>
-                            )}
-                            <div>
-                                <div style={{fontWeight: 600}}>{p.name}</div>
-                                <div style={{fontSize: '0.75rem', color: 'var(--text-muted)'}}>{p.slug}</div>
-                                {p.sku && <div style={{fontSize: '0.7rem', color: 'var(--text-muted)', fontFamily: 'monospace'}}>{p.sku}</div>}
+                        <td className="cell-head">
+                          <div className="cell-product">
+                            <div className="admin-thumb">
+                              {getProductCoverImage(p) ? (
+                                <Image src={getProductCoverImage(p) as string} alt={p.name} fill sizes="44px" style={{ objectFit: 'cover' }} />
+                              ) : (
+                                <FiPackage size={18} />
+                              )}
                             </div>
+                            <div>
+                                <div className="cell-title">{p.name}</div>
+                                <div className="cell-sub">{p.slug}</div>
+                                {p.sku && <div className="cell-mono">{p.sku}</div>}
+                            </div>
+                          </div>
                         </td>
-                        <td>{p.hasVariants && <span style={{fontSize:'0.75em', color:'var(--text-muted)'}}>From </span>}৳{shown.salePrice || shown.price} {!!shown.salePrice && <span style={{textDecoration:'line-through', color:'var(--text-muted)', fontSize: '0.75em'}}>৳{shown.price}</span>}</td>
-                        <td>
+                        <td data-label="Price" className="nowrap"><span>{p.hasVariants && <span style={{fontSize:'0.75em', color:'var(--text-muted)'}}>From </span>}<strong style={{ fontWeight: 600 }}>৳{shown.salePrice || shown.price}</strong> {!!shown.salePrice && <span style={{textDecoration:'line-through', color:'var(--text-muted)', fontSize: '0.75em'}}>৳{shown.price}</span>}</span></td>
+                        <td data-label="Stock">
+                          <div>
                             {p.quantity === 0 ? <span className="badge badge-red">Out of Stock</span> :
                              p.quantity < 10 ? <span className="badge badge-yellow">Low: {p.quantity}</span> :
                              <span className="badge badge-green">In Stock: {p.quantity}</span>}
@@ -307,31 +310,39 @@ export default function ProductsPage() {
                                     </div>
                                 );
                             })()}
+                          </div>
                         </td>
-                        <td>
+                        <td data-label="Category">
+                          <div>
                             <div>{cat}</div>
-                            {subCat && <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 400 }}>{subCat}</div>}
+                            {subCat && <div className="cell-sub">{subCat}</div>}
+                          </div>
                         </td>
-                        <td>
-                            <div className="admin-item-actions" style={{ flexWrap: 'wrap', rowGap: '0.35rem' }}>
-                                <button className="btn-admin-edit" aria-label="Edit product" onClick={() => openEdit(p)}>
-                                    <FiEdit2 size={14} />
+                        <td className="cell-actions-td">
+                          <div>
+                            <div className="cell-actions">
+                                <button className="btn-admin-edit btn-sm" aria-label="Edit product" onClick={() => openEdit(p)}>
+                                    <FiEdit2 size={14} /> Edit
                                 </button>
-                                <button className="btn-admin-danger" aria-label="Delete product" onClick={() => handleDelete(p._id)}>
+                                <button className="btn-admin-danger btn-sm btn-icon" aria-label="Delete product" onClick={() => handleDelete(p._id)}>
                                     <FiTrash2 size={14} />
                                 </button>
+                            </div>
+                            <div className="cell-tags" role="group" aria-label="Homepage placement">
                                 {TAGS.map(tag => (
                                     <button
                                         key={tag.key}
-                                        className={(p as any)[tag.key] ? 'btn-admin-success' : 'btn-admin-secondary'}
+                                        type="button"
+                                        className={`tag-toggle ${p[tag.key] ? 'is-on' : ''}`}
+                                        aria-pressed={!!p[tag.key]}
                                         onClick={() => toggleTag(p, tag.key)}
-                                        style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem', borderRadius: 4 }}
                                         title={`Toggle ${tag.label} on homepage`}
                                     >
                                         {tag.label}
                                     </button>
                                 ))}
                             </div>
+                          </div>
                         </td>
                       </tr>
                   );
@@ -341,8 +352,8 @@ export default function ProductsPage() {
         </div>
         )}
         {totalPages > 1 && (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.6rem', marginTop: '1.25rem' }}>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem', alignItems: 'center', justifyContent: 'center' }}>
+          <nav className="admin-pagination" aria-label="Product pages">
+            <div className="admin-pagination-pages">
               <button type="button" className="btn-admin-secondary" disabled={currentPage === 1} onClick={() => setPage(currentPage - 1)}>
                 ‹ Prev
               </button>
@@ -352,24 +363,23 @@ export default function ProductsPage() {
                     key={n}
                     type="button"
                     className={n === currentPage ? 'btn-admin-primary' : 'btn-admin-secondary'}
-                    style={{ minWidth: 36 }}
                     aria-current={n === currentPage ? 'page' : undefined}
                     onClick={() => setPage(n)}
                   >
                     {n}
                   </button>
                 ) : (
-                  <span key={`${n}-${i}`} style={{ padding: '0 0.25rem', color: 'var(--text-muted)' }}>…</span>
+                  <span key={`${n}-${i}`} className="admin-pagination-gap">…</span>
                 )
               )}
               <button type="button" className="btn-admin-secondary" disabled={currentPage === totalPages} onClick={() => setPage(currentPage + 1)}>
                 Next ›
               </button>
             </div>
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+            <span className="admin-pagination-meta">
               Showing {pageStart + 1}–{Math.min(pageStart + PAGE_SIZE, filteredProducts.length)} of {filteredProducts.length}
             </span>
-          </div>
+          </nav>
         )}
         </>
       )}
@@ -377,12 +387,12 @@ export default function ProductsPage() {
       {/* Modal */}
       {modal && (
         <div className="modal-overlay">
-          <div className="modal-box modal-lg" style={{ maxWidth: 900 }}>
+          <div className="modal-box modal-xl" role="dialog" aria-modal="true" aria-label={editing ? 'Edit Product' : 'Add New Product'}>
             <div className="modal-header">
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
                 {editing ? <FiEdit2 size={16} /> : <FiPlus size={16} />} {editing ? 'Edit Product' : 'Add New Product'}
               </span>
-              <button className="modal-close" onClick={() => setModal(false)}><FiX size={16} /></button>
+              <button className="modal-close" aria-label="Close" onClick={() => setModal(false)}><FiX size={18} /></button>
             </div>
             <div className="modal-body">
               <div className="admin-form">
@@ -393,9 +403,9 @@ export default function ProductsPage() {
                     </div>
                     <div className="admin-field">
                         <label className="admin-label">URL Slug</label>
-                        <div style={{display:'flex', gap:'0.5rem'}}>
-                            <input className="admin-input" value={form.slug} onChange={e => setForm((f:any) => ({...f, slug: e.target.value}))} style={{fontFamily:'monospace', fontSize:'0.85rem'}} />
-                            <button type="button" className="btn-admin-secondary" title="Regenerate slug" onClick={() => setForm((f:any) => ({...f, slug: generateSlug(f.name)}))}>
+                        <div className="admin-input-group">
+                            <input className="admin-input" value={form.slug} onChange={e => setForm((f:any) => ({...f, slug: e.target.value}))} style={{fontFamily:'monospace'}} />
+                            <button type="button" className="btn-admin-secondary btn-icon" title="Regenerate slug" aria-label="Regenerate slug" onClick={() => setForm((f:any) => ({...f, slug: generateSlug(f.name)}))}>
                                 <FiRefreshCw size={14} />
                             </button>
                         </div>
@@ -405,7 +415,7 @@ export default function ProductsPage() {
                 <div className="admin-form-row">
                     <div className="admin-field">
                         <label className="admin-label">SKU</label>
-                        <div style={{display:'flex', gap:'0.5rem'}}>
+                        <div className="admin-input-group">
                             <input
                                 className="admin-input"
                                 value={form.sku}
@@ -530,7 +540,7 @@ export default function ProductsPage() {
 
                 <div className="admin-field">
                     <label className="admin-label">Homepage Placement</label>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.25rem' }}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem 1.25rem' }}>
                         {TAGS.map(tag => (
                             <label key={tag.key} className="admin-checkbox-row">
                                 <input

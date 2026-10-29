@@ -24,15 +24,15 @@ function SubCategoryRow({
   const { setNodeRef, style, isDragging, handle } = useSortableItem(subCategory._id);
   return (
     <tr ref={setNodeRef} style={style} className={isDragging ? 'is-dragging' : undefined}>
-      <td style={{ width: 32 }}><DragHandle handle={handle} /></td>
-      <td style={{ fontWeight: 600 }}>{subCategory.name}</td>
-      <td>{subCategory.order}</td>
-      <td>
-        <div className="admin-item-actions">
-          <button className="btn-admin-edit" aria-label="Edit sub-category" onClick={onEdit}>
+      <td style={{ width: 48 }}><DragHandle handle={handle} /></td>
+      <td style={{ fontWeight: 600, overflowWrap: 'anywhere' }}>{subCategory.name}</td>
+      <td className="num" style={{ width: 72 }}>{subCategory.order}</td>
+      <td style={{ width: 1 }}>
+        <div className="cell-actions" style={{ flexWrap: 'nowrap' }}>
+          <button className="btn-admin-edit btn-sm btn-icon" aria-label="Edit sub-category" title="Edit" onClick={onEdit}>
             <FiEdit2 size={14} />
           </button>
-          <button className="btn-admin-danger" aria-label="Delete sub-category" onClick={onDelete}>
+          <button className="btn-admin-danger btn-sm btn-icon" aria-label="Delete sub-category" title="Delete" onClick={onDelete}>
             <FiTrash2 size={14} />
           </button>
         </div>
@@ -139,10 +139,10 @@ export default function CategorySubCategoriesPage() {
 
       <div className="admin-page-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <div style={{ position: 'relative', width: 56, height: 56, borderRadius: 12, overflow: 'hidden', flexShrink: 0 }}>
-            <Image src={category.imageUrl} alt={category.name} fill style={{ objectFit: 'cover' }} />
+          <div className="admin-thumb admin-thumb--lg">
+            <Image src={category.imageUrl} alt={category.name} fill sizes="56px" style={{ objectFit: 'cover' }} />
           </div>
-          <div>
+          <div style={{ minWidth: 0 }}>
             <h1 className="admin-page-title">{category.name}</h1>
             <p className="admin-page-subtitle">Sub-categories under this category. Name only — no photo needed. Drag rows to reorder.</p>
           </div>
@@ -161,10 +161,10 @@ export default function CategorySubCategoriesPage() {
           <table className="admin-table">
             <thead>
               <tr>
-                <th style={{ width: 32 }}></th>
+                <th style={{ width: 48 }}><span className="sr-only">Reorder</span></th>
                 <th>Name</th>
-                <th>Order</th>
-                <th>Actions</th>
+                <th className="num">Order</th>
+                <th><span className="sr-only">Actions</span></th>
               </tr>
             </thead>
             <SortableList items={subCategories} onReorder={handleReorder} as="tbody">
@@ -183,12 +183,12 @@ export default function CategorySubCategoriesPage() {
 
       {modal && (
         <div className="modal-overlay">
-          <div className="modal-box">
+          <div className="modal-box" role="dialog" aria-modal="true" aria-label={editing ? 'Edit Sub-category' : 'Add Sub-category'}>
             <div className="modal-header">
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
                 {editing ? <FiEdit2 size={16} /> : <FiPlus size={16} />} {editing ? 'Edit Sub-category' : `Add Sub-category to ${category.name}`}
               </span>
-              <button className="modal-close" onClick={() => setModal(false)}><FiX size={16} /></button>
+              <button className="modal-close" aria-label="Close" onClick={() => setModal(false)}><FiX size={18} /></button>
             </div>
             <div className="modal-body">
               <div className="admin-form">

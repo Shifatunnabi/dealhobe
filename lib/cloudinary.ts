@@ -22,3 +22,9 @@ export async function uploadImage(
 export async function deleteImage(publicId: string): Promise<void> {
   await cloudinary.uploader.destroy(publicId);
 }
+
+/** Deletes an upload whatever its type: homepage banners may be images/GIFs or MP4/WebM videos. */
+export async function deleteAsset(publicId: string): Promise<void> {
+  const res = await cloudinary.uploader.destroy(publicId);
+  if (res?.result === 'not found') await cloudinary.uploader.destroy(publicId, { resource_type: 'video' });
+}

@@ -3,6 +3,8 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
+import { FiUploadCloud } from 'react-icons/fi';
+import { uploadImageFile } from '@/lib/upload-image-client';
 
 interface MultiImageUploadProps {
   images: { url: string; publicId: string }[];
@@ -10,14 +12,6 @@ interface MultiImageUploadProps {
   folder?: string;
   label?: string;
 }
-
-const readAsDataUrl = (file: File) =>
-  new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(file);
-  });
 
 export default function MultiImageUpload({
   images,
@@ -40,15 +34,7 @@ export default function MultiImageUpload({
   }, [images, onChange]);
 
   const uploadOne = useCallback(async (file: File) => {
-    const base64 = await readAsDataUrl(file);
-    const res = await fetch('/api/upload', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ data: base64, folder }),
-    });
-    const data = await res.json();
-    if (!res.ok || !data.url) throw new Error(data.error || 'Upload failed');
-    return { url: data.url as string, publicId: data.publicId as string };
+    return uploadImageFile(file, folder);
   }, [folder]);
 
   const handleFiles = useCallback(async (fileList: FileList | File[]) => {
@@ -115,45 +101,40 @@ export default function MultiImageUpload({
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
         onDrop={onDrop}
-        style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: '100%' }}
+        className="multi-upload"
       >
         {(images.length > 0 || pending > 0) && (
-          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <div className="multi-upload-grid">
             {images.map((img, i) => (
-              <div key={img.url + i} style={{ position: 'relative', width: 100, height: 100, border: '1px solid #ccc', borderRadius: 8, overflow: 'hidden' }}>
-                <Image src={img.url} alt="Uploaded" fill style={{ objectFit: 'cover' }} />
+              <div key={img.url + i} className="multi-upload-thumb">
+                <Image src={img.url} alt={`Image ${i + 1}`} fill sizes="120px" style={{ objectFit: 'cover' }} />
+                {i === 0 && <span className="is-cover">Cover</span>}
                 <button
                    type="button"
+                   className="multi-upload-remove"
                    onClick={() => removeImage(i)}
-                   style={{ position: 'absolute', top: 2, right: 2, background: 'red', color: 'white', borderRadius: '50%', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: 'none' }}
+                   aria-label={`Remove image ${i + 1}`}
                 >×</button>
               </div>
             ))}
             {Array.from({ length: pending }).map((_, i) => (
-              <div key={`pending-${i}`} style={{ width: 100, height: 100, border: '2px dashed #ccc', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div key={`pending-${i}`} className="multi-upload-thumb is-pending">
                 <div className="spinner" style={{ width: 20, height: 20 }} />
               </div>
             ))}
           </div>
         )}
-        <div
+        <button
+           type="button"
            onClick={() => inputRef.current?.click()}
-           style={{
-             width: '100%', boxSizing: 'border-box', minHeight: 120, padding: '1.25rem 1rem',
-             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4,
-             cursor: 'pointer', textAlign: 'center', borderRadius: 10,
-             border: `2px dashed ${dragging ? '#2563eb' : '#ccc'}`,
-             background: dragging ? 'rgba(37, 99, 235, 0.06)' : 'transparent',
-             color: dragging ? '#2563eb' : '#888',
-             transition: 'background 0.15s, border-color 0.15s, color 0.15s',
-           }}
+           className={`multi-upload-drop ${dragging ? 'is-dragging' : ''}`}
         >
-          <span style={{ fontSize: '2rem', lineHeight: 1 }}>+</span>
-          <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>
+          <FiUploadCloud size={26} aria-hidden="true" />
+          <strong>
             {dragging ? 'Drop to upload' : 'Drag & drop images here, or click to browse'}
-          </span>
-          <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>You can select or drop multiple images</span>
-        </div>
+          </strong>
+          <small>You can select or drop multiple images</small>
+        </button>
       </div>
       <input
         ref={inputRef}

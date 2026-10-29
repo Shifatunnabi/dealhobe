@@ -69,15 +69,15 @@ export default function ReviewsPage() {
       </div>
 
       {/* Filter tabs */}
-      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+      <div className="admin-tabs" role="group" aria-label="Filter reviews">
         {(['all', 'pending', 'approved', 'featured'] as const).map(f => (
-          <button key={f} onClick={() => setFilter(f)} style={{
-            padding: '0.45rem 1rem', borderRadius: '20px',
-            border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: '0.8rem',
-            background: filter === f ? 'var(--primary-pink)' : 'rgba(45,27,78,0.06)',
-            color: filter === f ? '#fff' : 'var(--text-dark)',
-            transition: 'all 0.2s',
-          }}>
+          <button
+            key={f}
+            type="button"
+            aria-pressed={filter === f}
+            className={`admin-tab ${filter === f ? 'is-active' : ''}`}
+            onClick={() => setFilter(f)}
+          >
             {f === 'all' ? `All (${reviews.length})` : f === 'pending' ? `Pending (${reviews.filter(r => !r.isApproved).length})` : f === 'approved' ? `Approved (${reviews.filter(r => r.isApproved).length})` : `Featured (${reviews.filter(r => r.isFeatured).length})`}
           </button>
         ))}
@@ -95,16 +95,16 @@ export default function ReviewsPage() {
         <div className="review-grid">
           {filtered.map(r => (
             <div key={r._id} className="review-card">
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                <div className="review-stars">{stars(r.rating)}</div>
-                <div style={{ display: 'flex', gap: '0.35rem' }}>
+              <div className="review-card-top">
+                <div className="review-stars" aria-label={`${r.rating} out of 5 stars`}>{stars(r.rating)}</div>
+                <div className="review-card-badges">
                   {r.isApproved && <span className="badge badge-green">Approved</span>}
                   {r.isFeatured && <span className="badge badge-yellow">Featured</span>}
                   {!r.isApproved && <span className="badge badge-red">Pending</span>}
                 </div>
               </div>
               <div className="review-name">{r.customerName}</div>
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>
+              <div className="review-date">
                 {new Date(r.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })} {new Date(r.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
               </div>
               <div className="review-text">{r.review}</div>
@@ -112,18 +112,16 @@ export default function ReviewsPage() {
                 <button
                   className={r.isFeatured ? 'btn-admin-success' : 'btn-admin-secondary'}
                   onClick={() => update(r._id, { isFeatured: true, isApproved: true })}
-                  style={{ fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
                 >
                   {r.isFeatured && <FaStar size={12} />} {r.isFeatured ? 'On Homepage' : '+ Add to Homepage'}
                 </button>
                 <button
                   className="btn-admin-danger"
                   onClick={() => update(r._id, { isFeatured: false, isApproved: false })}
-                  style={{ fontSize: '0.75rem' }}
                 >
                   Hide
                 </button>
-                <button className="btn-admin-danger" aria-label="Delete review" onClick={() => del(r._id)}><FiTrash2 size={13} /></button>
+                <button className="btn-admin-danger btn-icon" aria-label="Delete review" title="Delete review" onClick={() => del(r._id)}><FiTrash2 size={14} /></button>
               </div>
             </div>
           ))}

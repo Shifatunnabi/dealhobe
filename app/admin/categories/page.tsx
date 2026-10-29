@@ -40,24 +40,15 @@ function CategoryCard({
       style={{ ...style, cursor: 'pointer', opacity: category.isHidden ? 0.6 : 1 }}
       title="Manage sub-categories"
     >
-      <div className="admin-item-image" style={{ position: 'relative', height: 140 }}>
-        <Image src={category.imageUrl} alt={category.name} fill style={{ objectFit: 'cover' }} />
+      <div className="admin-item-image">
+        <Image src={category.imageUrl} alt={category.name} fill sizes="(max-width: 640px) 100vw, 260px" style={{ objectFit: 'cover' }} />
         {category.isHidden && (
-          <span style={{
-            position: 'absolute', bottom: 8, left: 8,
-            background: 'rgba(15,8,32,0.8)', color: '#fff', fontSize: '0.65rem', fontWeight: 700,
-            padding: '0.2rem 0.5rem', borderRadius: '20px',
-          }}>Hidden from website</span>
+          <span className="admin-media-badge bottom-left">Hidden from website</span>
         )}
         {isHomepage && !category.isHidden && (
-          <span style={{
-            position: 'absolute', top: 8, right: 8,
-            background: 'var(--primary-pink)',
-            color: '#fff', fontSize: '0.65rem', fontWeight: 700,
-            padding: '0.2rem 0.5rem', borderRadius: '20px',
-          }}>Homepage</span>
+          <span className="admin-media-badge top-right is-brand">Homepage</span>
         )}
-        <div style={{ position: 'absolute', top: 8, left: 8, background: 'rgba(255,255,255,0.9)', borderRadius: 8, padding: '0.25rem' }}>
+        <div className="admin-media-handle">
           <DragHandle handle={handle} />
         </div>
       </div>
@@ -66,15 +57,15 @@ function CategoryCard({
         <div className="admin-item-meta">Order: {category.order} · Click to manage sub-categories</div>
         <div className="admin-item-actions">
           <button
-            className="btn-admin-secondary"
+            className="btn-admin-secondary btn-sm btn-icon"
             title={category.isHidden ? 'Show on website' : 'Hide from website'}
             aria-label={category.isHidden ? 'Show on website' : 'Hide from website'}
             onClick={(e) => { e.stopPropagation(); onToggleHidden(); }}
           >
             {category.isHidden ? <FiEye size={14} /> : <FiEyeOff size={14} />}
           </button>
-          <button className="btn-admin-edit" title="Edit" aria-label="Edit category" onClick={(e) => { e.stopPropagation(); onEdit(); }}><FiEdit2 size={14} /></button>
-          <button className="btn-admin-danger" title="Delete" aria-label="Delete category" onClick={(e) => { e.stopPropagation(); onDelete(); }}><FiTrash2 size={14} /></button>
+          <button className="btn-admin-edit btn-sm btn-icon" title="Edit" aria-label="Edit category" onClick={(e) => { e.stopPropagation(); onEdit(); }}><FiEdit2 size={14} /></button>
+          <button className="btn-admin-danger btn-sm btn-icon" title="Delete" aria-label="Delete category" onClick={(e) => { e.stopPropagation(); onDelete(); }}><FiTrash2 size={14} /></button>
         </div>
       </div>
     </div>
@@ -165,17 +156,8 @@ export default function CategoriesPage() {
       </div>
 
       {categories.length > 4 && (
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: '0.5rem',
-          marginBottom: '1.25rem',
-          background: 'rgba(255,215,61,0.08)',
-          border: '1px solid rgba(255,215,61,0.25)',
-          borderRadius: '12px',
-          padding: '0.75rem 1rem',
-          fontSize: '0.825rem',
-          color: '#cc9900',
-        }}>
-          <FiZap size={14} style={{ flexShrink: 0 }} />
+        <div className="admin-notice admin-notice--gold">
+          <FiZap size={14} />
           <span>You have <strong>{categories.length}</strong> categories. The homepage shows 4 in a grid and the rest in a left/right slider.</span>
         </div>
       )}
@@ -190,7 +172,7 @@ export default function CategoriesPage() {
         </div>
       ) : (
         <SortableList items={categories} onReorder={handleReorder} layout="grid" className="admin-grid">
-          {categories.map((c, i) => (
+          {categories.map((c) => (
             <CategoryCard
               key={c._id}
               category={c}
@@ -206,12 +188,12 @@ export default function CategoriesPage() {
 
       {modal && (
         <div className="modal-overlay">
-          <div className="modal-box">
+          <div className="modal-box" role="dialog" aria-modal="true" aria-label={editing ? 'Edit Category' : 'Add Category'}>
             <div className="modal-header">
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
                 {editing ? <FiEdit2 size={16} /> : <FiPlus size={16} />} {editing ? 'Edit Category' : 'Add Category'}
               </span>
-              <button className="modal-close" onClick={() => setModal(false)}><FiX size={16} /></button>
+              <button className="modal-close" aria-label="Close" onClick={() => setModal(false)}><FiX size={18} /></button>
             </div>
             <div className="modal-body">
               <div className="admin-form">

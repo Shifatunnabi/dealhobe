@@ -1,298 +1,145 @@
 "use client";
 
-import { useMemo } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  FiTrash2,
-  FiChevronRight,
-  FiShoppingBag,
-  FiArrowRight,
-  FiCheck,
-  FiShoppingCart,
-} from "react-icons/fi";
-import { cn } from "@/lib/utils";
-import { fadeUp } from "@/components/animations/variants";
-import { ColorfulTitle } from "@/components/ui";
+import { FiArrowLeft, FiArrowRight, FiChevronRight, FiLock } from "react-icons/fi";
 import { useCart, cartLineId } from "@/components/cart/CartProvider";
+import { BagLine, EmptyBag, FreeDeliveryProgress, SummaryRow, TrustRow, UpsellRow } from "@/components/checkout/BagParts";
+import { useCartInsights, useFreeDeliveryThreshold } from "@/components/checkout/useCartInsights";
+import { DELIVERY_CHARGE, money } from "@/components/checkout/money";
 
-/* ─── Types ─────────────────────────────────────────────────── */
-/* ─── Qty Stepper ────────────────────────────────────────────── */
-function QtyStepper({
-  value,
-  onChange,
-}: {
-  value: number;
-  onChange: (v: number) => void;
-}) {
-  return (
-    <div className="inline-flex items-center overflow-hidden rounded-xl border border-gray-200 bg-soft-bg">
-      <button
-        onClick={() => onChange(Math.max(1, value - 1))}
-        className="flex h-8 w-8 items-center justify-center text-text-muted transition-colors hover:bg-primary-pink/8 hover:text-primary-pink active:bg-primary-pink/15"
-        aria-label="Decrease quantity"
-      >
-        <span className="font-poppins text-base font-bold leading-none select-none">−</span>
-      </button>
-      <div className="flex h-8 w-9 items-center justify-center border-x border-gray-200 bg-white font-poppins text-sm font-bold text-text-dark tabular-nums">
-        {value}
-      </div>
-      <button
-        onClick={() => onChange(value + 1)}
-        className="flex h-8 w-8 items-center justify-center text-text-muted transition-colors hover:bg-primary-pink/8 hover:text-primary-pink active:bg-primary-pink/15"
-        aria-label="Increase quantity"
-      >
-        <span className="font-poppins text-base font-bold leading-none select-none">+</span>
-      </button>
-    </div>
-  );
-}
-
-/* ─── Cart Page ──────────────────────────────────────────────── */
 export default function CartPage() {
-  const { items, updateQty, removeItem, subtotal } = useCart();
-  const cartItems = items;
+  const { items, hydrated, itemCount, updateQty, removeItem, subtotal } = useCart();
+  const threshold = useFreeDeliveryThreshold();
+  const gap = threshold > 0 ? Math.max(0, threshold - subtotal) : 0;
+  const freeDelivery = threshold > 0 && gap === 0;
+  const { compareAt, savings, suggestions } = useCartInsights(items, { enabled: items.length > 0, freeDeliveryGap: gap });
 
-  const itemCount = useMemo(
-    () => cartItems.reduce((s, i) => s + i.qty, 0),
-    [cartItems],
+  const checkoutButton = (
+    <Link
+      href="/checkout"
+      className="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-full bg-primary-pink px-6 text-[15px] font-semibold text-white shadow-button transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-hover active:translate-y-0"
+    >
+      <FiLock size={15} />
+      Checkout securely
+      <FiArrowRight size={16} />
+    </Link>
   );
 
   return (
-    <div className="min-h-screen bg-soft-bg pt-34 pb-24">
-      <div className="mx-auto max-w-5xl px-section">
+    <div className="min-h-[70vh] bg-soft-bg pb-36 pt-5 md:pb-20 md:pt-8">
+      <div className="shell">
+        <nav aria-label="Breadcrumb" className="mb-3 flex items-center gap-1.5 text-xs text-text-muted">
+          <Link href="/" className="transition-colors hover:text-primary-pink">Home</Link>
+          <FiChevronRight size={12} />
+          <span className="font-semibold text-text-dark">Bag</span>
+        </nav>
 
-        {/* ── Page Header ────────────────────────────────────── */}
-        <motion.div
-          className="mb-10 text-center"
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-        >
-          {/* Breadcrumb */}
-          <nav className="mb-5 flex items-center justify-center gap-2 text-small text-text-muted">
-            <Link href="/" className="transition-colors hover:text-primary-pink">
-              Home
+        <div className="mb-5 flex flex-wrap items-end justify-between gap-3 md:mb-7">
+          <h1 className="font-display text-3xl font-semibold text-text-dark md:text-[40px]">
+            Your bag
+            {hydrated && itemCount > 0 && (
+              <span className="ml-3 align-middle font-body text-base font-semibold text-text-muted">
+                {itemCount} item{itemCount !== 1 ? "s" : ""}
+              </span>
+            )}
+          </h1>
+          {items.length > 0 && (
+            <Link href="/products" className="hidden items-center gap-1.5 text-sm font-semibold text-text-muted transition-colors hover:text-primary-pink md:inline-flex">
+              <FiArrowLeft size={15} /> Continue shopping
             </Link>
-            <FiChevronRight size={12} />
-            <span className="font-semibold text-text-dark">Cart</span>
-          </nav>
+          )}
+        </div>
 
-          <ColorfulTitle title="Your Shopping Cart" as="h1" className="text-primary-pink" />
-          <p className="mt-2 font-poppins text-sm text-text-muted">
-            {cartItems.length === 0
-              ? "Your cart is empty — go explore something fun!"
-              : `You have ${itemCount} item${itemCount !== 1 ? "s" : ""} in your cart.`}
-          </p>
-        </motion.div>
-
-        {/* ── Empty State ─────────────────────────────────────── */}
-        {cartItems.length === 0 ? (
-          <motion.div
-            className="flex flex-col items-center gap-5 py-24 text-center"
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
-          >
-            <FiShoppingCart size={56} className="text-primary-pink/40" />
-            <p className="font-poppins text-xl text-text-muted">
-              Nothing here yet — time to start shopping!
-            </p>
-            <Link
-              href="/products"
-              className="flex items-center gap-2 rounded-2xl bg-gradient-primary px-8 py-3 font-poppins font-semibold text-white shadow-button transition-shadow hover:shadow-hover"
-            >
-              <FiShoppingBag size={16} />
-              Shop Now
-            </Link>
-          </motion.div>
+        {!hydrated ? (
+          <div className="h-80 animate-pulse rounded-3xl bg-white/70" aria-hidden />
+        ) : items.length === 0 ? (
+          <div className="rounded-3xl border border-[#F1E6EA] bg-white shadow-card">
+            <EmptyBag />
+          </div>
         ) : (
-          <div className="flex flex-col">
+          <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-8">
+            {/* Items */}
+            <div className="min-w-0 space-y-5">
+              <FreeDeliveryProgress subtotal={subtotal} threshold={threshold} className="bg-[#FFF9EE]" />
 
-            <motion.div
-              className="overflow-hidden rounded-3xl bg-white shadow-card"
-              initial="hidden"
-              animate="visible"
-              variants={fadeUp}
-            >
-              {/* ── Cart Table ──────────────────────────────────── */}
-              <div className="hidden grid-cols-[minmax(0,2.5fr)_1fr_auto_1fr_auto] gap-4 border-b border-gray-100 bg-soft-bg px-6 py-4 md:grid">
-                {["Product", "Price", "Quantity", "Total", ""].map((col) => (
-                  <span
-                    key={col}
-                    className="font-poppins text-xs font-semibold uppercase tracking-wider text-text-muted"
-                  >
-                    {col}
-                  </span>
-                ))}
-              </div>
-
-              <AnimatePresence initial={false}>
-                {cartItems.map((item, i) => (
-                  <motion.div
-                    key={cartLineId(item)}
-                    layout
-                    initial={{ opacity: 0, y: -12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, x: -24, height: 0, marginBottom: 0 }}
-                    transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-                    className={cn(
-                      "overflow-hidden",
-                      i < cartItems.length - 1 ? "border-b border-gray-100" : "",
-                    )}
-                  >
-                    {/* ── Desktop row ── */}
-                    <div className="hidden grid-cols-[minmax(0,2.5fr)_1fr_auto_1fr_auto] gap-4 items-center px-6 py-5 md:grid">
-                      {/* Product cell */}
-                      <div className="flex min-w-0 items-center gap-4">
-                        <Link href={`/product/${item.slug}`} className="shrink-0">
-                          <div className="relative h-16 w-16 overflow-hidden rounded-xl bg-gray-50 shadow-soft transition-transform duration-300 hover:scale-105">
-                            <Image
-                              src={item.image}
-                              alt={item.name}
-                              fill
-                              className="object-cover"
-                              sizes="64px"
-                            />
-                          </div>
-                        </Link>
-                        <div className="min-w-0">
-                          <Link href={`/product/${item.slug}`}>
-                            <p className="font-poppins text-sm font-semibold leading-snug text-text-dark hover:text-primary-pink transition-colors line-clamp-2">
-                              {item.name}
-                            </p>
-                          </Link>
-                          {item.variantLabel && <p className="font-poppins text-xs text-text-muted">{item.variantLabel}</p>}
-                        </div>
-                      </div>
-
-                      {/* Unit price */}
-                      <p className="font-poppins text-base font-semibold text-text-dark">
-                        ৳{item.unitPrice.toLocaleString()}
-                      </p>
-
-                      {/* Qty stepper */}
-                      <QtyStepper
-                        value={item.qty}
-                        onChange={(v) => updateQty(cartLineId(item), v)}
+              <motion.ul
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35 }}
+                className="rounded-3xl border border-[#F1E6EA] bg-white px-4 shadow-tile md:px-6"
+              >
+                <AnimatePresence initial={false}>
+                  {items.map((item) => (
+                    <motion.li
+                      key={cartLineId(item)}
+                      layout
+                      exit={{ opacity: 0, x: -24, height: 0, paddingTop: 0, paddingBottom: 0 }}
+                      transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+                      className="overflow-hidden border-b border-[#F4ECEF] py-4 last:border-b-0 md:py-5"
+                    >
+                      <BagLine
+                        item={item}
+                        compareAt={compareAt[cartLineId(item)]}
+                        onQty={(q) => updateQty(cartLineId(item), q)}
+                        onRemove={() => removeItem(cartLineId(item))}
                       />
+                    </motion.li>
+                  ))}
+                </AnimatePresence>
+              </motion.ul>
 
-                      {/* Row total */}
-                      <p className="font-poppins text-base font-bold text-primary-pink">
-                        ৳{(item.unitPrice * item.qty).toLocaleString()}
-                      </p>
+              <UpsellRow products={suggestions} freeDeliveryGap={gap} className="rounded-3xl border border-[#F1E6EA] bg-white p-4 shadow-tile md:p-6" />
+            </div>
 
-                      {/* Delete */}
-                      <button
-                        onClick={() => removeItem(cartLineId(item))}
-                        className="rounded-xl p-2 text-gray-300 transition-colors duration-200 hover:bg-red-50 hover:text-red-400"
-                        aria-label={`Remove ${item.name} from cart`}
-                      >
-                        <FiTrash2 size={17} />
-                      </button>
-                    </div>
-
-                    {/* ── Mobile row ── */}
-                    <div className="flex gap-3 px-4 py-4 md:hidden">
-                      <Link href={`/product/${item.slug}`} className="shrink-0">
-                        <div className="relative h-20 w-20 overflow-hidden rounded-xl bg-gray-50 shadow-soft">
-                          <Image
-                            src={item.image}
-                            alt={item.name}
-                            fill
-                            className="object-cover"
-                            sizes="80px"
-                          />
-                        </div>
-                      </Link>
-                      <div className="min-w-0 flex-1">
-                        <Link href={`/product/${item.slug}`}>
-                          <p className="line-clamp-2 font-poppins text-sm font-semibold leading-snug text-text-dark">
-                            {item.name}
-                          </p>
-                        </Link>
-                        <p className="mt-0.5 font-poppins text-xs text-text-muted">
-                          {item.variantLabel || " "}
-                        </p>
-                        <div className="mt-2.5 flex items-center justify-between gap-2">
-                          <QtyStepper
-                            value={item.qty}
-                            onChange={(v) => updateQty(cartLineId(item), v)}
-                          />
-                          <p className="font-poppins text-base font-bold text-primary-pink">
-                            ৳{(item.unitPrice * item.qty).toLocaleString()}
-                          </p>
-                          <button
-                            onClick={() => removeItem(cartLineId(item))}
-                            className="rounded-xl p-1.5 text-gray-300 transition-colors hover:bg-red-50 hover:text-red-400"
-                            aria-label={`Remove ${item.name}`}
-                          >
-                            <FiTrash2 size={15} />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-
-              <hr className="border-gray-200" />
-
-              {/* ── Order Summary ────────────────────────────────── */}
-              <div className="p-6">
-                <h2 className="mb-5 font-poppins text-xl font-semibold text-text-dark">
-                  Order Summary
-                </h2>
-
-                <div className="space-y-3">
-                  {/* Subtotal */}
-                  <div className="flex items-center justify-between">
-                    <span className="font-poppins text-sm text-text-muted">
-                      Subtotal
-                    </span>
-                    <span className="font-poppins font-semibold text-text-dark">
-                      ৳{subtotal.toLocaleString()}
-                    </span>
-                  </div>
+            {/* Summary */}
+            <aside className="lg:sticky lg:top-40 lg:self-start">
+              <div className="rounded-3xl border border-[#F1E6EA] bg-white p-5 shadow-card md:p-6">
+                <h2 className="font-display text-xl font-semibold text-text-dark">Order summary</h2>
+                <div className="mt-4 space-y-2.5">
+                  <SummaryRow label={`Subtotal (${itemCount} item${itemCount !== 1 ? "s" : ""})`} value={money(subtotal)} />
+                  {savings > 0 && <SummaryRow label="Your savings" value={`−${money(savings)}`} tone="savings" />}
+                  <SummaryRow
+                    label="Delivery"
+                    hint={freeDelivery ? undefined : `Inside Dhaka ${money(DELIVERY_CHARGE.inside_dhaka)} · Outside ${money(DELIVERY_CHARGE.outside_dhaka)}`}
+                    value={freeDelivery ? <span className="font-bold text-[#1F8A4C]">Free</span> : "At checkout"}
+                    tone={freeDelivery ? "default" : "muted"}
+                  />
                 </div>
-
-                {/* Total */}
-                <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-4">
-                  <span className="font-poppins text-lg font-bold text-text-dark">
-                    Total
-                  </span>
-                  <span className="font-poppins text-2xl font-bold text-primary-pink">
-                    ৳{subtotal.toLocaleString()}
-                  </span>
+                <div className="mt-4 flex items-baseline justify-between border-t border-dashed border-[#EADDE3] pt-4">
+                  <span className="font-semibold text-text-dark">{freeDelivery ? "Total" : "Estimated total"}</span>
+                  <span className="text-2xl font-extrabold tabular-nums text-text-dark">{money(subtotal)}</span>
                 </div>
-
-                {/* Checkout button */}
-                <Link href="/checkout">
-                  <motion.div
-                    whileHover={{ y: -2, boxShadow: "0 16px 48px rgba(164, 27, 21, 0.28)" }}
-                    whileTap={{ scale: 0.97 }}
-                    transition={{ duration: 0.2 }}
-                    className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-primary py-3.5 font-poppins font-semibold text-white shadow-button transition-shadow cursor-pointer"
-                  >
-                    Proceed to Checkout
-                    <FiArrowRight size={16} />
-                  </motion.div>
-                </Link>
-
-                {/* Continue shopping */}
-                <Link
-                  href="/products"
-                  className="mt-3 flex items-center justify-center gap-1.5 font-poppins text-xs text-black transition-colors hover:text-primary-pink"
-                >
-                  <FiShoppingCart size={12} />
-                  Continue Shopping
-                </Link>
+                {savings > 0 && (
+                  <p className="mt-2 rounded-xl bg-[#F1FAF4] px-3 py-2 text-center text-xs font-semibold text-[#1F8A4C]">
+                    You&apos;re saving {money(savings)} on this order
+                  </p>
+                )}
+                <div className="mt-5 hidden md:block">{checkoutButton}</div>
+                <p className="mt-3 hidden text-center text-xs text-text-muted md:block">Pay with cash when your order arrives.</p>
+                <TrustRow className="mt-5 border-t border-[#F4ECEF] pt-5" />
               </div>
-            </motion.div>
+              <Link href="/products" className="mt-4 flex min-h-11 items-center justify-center gap-1.5 text-sm font-semibold text-text-muted transition-colors hover:text-primary-pink md:hidden">
+                <FiArrowLeft size={15} /> Continue shopping
+              </Link>
+            </aside>
           </div>
         )}
       </div>
+
+      {/* Mobile sticky checkout bar (sits above the bottom nav) */}
+      {hydrated && items.length > 0 && (
+        <div className="fixed inset-x-0 bottom-[calc(4.3rem+env(safe-area-inset-bottom))] z-[45] border-t border-[#F1E6EA] bg-white px-4 pb-[2.1rem] pt-2.5 shadow-[0_-8px_24px_rgba(59,13,46,0.08)] md:hidden">
+          <div className="mb-2 flex items-baseline justify-between text-sm">
+            <span className="text-text-muted">
+              {freeDelivery ? "Total" : "Subtotal"}
+              {savings > 0 && <span className="ml-1.5 font-semibold text-[#1F8A4C]">· saving {money(savings)}</span>}
+            </span>
+            <span className="text-lg font-extrabold tabular-nums text-text-dark">{money(subtotal)}</span>
+          </div>
+          {checkoutButton}
+        </div>
+      )}
     </div>
   );
 }

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { FiBarChart2, FiSearch, FiTrendingUp, FiInbox, FiPackage } from "react-icons/fi";
+import { FiBarChart2, FiSearch, FiTrendingUp, FiInbox, FiPackage, FiX } from "react-icons/fi";
 
 interface ProductHit {
   id: string;
@@ -161,20 +161,22 @@ export default function SalesReportPage() {
       <div className="admin-card" style={{ marginBottom: "1.5rem" }}>
         <div className="admin-card-header"><span style={{display:"inline-flex",alignItems:"center",gap:"0.5rem"}}><FiSearch size={16} /> Filters</span></div>
         <div className="admin-card-body">
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem", alignItems: "flex-end" }}>
+          <div className="report-filters">
             {/* Date range */}
-            <div className="admin-field" style={{ flex: "1 1 160px" }}>
-              <label className="admin-label">From</label>
+            <div className="admin-field report-field-date">
+              <label className="admin-label" htmlFor="report-from">From</label>
               <input
+                id="report-from"
                 type="date"
                 className="admin-input"
                 value={from}
                 onChange={(e) => setFrom(e.target.value)}
               />
             </div>
-            <div className="admin-field" style={{ flex: "1 1 160px" }}>
-              <label className="admin-label">To</label>
+            <div className="admin-field report-field-date">
+              <label className="admin-label" htmlFor="report-to">To</label>
               <input
+                id="report-to"
                 type="date"
                 className="admin-input"
                 value={to}
@@ -183,15 +185,13 @@ export default function SalesReportPage() {
             </div>
 
             {/* Product selector */}
-            <div className="admin-field" style={{ flex: "2 1 260px" }}>
+            <div className="admin-field report-field-products">
               <label className="admin-label">Products</label>
               <button
                 type="button"
                 className="admin-input"
                 onClick={openModal}
                 style={{
-                  textAlign: "left",
-                  cursor: "pointer",
                   color: selected.length ? "var(--text-dark)" : "var(--text-muted)",
                 }}
               >
@@ -201,74 +201,42 @@ export default function SalesReportPage() {
               </button>
             </div>
 
-            <button
-              type="button"
-              className="btn-admin-secondary"
-              onClick={generateAll}
-              disabled={loading}
-              style={{ flexShrink: 0 }}
-            >
-              All Products
-            </button>
-            <button
-              type="button"
-              className="btn-admin-primary"
-              onClick={generateReport}
-              disabled={loading}
-              style={{ flexShrink: 0 }}
-            >
-              {loading ? "Generating…" : "Generate Report"}
-            </button>
+            <div className="report-actions">
+              <button
+                type="button"
+                className="btn-admin-secondary"
+                onClick={generateAll}
+                disabled={loading}
+              >
+                All Products
+              </button>
+              <button
+                type="button"
+                className="btn-admin-primary"
+                onClick={generateReport}
+                disabled={loading}
+              >
+                {loading ? "Generating…" : "Generate Report"}
+              </button>
+            </div>
           </div>
 
           {/* Selected product pills */}
           {selected.length > 0 && (
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", marginTop: "1rem" }}>
+            <div className="admin-chip-list" style={{ marginTop: "1rem" }}>
               {selected.map((p) => (
-                <span
-                  key={p.id}
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "0.4rem",
-                    padding: "0.25rem 0.75rem",
-                    background: "rgba(164, 27, 21, 0.08)",
-                    border: "1px solid rgba(164, 27, 21, 0.2)",
-                    borderRadius: "20px",
-                    fontSize: "0.8rem",
-                    color: "var(--text-dark)",
-                  }}
-                >
-                  {p.name}
+                <span key={p.id} className="admin-chip">
+                  <span>{p.name}</span>
                   <button
+                    type="button"
                     onClick={() => removeSelected(p.id)}
-                    style={{
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                      color: "#A41B15",
-                      fontSize: "0.9rem",
-                      lineHeight: 1,
-                      padding: 0,
-                    }}
                     aria-label={`Remove ${p.name}`}
                   >
                     ×
                   </button>
                 </span>
               ))}
-              <button
-                onClick={() => setSelected([])}
-                style={{
-                  background: "none",
-                  border: "1px solid rgba(45,27,78,0.15)",
-                  borderRadius: "20px",
-                  padding: "0.25rem 0.75rem",
-                  fontSize: "0.75rem",
-                  cursor: "pointer",
-                  color: "var(--text-muted)",
-                }}
-              >
+              <button type="button" className="admin-chip admin-chip--ghost" onClick={() => setSelected([])}>
                 Clear all
               </button>
             </div>
@@ -277,7 +245,7 @@ export default function SalesReportPage() {
       </div>
 
       {error && (
-        <div style={{ marginBottom: "1rem", padding: "0.75rem 1rem", borderRadius: "10px", background: "rgba(164, 27, 21, 0.08)", color: "#A41B15", fontSize: "0.875rem" }}>
+        <div className="admin-notice admin-notice--error" role="alert">
           {error}
         </div>
       )}
@@ -290,7 +258,7 @@ export default function SalesReportPage() {
               <FiTrendingUp size={16} /> Results
             </span>
             {totals && (
-              <span style={{ fontSize: "0.85rem", fontWeight: 400, color: "var(--text-muted)" }}>
+              <span style={{ fontSize: "0.82rem", fontWeight: 400, color: "var(--text-muted)" }}>
                 {rows.length} product{rows.length !== 1 ? "s" : ""} · ৳
                 {totals.revenue.toLocaleString()} revenue · ৳{totals.profit.toLocaleString()} profit
               </span>
@@ -298,24 +266,24 @@ export default function SalesReportPage() {
           </div>
 
           {rows.length === 0 ? (
-            <div className="admin-empty" style={{ padding: "3rem" }}>
+            <div className="admin-empty">
               <div className="empty-icon"><FiInbox size={40} /></div>
               <h3>No Sales Data</h3>
               <p>No orders matched the selected filters.</p>
             </div>
           ) : (
             <>
-              <div className="admin-table-wrap">
-                <table className="admin-table">
+              <div className="admin-table-wrap" style={{ border: "none", borderRadius: 0, boxShadow: "none" }}>
+                <table className="admin-table admin-table--sticky report-table">
                   <thead>
                     <tr>
                       <th>#</th>
-                      <th>Product</th>
+                      <th className="sticky-col">Product</th>
                       <th>Variant</th>
-                      <th>Orders</th>
-                      <th>Qty Sold</th>
-                      <th>Revenue (৳)</th>
-                      <th>Profit (৳)</th>
+                      <th className="num">Orders</th>
+                      <th className="num">Qty Sold</th>
+                      <th className="num">Revenue (৳)</th>
+                      <th className="num">Profit (৳)</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -327,15 +295,15 @@ export default function SalesReportPage() {
                       return lines.map((v, j) => (
                         <tr
                           key={row.productId + "|" + v.label}
-                          style={j === 0 && i > 0 ? { borderTop: "2px solid rgba(0,0,0,0.08)" } : undefined}
+                          className={j === 0 && i > 0 ? "group-start" : undefined}
                         >
-                          {j === 0 && <td rowSpan={lines.length} style={{ verticalAlign: "top" }}>{i + 1}</td>}
-                          {j === 0 && <td rowSpan={lines.length} style={{ fontWeight: 600, verticalAlign: "top" }}>{row.name}</td>}
+                          {j === 0 && <td rowSpan={lines.length} style={{ verticalAlign: "top", color: "var(--text-muted)" }}>{i + 1}</td>}
+                          {j === 0 && <td rowSpan={lines.length} className="sticky-col report-product" style={{ fontWeight: 600, verticalAlign: "top" }}>{row.name}</td>}
                           <td style={{ color: v.label ? undefined : "var(--text-muted)" }}>{v.label || "—"}</td>
-                          <td>{v.orderCount}</td>
-                          <td>{v.qty}</td>
-                          <td>৳{v.revenue.toLocaleString()}</td>
-                          <td style={{ fontWeight: 600, color: v.profit < 0 ? "#A41B15" : "#15803d" }}>
+                          <td className="num">{v.orderCount}</td>
+                          <td className="num">{v.qty}</td>
+                          <td className="num">৳{v.revenue.toLocaleString()}</td>
+                          <td className="num" style={{ fontWeight: 600, color: v.profit < 0 ? "#A41B15" : "#15803d" }}>
                             ৳{v.profit.toLocaleString()}
                           </td>
                         </tr>
@@ -344,11 +312,13 @@ export default function SalesReportPage() {
                   </tbody>
                   {totals && (
                     <tfoot>
-                      <tr style={{ fontWeight: 700, background: "rgba(164, 27, 21, 0.04)" }}>
-                        <td colSpan={4}>Total</td>
-                        <td>{totals.qty}</td>
-                        <td>৳{totals.revenue.toLocaleString()}</td>
-                        <td style={{ color: totals.profit < 0 ? "#A41B15" : "#15803d" }}>
+                      <tr>
+                        <td>&nbsp;</td>
+                        <td className="sticky-col">Total</td>
+                        <td colSpan={2}>&nbsp;</td>
+                        <td className="num">{totals.qty}</td>
+                        <td className="num">৳{totals.revenue.toLocaleString()}</td>
+                        <td className="num" style={{ color: totals.profit < 0 ? "#A41B15" : "#15803d" }}>
                           ৳{totals.profit.toLocaleString()}
                         </td>
                       </tr>
@@ -364,258 +334,117 @@ export default function SalesReportPage() {
       {/* Product Selection Modal */}
       {modalOpen && (
         <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(15,8,32,0.65)",
-            backdropFilter: "blur(4px)",
-            zIndex: 9999,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "1rem",
-          }}
+          className="modal-overlay"
           onClick={(e) => e.target === e.currentTarget && closeModal()}
         >
-          <div
-            style={{
-              background: "#fff",
-              borderRadius: "20px",
-              width: "100%",
-              maxWidth: "560px",
-              maxHeight: "80vh",
-              display: "flex",
-              flexDirection: "column",
-              boxShadow: "0 24px 64px rgba(15,8,32,0.4)",
-              overflow: "hidden",
-            }}
-          >
+          <div className="modal-box modal-md" role="dialog" aria-modal="true" aria-labelledby="picker-title">
             {/* Modal header */}
-            <div
-              style={{
-                padding: "1.25rem 1.5rem",
-                borderBottom: "1px solid rgba(45,27,78,0.08)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                flexShrink: 0,
-              }}
-            >
-              <div>
-                <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text-dark)", margin: 0 }}>
+            <div className="modal-header">
+              <div style={{ minWidth: 0 }}>
+                <h3 id="picker-title" style={{ fontSize: "1.05rem", fontWeight: 700, margin: 0 }}>
                   Select Products
                 </h3>
                 {staged.length > 0 && (
-                  <p style={{ fontSize: "0.8rem", color: "var(--text-muted)", margin: "0.15rem 0 0" }}>
-                    {staged.length} selected
-                  </p>
+                  <p className="modal-subtitle">{staged.length} selected</p>
                 )}
               </div>
-              <button
-                onClick={closeModal}
-                style={{
-                  background: "none",
-                  border: "none",
-                  fontSize: "1.5rem",
-                  cursor: "pointer",
-                  color: "var(--text-muted)",
-                  lineHeight: 1,
-                }}
-                aria-label="Close"
-              >
-                ×
+              <button type="button" className="modal-close" onClick={closeModal} aria-label="Close">
+                <FiX size={18} />
               </button>
             </div>
 
-            {/* Search input */}
-            <div style={{ padding: "1rem 1.5rem 0.75rem", flexShrink: 0 }}>
-              <input
-                autoFocus
-                type="text"
-                className="admin-input"
-                placeholder="Search to filter…"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-              />
-            </div>
-
-            {/* Selected chips inside modal */}
-            {staged.length > 0 && (
-              <div
-                style={{
-                  padding: "0 1.5rem 0.75rem",
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: "0.4rem",
-                  flexShrink: 0,
-                }}
-              >
-                {staged.map((p) => (
-                  <span
-                    key={p.id}
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "0.3rem",
-                      padding: "0.2rem 0.6rem",
-                      background: "rgba(164, 27, 21, 0.08)",
-                      border: "1px solid rgba(164, 27, 21, 0.2)",
-                      borderRadius: "20px",
-                      fontSize: "0.75rem",
-                      color: "var(--text-dark)",
-                    }}
-                  >
-                    {p.name}
-                    <button
-                      onClick={() => toggleStaged(p)}
-                      style={{
-                        background: "none",
-                        border: "none",
-                        cursor: "pointer",
-                        color: "#A41B15",
-                        fontSize: "0.9rem",
-                        lineHeight: 1,
-                        padding: 0,
-                      }}
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
+            <div className="modal-body modal-body--flush">
+              {/* Search input */}
+              <div className="picker-search">
+                <input
+                  autoFocus
+                  type="search"
+                  className="admin-input"
+                  placeholder="Search to filter…"
+                  aria-label="Search products"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                />
               </div>
-            )}
 
-            {/* Results list */}
-            <div style={{ flex: 1, overflowY: "auto", padding: "0 1rem 1rem" }}>
-              {searching && (
-                <div style={{ textAlign: "center", padding: "2rem", color: "var(--text-muted)" }}>
-                  <div className="spinner" style={{ margin: "0 auto 0.75rem" }} />
-                  Searching…
+              {/* Selected chips inside modal */}
+              {staged.length > 0 && (
+                <div className="picker-chips admin-chip-list">
+                  {staged.map((p) => (
+                    <span key={p.id} className="admin-chip">
+                      <span>{p.name}</span>
+                      <button type="button" onClick={() => toggleStaged(p)} aria-label={`Remove ${p.name}`}>
+                        ×
+                      </button>
+                    </span>
+                  ))}
                 </div>
               )}
 
-              {productsError && (
-                <div style={{ textAlign: "center", padding: "2rem", color: "#A41B15", fontSize: "0.9rem" }}>
-                  {productsError}
-                </div>
-              )}
-
-              {!searching && !productsError && hits.length === 0 && (
-                <div style={{ textAlign: "center", padding: "2rem", color: "var(--text-muted)", fontSize: "0.9rem" }}>
-                  {query ? <>No products found for &ldquo;{query}&rdquo;</> : "No products yet."}
-                </div>
-              )}
-
-              {!searching && hits.map((hit) => {
-                const isSelected = staged.some((p) => p.id === hit.id);
-                return (
-                  <div
-                    key={hit.id}
-                    onClick={() => toggleStaged(hit)}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "0.75rem",
-                      padding: "0.75rem 0.5rem",
-                      borderRadius: "12px",
-                      cursor: "pointer",
-                      background: isSelected ? "rgba(164, 27, 21, 0.06)" : "transparent",
-                      border: isSelected
-                        ? "1px solid rgba(164, 27, 21, 0.2)"
-                        : "1px solid transparent",
-                      marginBottom: "0.35rem",
-                      transition: "all 0.15s",
-                    }}
-                  >
-                    {/* Product image */}
-                    <div
-                      style={{
-                        width: 48,
-                        height: 48,
-                        borderRadius: "10px",
-                        overflow: "hidden",
-                        flexShrink: 0,
-                        background: "rgba(45,27,78,0.06)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      {hit.image ? (
-                        <Image
-                          src={hit.image}
-                          alt={hit.name}
-                          width={48}
-                          height={48}
-                          style={{ objectFit: "cover", width: "100%", height: "100%" }}
-                        />
-                      ) : (
-                        <FiPackage size={20} />
-                      )}
-                    </div>
-
-                    {/* Name + price */}
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div
-                        style={{
-                          fontWeight: 600,
-                          fontSize: "0.875rem",
-                          color: "var(--text-dark)",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          whiteSpace: "nowrap",
-                        }}
-                      >
-                        {hit.name}
-                      </div>
-                      <div style={{ fontSize: "0.78rem", color: "var(--text-muted)", marginTop: "0.1rem" }}>
-                        ৳{hit.price.toLocaleString()}
-                      </div>
-                    </div>
-
-                    {/* Checkbox */}
-                    <div
-                      style={{
-                        width: 22,
-                        height: 22,
-                        borderRadius: "6px",
-                        border: isSelected
-                          ? "2px solid #A41B15"
-                          : "2px solid rgba(45,27,78,0.2)",
-                        background: isSelected ? "#A41B15" : "transparent",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexShrink: 0,
-                        transition: "all 0.15s",
-                      }}
-                    >
-                      {isSelected && (
-                        <svg width="12" height="9" viewBox="0 0 12 9" fill="none">
-                          <path d="M1 4L4.5 7.5L11 1" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                      )}
-                    </div>
+              {/* Results list */}
+              <div className="picker-list">
+                {searching && (
+                  <div className="picker-state">
+                    <div className="spinner" style={{ margin: "0 auto 0.75rem" }} />
+                    Searching…
                   </div>
-                );
-              })}
+                )}
+
+                {productsError && (
+                  <div className="picker-state is-error">{productsError}</div>
+                )}
+
+                {!searching && !productsError && hits.length === 0 && (
+                  <div className="picker-state">
+                    {query ? <>No products found for &ldquo;{query}&rdquo;</> : "No products yet."}
+                  </div>
+                )}
+
+                {!searching && hits.map((hit) => {
+                  const isSelected = staged.some((p) => p.id === hit.id);
+                  return (
+                    <button
+                      type="button"
+                      key={hit.id}
+                      onClick={() => toggleStaged(hit)}
+                      className={`picker-row ${isSelected ? "is-selected" : ""}`}
+                      aria-pressed={isSelected}
+                    >
+                      {/* Product image */}
+                      <span className="admin-thumb admin-thumb--lg" style={{ width: 48, height: 48 }}>
+                        {hit.image ? (
+                          <Image src={hit.image} alt="" fill sizes="48px" style={{ objectFit: "cover" }} />
+                        ) : (
+                          <FiPackage size={20} />
+                        )}
+                      </span>
+
+                      {/* Name + price */}
+                      <span style={{ flex: 1, minWidth: 0 }}>
+                        <span className="picker-row-name" style={{ display: "block" }}>{hit.name}</span>
+                        <span className="picker-row-sub" style={{ display: "block" }}>৳{hit.price.toLocaleString()}</span>
+                      </span>
+
+                      {/* Checkbox */}
+                      <span className="picker-check" aria-hidden="true">
+                        {isSelected && (
+                          <svg width="12" height="9" viewBox="0 0 12 9" fill="none">
+                            <path d="M1 4L4.5 7.5L11 1" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        )}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Modal footer */}
-            <div
-              style={{
-                padding: "1rem 1.5rem",
-                borderTop: "1px solid rgba(45,27,78,0.08)",
-                display: "flex",
-                gap: "0.75rem",
-                justifyContent: "flex-end",
-                flexShrink: 0,
-              }}
-            >
-              <button className="btn-admin-secondary" onClick={closeModal}>
+            <div className="modal-footer">
+              <button type="button" className="btn-admin-secondary" onClick={closeModal}>
                 Cancel
               </button>
-              <button className="btn-admin-primary" onClick={applyModal}>
+              <button type="button" className="btn-admin-primary" onClick={applyModal}>
                 Apply Selection{staged.length > 0 ? ` (${staged.length})` : ""}
               </button>
             </div>

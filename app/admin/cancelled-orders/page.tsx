@@ -52,8 +52,8 @@ export default function CancelledOrdersPage() {
           <p>Cancelled orders will appear here.</p>
         </div>
       ) : (
-        <div className="admin-table-wrap">
-          <table className="admin-table">
+        <div className="admin-table-wrap admin-table-wrap--stack">
+          <table className="admin-table admin-table--stack">
             <thead>
               <tr>
                 <th>#</th>
@@ -68,23 +68,25 @@ export default function CancelledOrdersPage() {
             <tbody>
               {orders.map((order, index) => (
                 <tr key={order._id}>
-                  <td>{index + 1}</td>
-                  <td style={{ fontWeight: 600 }}>{order.orderNumber}</td>
-                  <td>
+                  <td className="hide-stacked">{index + 1}</td>
+                  <td className="cell-head" style={{ fontWeight: 600 }}>{order.orderNumber}</td>
+                  <td data-label="Customer">
                     <div style={{ fontSize: 13 }}>
                       <div>{order.delivery.fullName}</div>
-                      <div style={{ color: "#9ca3af" }}>{order.delivery.phone}</div>
+                      <div className="cell-sub">{order.delivery.phone}</div>
                     </div>
                   </td>
-                  <td>{new Date(order.createdAt).toLocaleDateString()}</td>
-                  <td>৳{order.total.toLocaleString()}</td>
-                  <td style={{ fontSize: 12, color: "#6b7280" }}>
+                  <td data-label="Date" className="nowrap">{new Date(order.createdAt).toLocaleDateString()}</td>
+                  <td data-label="Total" className="nowrap">৳{order.total.toLocaleString()}</td>
+                  <td data-label="Tracking" style={{ fontSize: 12, color: "var(--text-muted)" }}>
                     {order.steadfastTrackingCode || "—"}
                   </td>
-                  <td>
-                    <Link href={`/admin/orders/${order.orderNumber}`} className="btn-admin-edit">
-                      View
-                    </Link>
+                  <td className="cell-actions-td">
+                    <div className="cell-actions">
+                      <Link href={`/admin/orders/${order.orderNumber}`} className="btn-admin-edit btn-sm">
+                        View
+                      </Link>
+                    </div>
                   </td>
                 </tr>
               ))}

@@ -168,6 +168,7 @@ export default function AdminChatPage() {
             ) : threads.length ? (
               threads.map((thread) => (
                 <button
+                  type="button"
                   key={thread.id}
                   className={`admin-chat-thread ${thread.id === activeId ? "active" : ""}`}
                   onClick={() => {
@@ -205,10 +206,11 @@ export default function AdminChatPage() {
                 {isMobile && (
                   <button
                     type="button"
-                    className="btn-admin-secondary"
+                    className="btn-admin-secondary btn-icon"
                     onClick={() => setMobileView("list")}
+                    aria-label="Back to conversations"
                   >
-                    <FiChevronLeft size={16} /> Back
+                    <FiChevronLeft size={18} />
                   </button>
                 )}
                 <div className="admin-chat-panel-name">
@@ -255,6 +257,7 @@ export default function AdminChatPage() {
             <input
               ref={inputRef}
               type="text"
+              aria-label="Reply message"
               placeholder={activeThread ? "Type a reply..." : "Select a chat first"}
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -264,6 +267,7 @@ export default function AdminChatPage() {
               disabled={!activeThread || sending}
             />
             <button
+              type="button"
               className="btn-admin-primary"
               onClick={handleSend}
               disabled={!activeThread || sending || !input.trim()}

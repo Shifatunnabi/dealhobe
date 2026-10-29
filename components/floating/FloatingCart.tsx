@@ -41,12 +41,12 @@ export default function FloatingCart() {
           initial={{ scale: 0.7, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", stiffness: 400, damping: 22 }}
-          className="font-poppins text-sm font-semibold leading-none text-text-dark"
+          className="font-body text-sm font-semibold leading-none text-text-dark"
         >
           {count} {count === 1 ? "item" : "items"}
         </motion.span>
 
-        <span className="font-poppins text-sm font-bold leading-none text-primary-pink">
+        <span className="font-body text-sm font-bold leading-none text-primary-pink">
           ৳{total.toLocaleString()}
         </span>
       </motion.span>

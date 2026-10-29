@@ -25,6 +25,8 @@ const ToolbarBtn = ({
   <button
     type="button"
     title={title}
+    aria-label={title}
+    aria-pressed={active}
     onClick={onClick}
     className={`rte-btn ${active ? 'rte-btn-active' : ''}`}
   >
