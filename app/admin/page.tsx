@@ -24,7 +24,7 @@ const statCards = (s: Stats) => [
 ];
 
 const quickLinks: { href: string; icon: IconType; label: string; desc: string }[] = [
-  { href: '/admin/hero',  icon: FiImage,    label: 'Manage Hero', desc: 'Update hero slides & top bar' },
+  { href: '/admin/hero',  icon: FiImage,    label: 'Top Bar', desc: 'Edit the announcement strip above the header' },
   { href: '/admin/blogs', icon: FiFileText, label: 'Write a Blog', desc: 'Publish tips & stories' },
 ];
 

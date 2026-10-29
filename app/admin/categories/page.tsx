@@ -149,7 +149,7 @@ export default function CategoriesPage() {
         <div>
           <h1 className="admin-page-title"><span className="page-icon"><FiFolder size={20} /></span> Category Management</h1>
           <p className="admin-page-subtitle">
-            Manage categories for favourites section and product filters. First 4 shown on homepage, rest in slider. Drag cards to reorder.
+            Categories used by product filters and navigation. Drag cards to reorder. Homepage banners are edited in Homepage Builder.
           </p>
         </div>
         <button id="add-category-btn" className="btn-admin-primary" onClick={openAdd}>+ Add Category</button>

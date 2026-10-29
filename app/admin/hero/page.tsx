@@ -2,102 +2,15 @@
 
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
-import Image from 'next/image';
-import { FiImage, FiVolume2, FiEdit2, FiTrash2, FiPlus, FiX, FiSmartphone } from 'react-icons/fi';
-import ImageUpload from '@/components/admin/ImageUpload';
+import { FiVolume2, FiEdit2, FiTrash2, FiPlus, FiX } from 'react-icons/fi';
 import DragHandle from '@/components/admin/DragHandle';
 import { SortableList, useSortableItem } from '@/components/admin/SortableList';
 import { renumbered, nextOrder, saveOrder } from '@/components/admin/reorderUtils';
 
 /* ── Types ─────────────────────────────────────────────────── */
-interface HeroSlide { _id: string; imageUrl: string; imagePublicId: string; mobileImageUrl?: string; mobileImagePublicId?: string; ctaText: string; ctaLink: string; ctaColor: string; ctaTextColor: string; order: number; isActive: boolean; }
 interface TopBarText { _id: string; text: string; isActive: boolean; order: number; }
 
-const DEFAULT_CTA_COLOR = '#A41B15';
-const DEFAULT_CTA_TEXT_COLOR = '#FFFFFF';
-const emptySlide = { ctaText: 'Shop Now', ctaLink: '/products', ctaColor: DEFAULT_CTA_COLOR, ctaTextColor: DEFAULT_CTA_TEXT_COLOR, imageUrl: '', imagePublicId: '', mobileImageUrl: '', mobileImagePublicId: '', order: 0, isActive: true };
 const emptyTbText = { text: '', isActive: true, order: 0 };
-
-/* A half-typed hex ("#A9") must not be handed to a swatch or preview. */
-const safeColor = (value: string, fallback: string) =>
-  /^#[0-9a-fA-F]{6}$/.test(value) ? value : fallback;
-
-/* Native colour picker paired with a hex field, kept in sync. */
-function ColorField({
-  label, value, fallback, onChange,
-}: { label: string; value: string; fallback: string; onChange: (v: string) => void }) {
-  return (
-    <div className="admin-field">
-      <label className="admin-label">{label}</label>
-      <div className="admin-color-field">
-        <input
-          type="color"
-          aria-label={label}
-          value={safeColor(value, fallback)}
-          onChange={e => onChange(e.target.value.toUpperCase())}
-          className="admin-color-swatch"
-        />
-        <input
-          className="admin-input"
-          value={value}
-          onChange={e => onChange(e.target.value)}
-          placeholder={fallback}
-          style={{ flex: 1, minWidth: 0 }}
-        />
-      </div>
-    </div>
-  );
-}
-
-function HeroSlideCard({
-  slide, onEdit, onDelete,
-}: {
-  slide: HeroSlide;
-  onEdit: () => void;
-  onDelete: () => void;
-}) {
-  const { setNodeRef, style, isDragging, handle } = useSortableItem(slide._id);
-  return (
-    <div ref={setNodeRef} style={style} className={`admin-item-card${isDragging ? ' is-dragging' : ''}`}>
-      <div className="admin-item-image admin-item-image--wide">
-        <Image src={slide.imageUrl} alt={slide.ctaText || 'Hero slide'} fill sizes="(max-width: 640px) 100vw, 400px" style={{ objectFit: 'cover' }} />
-        <span className={`admin-media-badge top-right ${slide.isActive ? 'is-gold' : ''}`}>
-          {slide.isActive ? 'Active' : 'Hidden'}
-        </span>
-        {slide.mobileImageUrl && (
-          <span className="admin-media-badge bottom-left">
-            <FiSmartphone size={11} /> Own mobile photo
-          </span>
-        )}
-        <div className="admin-media-handle">
-          <DragHandle handle={handle} />
-        </div>
-      </div>
-      <div className="admin-item-body">
-        <div className="admin-item-title">
-          <span
-            style={{
-              display: 'inline-flex', alignItems: 'center', borderRadius: 10,
-              padding: '0.35rem 0.85rem', fontSize: '0.8rem', fontWeight: 600,
-              background: safeColor(slide.ctaColor, DEFAULT_CTA_COLOR),
-              color: safeColor(slide.ctaTextColor, DEFAULT_CTA_TEXT_COLOR),
-            }}
-          >
-            {slide.ctaText || 'Shop Now'}
-          </span>
-        </div>
-        <div className="admin-item-meta">→ {slide.ctaLink || '/products'}</div>
-        <div className="admin-item-meta">
-          Order: {slide.order} · bg {safeColor(slide.ctaColor, DEFAULT_CTA_COLOR)} · text {safeColor(slide.ctaTextColor, DEFAULT_CTA_TEXT_COLOR)}
-        </div>
-        <div className="admin-item-actions">
-          <button className="btn-admin-edit btn-sm"   onClick={onEdit}><FiEdit2 size={13} /> Edit</button>
-          <button className="btn-admin-danger btn-sm" onClick={onDelete}><FiTrash2 size={13} /> Delete</button>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function TopBarRow({
   text, index, onEdit, onDelete,
@@ -126,17 +39,8 @@ function TopBarRow({
 
 /* ── Page ───────────────────────────────────────────────────── */
 export default function HeroPage() {
-  const [slides,   setSlides]   = useState<HeroSlide[]>([]);
   const [topbar,   setTopbar]   = useState<TopBarText[]>([]);
-  const [tab,      setTab]      = useState<'slides'|'topbar'>('slides');
   const [loading,  setLoading]  = useState(true);
-
-  // Slides modal
-  const [slideModal,   setSlideModal]   = useState(false);
-  const [editingSlide, setEditingSlide] = useState<HeroSlide | null>(null);
-  const [slideForm,    setSlideForm]    = useState({ ...emptySlide });
-  const [savingSlide,  setSavingSlide]  = useState(false);
-  const [mobileOpen,   setMobileOpen]   = useState(false); // mobile-photo uploader visible in the modal
 
   // Topbar modal
   const [tbModal,   setTbModal]   = useState(false);
@@ -145,22 +49,12 @@ export default function HeroPage() {
   const [savingTb,  setSavingTb]  = useState(false);
 
 
-  const loadSlides = async () => { const r = await fetch('/api/admin/hero/slides'); setSlides(await r.json()); };
   const loadTopbar = async () => { const r = await fetch('/api/admin/hero/topbar');  setTopbar(await r.json()); };
 
   useEffect(() => {
-    Promise.all([loadSlides(), loadTopbar()]).finally(() => setLoading(false));
+    fetch('/api/admin/hero/topbar').then(r => r.json()).then(setTopbar).finally(() => setLoading(false));
   }, []);
 
-  const handleReorderSlides = (newOrder: HeroSlide[]) => {
-    const prev = slides;
-    const next = renumbered(newOrder);
-    setSlides(next);
-    saveOrder('/api/admin/hero/slides', next).catch(() => {
-      setSlides(prev);
-      toast.error('Could not save the new order');
-    });
-  };
   const handleReorderTopbar = (newOrder: TopBarText[]) => {
     const prev = topbar;
     const next = renumbered(newOrder);
@@ -169,47 +63,6 @@ export default function HeroPage() {
       setTopbar(prev);
       toast.error('Could not save the new order');
     });
-  };
-
-  /* Slides CRUD */
-  const openAddSlide  = () => { setEditingSlide(null); setSlideForm({ ...emptySlide, order: nextOrder(slides) }); setMobileOpen(false); setSlideModal(true); };
-  const openEditSlide = (s: HeroSlide) => {
-    setEditingSlide(s);
-    setSlideForm({ ctaText: s.ctaText, ctaLink: s.ctaLink, ctaColor: s.ctaColor || DEFAULT_CTA_COLOR, ctaTextColor: s.ctaTextColor || DEFAULT_CTA_TEXT_COLOR, imageUrl: s.imageUrl, imagePublicId: s.imagePublicId, mobileImageUrl: s.mobileImageUrl || '', mobileImagePublicId: s.mobileImagePublicId || '', order: s.order, isActive: s.isActive });
-    setMobileOpen(!!s.mobileImageUrl);
-    setSlideModal(true);
-  };
-  const saveSlide = async () => {
-    if (!slideForm.imageUrl) {
-      toast.error('Image is required');
-      return;
-    }
-    setSavingSlide(true);
-    try {
-      const res = editingSlide
-        ? await fetch('/api/admin/hero/slides', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: editingSlide._id, ...slideForm }) })
-        : await fetch('/api/admin/hero/slides', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(slideForm) });
-      if (!res.ok) throw new Error('Could not save the slide');
-      const saved = await res.json();
-      // The server echoes what it stored; if the mobile photo didn't make it, say so instead of pretending it saved.
-      if (slideForm.mobileImageUrl && saved.mobileImageUrl !== slideForm.mobileImageUrl) {
-        toast.error('Slide saved, but the mobile photo was not stored. Restart the dev server and upload it again.');
-      } else {
-        toast.success(editingSlide ? 'Slide updated' : 'Slide added');
-      }
-      setSlideModal(false);
-      loadSlides();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Could not save the slide');
-    } finally {
-      setSavingSlide(false);
-    }
-  };
-  const deleteSlide = async (id: string) => {
-    if (!confirm('Delete this slide?')) return;
-    await fetch('/api/admin/hero/slides', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
-    toast.success('Slide deleted');
-    loadSlides();
   };
 
   /* Topbar CRUD */
@@ -243,55 +96,14 @@ export default function HeroPage() {
     <div>
       <div className="admin-page-header">
         <div>
-          <h1 className="admin-page-title"><span className="page-icon"><FiImage size={20} /></span> Hero Section</h1>
-          <p className="admin-page-subtitle">Manage hero slides and top bar announcements. Drag to reorder.</p>
+          <h1 className="admin-page-title"><span className="page-icon"><FiVolume2 size={20} /></span> Top Bar</h1>
+          <p className="admin-page-subtitle">Announcements shown in the strip above the header. Drag to reorder. Banners live in Homepage Builder.</p>
         </div>
-        {tab === 'slides'
-          ? <button className="btn-admin-primary" onClick={openAddSlide}>+ Add Slide</button>
-          : <button className="btn-admin-primary" onClick={openAddTb}>+ Add Text</button>
-        }
+        <button className="btn-admin-primary" onClick={openAddTb}>+ Add Text</button>
       </div>
-
-      {/* Tabs */}
-      <div className="admin-tabs" role="group" aria-label="Section">
-        {(['slides', 'topbar'] as const).map(t => (
-          <button
-            key={t}
-            type="button"
-            aria-pressed={tab === t}
-            className={`admin-tab ${tab === t ? 'is-active' : ''}`}
-            onClick={() => setTab(t)}
-          >
-            {t === 'slides' ? <FiImage size={15} /> : <FiVolume2 size={15} />}
-            {t === 'slides' ? 'Hero Slides' : 'Top Bar Texts'}
-          </button>
-        ))}
-      </div>
-
-      {/* Hero Slides */}
-      {tab === 'slides' && (
-        slides.length === 0 ? (
-          <div className="admin-empty">
-            <div className="empty-icon"><FiImage size={40} /></div>
-            <h3>No Hero Slides</h3>
-            <p>Add your first hero slide to update the homepage banner.</p>
-          </div>
-        ) : (
-          <SortableList
-            items={slides}
-            onReorder={handleReorderSlides}
-            layout="grid"
-            className="admin-grid admin-grid--wide"
-          >
-            {slides.map(s => (
-              <HeroSlideCard key={s._id} slide={s} onEdit={() => openEditSlide(s)} onDelete={() => deleteSlide(s._id)} />
-            ))}
-          </SortableList>
-        )
-      )}
 
       {/* Top Bar */}
-      {tab === 'topbar' && (
+      {(
         topbar.length === 0 ? (
           <div className="admin-empty">
             <div className="empty-icon"><FiVolume2 size={40} /></div>
@@ -309,90 +121,6 @@ export default function HeroPage() {
             ))}
           </SortableList>
         )
-      )}
-
-      {/* Slide Modal */}
-      {slideModal && (
-        <div className="modal-overlay">
-          <div className="modal-box modal-lg" role="dialog" aria-modal="true" aria-label={editingSlide ? 'Edit Hero Slide' : 'Add Hero Slide'}>
-            <div className="modal-header">
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-                {editingSlide ? <FiEdit2 size={16} /> : <FiPlus size={16} />} {editingSlide ? 'Edit Hero Slide' : 'Add Hero Slide'}
-              </span>
-              <button className="modal-close" aria-label="Close" onClick={() => setSlideModal(false)}><FiX size={18} /></button>
-            </div>
-            <div className="modal-body">
-              <div className="admin-form">
-                <ImageUpload label="Slide Image (desktop)" value={slideForm.imageUrl} folder="dealhobe/hero" onChange={(url, pid) => setSlideForm(f => ({ ...f, imageUrl: url, imagePublicId: pid }))} />
-                {!mobileOpen ? (
-                  <div>
-                    <button type="button" className="btn-admin-secondary" onClick={() => setMobileOpen(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
-                      <FiSmartphone size={14} /> Add a different photo for mobile
-                    </button>
-                    <p className="admin-hint" style={{ margin: '0.4rem 0 0' }}>
-                      Without one, phones show the desktop photo above.
-                    </p>
-                  </div>
-                ) : (
-                  <div>
-                    <ImageUpload label="Mobile Image (phones only, square 1:1 works best)" value={slideForm.mobileImageUrl} folder="dealhobe/hero" onChange={(url, pid) => setSlideForm(f => ({ ...f, mobileImageUrl: url, mobileImagePublicId: pid }))} />
-                    <button type="button" className="btn-admin-secondary" style={{ marginTop: '0.5rem' }} onClick={() => { setSlideForm(f => ({ ...f, mobileImageUrl: '', mobileImagePublicId: '' })); setMobileOpen(false); }}>
-                      Remove mobile photo (use the desktop photo)
-                    </button>
-                  </div>
-                )}
-                <div className="admin-form-row">
-                  <div className="admin-field"><label className="admin-label">Button Text</label><input className="admin-input" value={slideForm.ctaText} onChange={e => setSlideForm(f => ({ ...f, ctaText: e.target.value }))} placeholder="Shop Now" /></div>
-                  <div className="admin-field"><label className="admin-label">Button Link</label><input className="admin-input" value={slideForm.ctaLink} onChange={e => setSlideForm(f => ({ ...f, ctaLink: e.target.value }))} placeholder="/products" /></div>
-                </div>
-                <div className="admin-form-row">
-                  <ColorField
-                    label="Button Colour"
-                    value={slideForm.ctaColor}
-                    fallback={DEFAULT_CTA_COLOR}
-                    onChange={v => setSlideForm(f => ({ ...f, ctaColor: v }))}
-                  />
-                  <ColorField
-                    label="Button Text Colour"
-                    value={slideForm.ctaTextColor}
-                    fallback={DEFAULT_CTA_TEXT_COLOR}
-                    onChange={v => setSlideForm(f => ({ ...f, ctaTextColor: v }))}
-                  />
-                </div>
-                <div className="admin-field">
-                  <label className="admin-label">Preview</label>
-                  <div className="admin-subpanel" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', overflow: 'hidden' }}>
-                    <span
-                      style={{
-                        display: 'inline-flex', alignItems: 'center', borderRadius: 12,
-                        padding: '0.6rem 1.2rem', fontWeight: 600, fontSize: '0.875rem',
-                        whiteSpace: 'nowrap',
-                        background: safeColor(slideForm.ctaColor, DEFAULT_CTA_COLOR),
-                        color: safeColor(slideForm.ctaTextColor, DEFAULT_CTA_TEXT_COLOR),
-                      }}
-                    >
-                      {slideForm.ctaText || 'Shop Now'}
-                    </span>
-                  </div>
-                  <small className="admin-hint">The slide shows only the photo and this button — no heading or subtitle.</small>
-                </div>
-                <div className="admin-form-row">
-                  <div className="admin-field"><label className="admin-label">Order</label><input type="number" className="admin-input" value={slideForm.order} onChange={e => setSlideForm(f => ({ ...f, order: +e.target.value }))} /></div>
-                  <div className="admin-field admin-field--end">
-                    <label className="admin-checkbox-row">
-                      <input type="checkbox" className="admin-checkbox" checked={slideForm.isActive} onChange={e => setSlideForm(f => ({ ...f, isActive: e.target.checked }))} />
-                      <span className="admin-label">Active</span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="modal-footer">
-              <button className="btn-admin-secondary" onClick={() => setSlideModal(false)}>Cancel</button>
-              <button className="btn-admin-primary" onClick={saveSlide} disabled={savingSlide}>{savingSlide ? 'Saving…' : editingSlide ? 'Update' : 'Add Slide'}</button>
-            </div>
-          </div>
-        </div>
       )}
 
       {/* Topbar Modal */}
