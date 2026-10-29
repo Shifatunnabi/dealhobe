@@ -169,7 +169,7 @@ export default async function RootLayout({
             <CartSidebar />
             <div className="flex min-h-screen flex-col">
               <Navbar storefront={storefront} />
-              <main className="flex-1 pt-36 pb-20 md:pb-0">{children}</main>
+              <main className="flex-1 pt-36">{children}</main>
               <RouteChrome storefront={storefront} />
             </div>
           </CartProvider>

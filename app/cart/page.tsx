@@ -27,7 +27,7 @@ export default function CartPage() {
   );
 
   return (
-    <div className="min-h-[70vh] bg-soft-bg pb-36 pt-5 md:pb-20 md:pt-8">
+    <div className="min-h-[70vh] bg-soft-bg pb-32 pt-5 md:pb-20 md:pt-8">
       <div className="shell">
         <nav aria-label="Breadcrumb" className="mb-3 flex items-center gap-1.5 text-xs text-text-muted">
           <Link href="/" className="transition-colors hover:text-primary-pink">Home</Link>
@@ -127,9 +127,9 @@ export default function CartPage() {
         )}
       </div>
 
-      {/* Mobile sticky checkout bar (sits above the bottom nav) */}
+      {/* Mobile sticky checkout bar */}
       {hydrated && items.length > 0 && (
-        <div className="fixed inset-x-0 bottom-[calc(4.3rem+env(safe-area-inset-bottom))] z-[45] border-t border-[#F1E6EA] bg-white px-4 pb-[2.1rem] pt-2.5 shadow-[0_-8px_24px_rgba(59,13,46,0.08)] md:hidden">
+        <div className="fixed inset-x-0 bottom-0 z-[45] border-t border-[#F1E6EA] bg-white px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-2.5 shadow-[0_-8px_24px_rgba(59,13,46,0.08)] md:hidden">
           <div className="mb-2 flex items-baseline justify-between text-sm">
             <span className="text-text-muted">
               {freeDelivery ? "Total" : "Subtotal"}

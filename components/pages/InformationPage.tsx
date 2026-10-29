@@ -9,7 +9,7 @@ export default function InformationPage({ content, pathname }: { content: Inform
   const otherPages = INFORMATION_LINKS.filter((l) => l.href !== pathname);
 
   return (
-    <div className="bg-soft-bg pb-20 pt-4 md:pb-28 md:pt-6">
+    <div className="bg-soft-bg pb-12 pt-4 md:pb-28 md:pt-6">
       <div className="shell">
         <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: content.eyebrow }]} />
 

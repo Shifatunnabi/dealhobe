@@ -462,7 +462,7 @@ function ChatPopup({ onClose }: { onClose: () => void }) {
 }
 
 /* ── Floating Chat Button ────────────────────────────────────── */
-// Cart/checkout have a full-width sticky totals bar above the bottom nav on phones; sit above it there.
+// Cart/checkout have a full-width sticky totals bar at the bottom on phones; sit above it there.
 // (The product page's buy bar is laid out beside this button, so it keeps the default position.)
 const RAISED_ROUTES = ["/cart", "/checkout"];
 
@@ -474,7 +474,7 @@ export default function FloatingSocial() {
   return (
     <div
       className={`fixed right-4 z-40 flex flex-col items-end md:bottom-6 md:right-6 ${
-        raised ? "bottom-[calc(11.5rem+env(safe-area-inset-bottom))]" : "bottom-[calc(5.25rem+env(safe-area-inset-bottom))]"
+        raised ? "bottom-[calc(7.5rem+env(safe-area-inset-bottom))]" : "bottom-[calc(1rem+env(safe-area-inset-bottom))]"
       }`}
     >
       <AnimatePresence>

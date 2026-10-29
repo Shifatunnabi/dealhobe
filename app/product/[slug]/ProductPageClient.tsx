@@ -581,11 +581,11 @@ export default function ProductDetailPageClient({
         </div>
       </div>
 
-      {/* ── Phone sticky buy bar: above the bottom nav and its raised cart button, beside the chat button ── */}
+      {/* ── Phone sticky buy bar: pinned to the bottom, beside the chat button ── */}
       <div
         className={cn(
           "fixed left-3 right-[4.75rem] z-[45] transition-all duration-300 md:hidden",
-          "bottom-[calc(5.75rem+env(safe-area-inset-bottom))]",
+          "bottom-[calc(0.75rem+env(safe-area-inset-bottom))]",
           showBar ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-4 opacity-0",
         )}
         aria-hidden={!showBar}

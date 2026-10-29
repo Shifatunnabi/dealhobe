@@ -420,7 +420,7 @@ export default function CheckoutPage() {
   );
 
   return (
-    <div className="min-h-screen bg-soft-bg pb-40 pt-5 md:pb-20 md:pt-8">
+    <div className="min-h-screen bg-soft-bg pb-36 pt-5 md:pb-20 md:pt-8">
       <div className="shell">
         {/* Header */}
         <div className="mb-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-3 md:mb-7">
@@ -821,8 +821,8 @@ export default function CheckoutPage() {
             </aside>
           </div>
 
-          {/* Mobile: sticky place-order bar above the bottom nav */}
-          <div className="fixed inset-x-0 bottom-[calc(4.3rem+env(safe-area-inset-bottom))] z-[45] border-t border-[#F1E6EA] bg-white px-4 pb-[2.1rem] pt-2.5 shadow-[0_-8px_24px_rgba(59,13,46,0.08)] lg:hidden">
+          {/* Mobile: sticky place-order bar */}
+          <div className="fixed inset-x-0 bottom-0 z-[45] border-t border-[#F1E6EA] bg-white px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-2.5 shadow-[0_-8px_24px_rgba(59,13,46,0.08)] lg:hidden">
             <button
               type="submit"
               disabled={loading}
