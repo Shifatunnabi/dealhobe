@@ -7,6 +7,7 @@ import { loadCatalog } from '@/lib/catalog-server';
 import { isOfferActive } from '@/lib/offers';
 import { slimCard } from '@/components/content/slim';
 import OffersPageClient, { type DiscountedItem } from './OffersPageClient';
+import { shareOg, shareTwitter } from '@/lib/share';
 
 export const metadata: Metadata = {
   title: 'Offers & Deals on Authentic Cosmetics',
@@ -18,7 +19,9 @@ export const metadata: Metadata = {
     description: 'Limited-time discounts on authentic cosmetics. Cash on delivery across Bangladesh.',
     url: '/offers',
     type: 'website',
+    ...shareOg,
   },
+  twitter: { card: 'summary_large_image', ...shareTwitter },
 };
 
 export default async function OffersPage() {

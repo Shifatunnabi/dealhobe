@@ -7,6 +7,7 @@ import { getAllOfferSlugs } from '@/lib/data';
 import ProductsPageClient from '@/components/pages/ProductsPageClient';
 import { catalogSeo, filterAndSort, parseCatalogQuery, PER_PAGE } from '@/lib/catalog';
 import { catalogJsonLd, loadCatalog } from '@/lib/catalog-server';
+import { shareOg, shareTwitter } from '@/lib/share';
 
 type Props = { params: Promise<{ offer: string }> };
 
@@ -33,7 +34,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: { absolute: data.seo.title },
     description: data.offer.details?.slice(0, 160) || data.seo.description,
     alternates: { canonical: `/products/${data.offer.slug}` },
-    openGraph: { title: data.seo.title, description: data.seo.description, images: data.offer.thumbnailUrl ? [data.offer.thumbnailUrl] : undefined },
+    openGraph: { title: data.seo.title, description: data.seo.description, url: `/products/${data.offer.slug}`, type: 'website', ...(data.offer.thumbnailUrl ? { images: [{ url: data.offer.thumbnailUrl, alt: data.offer.title }] } : shareOg) },
+    twitter: { card: 'summary_large_image', title: data.seo.title, description: data.seo.description, ...(data.offer.thumbnailUrl ? { images: [data.offer.thumbnailUrl] } : shareTwitter) },
   };
 }
 

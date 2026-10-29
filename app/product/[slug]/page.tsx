@@ -87,7 +87,7 @@ const load = cache(async (slug: string) => {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const data = await load((await params).slug);
   if (!data) return { title: 'Product not found', robots: { index: false } };
-  const { product: p, images, low } = data;
+  const { product: p, low } = data;
   const brand = p.brandDisplay && !p.name.toLowerCase().includes(p.brandDisplay.toLowerCase()) ? `${p.brandDisplay} ` : '';
   const title = `${brand}${p.name} Price in Bangladesh`;
   const lead = plainExcerpt(p.shortDescription || p.description, 120);
@@ -103,9 +103,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: `${brand}${p.name} – ${money(low)}`,
       description,
       siteName: 'DealHobe',
-      images: images.slice(0, 4).map((url) => ({ url, alt: p.name })),
+      // images: generated 1200x630 card (opengraph-image.tsx next to this file)
     },
-    twitter: { card: 'summary_large_image', title: `${brand}${p.name}`, description, images: images.slice(0, 1) },
+    twitter: { card: 'summary_large_image', title: `${brand}${p.name}`, description },
     other: {
       'product:price:amount': String(low),
       'product:price:currency': 'BDT',
