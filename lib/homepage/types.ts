@@ -40,6 +40,7 @@ export type SectionSettings = {
   limit?: number;
   countdownTo?: string | null; // ISO date — shows a flash-sale timer
   viewAllLink?: string;
+  ticker?: string[];          // strip sections: scrolling text lines (shown instead of / without a banner image)
   accent?: string;            // heading accent colour
 };
 

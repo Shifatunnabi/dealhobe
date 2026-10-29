@@ -239,6 +239,28 @@ export default function SectionEditor({ initial, links, offers, saving, onSave, 
               </fieldset>
             )}
 
+            {s.type === 'strip' && (
+              <fieldset className="hb-fieldset">
+                <legend>Scrolling text</legend>
+                <div className="admin-field">
+                  <label className="admin-label">One line per message (leave empty to show the banner image below instead)</label>
+                  <textarea
+                    className="admin-textarea"
+                    rows={5}
+                    value={(st.ticker ?? []).join('\n')}
+                    onChange={(e) => setSettings({ ticker: e.target.value.split('\n') })}
+                    placeholder={'Best price in Bangladesh, guaranteed\n100% authentic\nCash on delivery'}
+                  />
+                </div>
+                <div className="admin-field">
+                  <label className="admin-label">Link when clicked (optional)</label>
+                  <input className="admin-input" list="hb-links" value={st.viewAllLink ?? ''} onChange={(e) => setSettings({ viewAllLink: e.target.value })} placeholder="/products" />
+                  <datalist id="hb-links">{links.map((l) => <option key={l.value} value={l.value}>{l.label}</option>)}</datalist>
+                </div>
+                <p className="hb-hint">Text moves with a native animation: smooth at any screen refresh rate and sharp at any size.</p>
+              </fieldset>
+            )}
+
             {s.type === 'product-rail' && (
               <fieldset className="hb-fieldset">
                 <legend>Products</legend>

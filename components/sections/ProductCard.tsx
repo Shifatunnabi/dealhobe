@@ -106,19 +106,22 @@ export default function ProductCard({ product, priority = false }: { product: Gr
           ) : product.variantLabel ? (
             <span className="mt-1.5 text-xs text-text-muted">{product.variantLabel}</span>
           ) : null}
-          <span className="mt-1.5 flex flex-wrap items-baseline gap-x-1.5">
+          {/* price + savings are pinned to the card bottom so every card in a row lines up, whatever sits above */}
+          <span className="mt-auto flex flex-col pt-1.5">
+          <span className="flex flex-wrap items-baseline gap-x-1.5">
             {product.hasVariants && <span className="text-[11px] font-medium text-text-muted">From</span>}
             <span className="text-base font-extrabold text-primary-pink md:text-lg">{money(price)}</span>
             {saving > 0 && <s className="text-xs text-[#7B6A76]">{money(product.price)}</s>}
           </span>
           {(saving > 0 || (!outOfStock && qty <= LOW_STOCK)) && (
-            <span className="mt-auto flex flex-wrap items-center justify-between gap-1 pt-2 text-[11px] font-bold md:text-xs">
+            <span className="flex flex-wrap items-center justify-between gap-1 pt-2 text-[11px] font-bold md:text-xs">
               {saving > 0 ? <span className="text-[#1F8A4C]">Save {money(saving)}</span> : <span />}
               {!outOfStock && qty <= LOW_STOCK && (
                 <span className="rounded-md bg-[#FBF0D9] px-1.5 py-0.5 text-[#9A6A10]">Only {qty} left</span>
               )}
             </span>
           )}
+          </span>
         </div>
       </Link>
 
