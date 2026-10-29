@@ -45,11 +45,12 @@ export function sanitizeSettings(v: unknown): SectionSettings {
   if (cols) out.cols = { mobile: int(cols.mobile, 1, 4, 2), tablet: int(cols.tablet, 1, 6, 3), desktop: int(cols.desktop, 1, 8, 4) };
   if (o.mobileLayout === 'grid' || o.mobileLayout === 'scroll') out.mobileLayout = o.mobileLayout;
   if (o.autoplayMs !== undefined) out.autoplayMs = int(o.autoplayMs, 0, 30000, 6000);
-  if (['trending', 'new', 'featured', 'top', 'offer'].includes(String(o.source))) out.source = o.source as SectionSettings['source'];
+  if (['trending', 'new', 'featured', 'top', 'offer', 'picks'].includes(String(o.source))) out.source = o.source as SectionSettings['source'];
   if (o.offerId) out.offerId = str(o.offerId, 40);
   if (o.limit !== undefined) out.limit = int(o.limit, 2, 24, 12);
   const cd = date(o.countdownTo); out.countdownTo = cd ? cd.toISOString() : null;
   if (o.viewAllLink) out.viewAllLink = str(o.viewAllLink, 500);
+  if (Array.isArray(o.productSlugs)) out.productSlugs = o.productSlugs.map((s) => str(s, 120)).filter(Boolean).slice(0, 24);
   if (Array.isArray(o.ticker)) out.ticker = o.ticker.map((s) => str(s, 80)).filter(Boolean).slice(0, 12);
   if (o.accent) out.accent = str(o.accent, 20);
   return out;

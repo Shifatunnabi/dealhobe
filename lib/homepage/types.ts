@@ -27,7 +27,7 @@ export type Tile = {
   badge?: string;         // small corner label, e.g. "-30%"
 };
 
-export type ProductSource = 'trending' | 'new' | 'featured' | 'top' | 'offer';
+export type ProductSource = 'trending' | 'new' | 'featured' | 'top' | 'offer' | 'picks';
 
 export type SectionSettings = {
   ratio?: Ratio;              // tile / desktop banner shape
@@ -37,6 +37,7 @@ export type SectionSettings = {
   autoplayMs?: number;
   source?: ProductSource;
   offerId?: string;
+  productSlugs?: string[];    // source 'picks': hand-picked products, in this order
   limit?: number;
   countdownTo?: string | null; // ISO date — shows a flash-sale timer
   viewAllLink?: string;

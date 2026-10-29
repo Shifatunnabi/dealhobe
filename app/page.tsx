@@ -29,7 +29,7 @@ function slim(products: Parameters<typeof toCardProduct>[0][], limit: number, ct
   return products.slice(0, limit).map((p) => toCardProduct(p, ctx));
 }
 
-const SOURCES: Record<Exclude<ProductSource, 'offer'>, () => Promise<GridProduct[]>> = {
+const SOURCES: Record<Exclude<ProductSource, 'offer' | 'picks'>, () => Promise<GridProduct[]>> = {
   trending: getTrendingProducts as () => Promise<GridProduct[]>,
   new:      getNewProducts as () => Promise<GridProduct[]>,
   featured: getFeaturedProducts as () => Promise<GridProduct[]>,
@@ -63,6 +63,10 @@ export default async function Home() {
       list = offer?.productSelection === 'selected'
         ? all.filter((p) => offer.selectedProducts.map(String).includes(String(p._id)))
         : all;
+    } else if (source === 'picks') {
+      const slugs = s.settings.productSlugs ?? [];
+      const all = (await getProducts()) as unknown as (GridProduct & { slug: string })[];
+      list = slugs.map((slug) => all.find((p) => p.slug === slug)).filter((p): p is GridProduct & { slug: string } => !!p);
     } else {
       list = await SOURCES[source]();
     }

@@ -46,10 +46,10 @@ export const DEFAULT_SECTIONS: Seed[] = [
   ]),
   section('strip', 'Promise strip', { ticker: ['Best price in Bangladesh, guaranteed', '100% authentic', 'Cash on delivery', 'Nationwide delivery'], viewAllLink: '/products' }),
   section('image-grid', 'Shop our favourites', { ratio: R(1, 1), cols: { mobile: 2, tablet: 4, desktop: 4 }, mobileLayout: 'grid', accent: '#A41B15' }, [
-    { image: real('deal-1'), poster: poster('deal-1'), link: '/products?brand=FENNEL&category=Makeup', alt: 'Fennel makeup, best price in Bangladesh guaranteed' },
-    { image: real('deal-2'), poster: poster('deal-2'), link: '/products?brand=KODOMO', alt: 'Kodomo baby care' },
-    { image: real('deal-3'), poster: poster('deal-3'), link: '/products?sort=best-selling', alt: 'Bestsellers' },
-    { image: real('deal-4'), poster: poster('deal-4'), link: '/products?q=gift', alt: 'Gift sets' },
+    { image: real('fav-mascara'), poster: poster('fav-mascara'), link: '/product/fennel-volume-express-mascara-4681586', alt: 'Fennel Volume Express Mascara, best price in Bangladesh guaranteed' },
+    { image: real('fav-powder'), poster: poster('fav-powder'), link: '/product/fennel-loose-rice-powder-2489019', alt: 'Fennel Loose Rice Powder, best price in Bangladesh guaranteed' },
+    { image: real('fav-lipstick'), poster: poster('fav-lipstick'), link: '/product/fennel-matte-lipstick-6708026', alt: 'Fennel Matte Lipstick, best price in Bangladesh guaranteed' },
+    { image: real('fav-bbcream'), poster: poster('fav-bbcream'), link: '/product/fennel-bb-cream-spf-35-0303543', alt: 'Fennel BB Cream SPF 35, best price in Bangladesh guaranteed' },
   ]),
   section('image-grid', 'Top brands and offers', { ratio: R(2, 1), cols: { mobile: 1, tablet: 2, desktop: 3 }, mobileLayout: 'scroll', accent: '#3B0D2E' },
     [
