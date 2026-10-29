@@ -44,9 +44,7 @@ export const DEFAULT_SECTIONS: Seed[] = [
     { image: real('hero-7-desktop'), poster: poster('hero-7-desktop'), mobileImage: real('hero-7-mobile'), mobilePoster: poster('hero-7-mobile'), link: '/products', alt: 'Authentic Fennel and Kodomo beauty, delivered across Bangladesh, best price guaranteed' },
     { image: real('hero-4-desktop'), poster: poster('hero-4-desktop'), mobileImage: real('hero-4-mobile'), mobilePoster: poster('hero-4-mobile'), link: '/products', alt: 'Authentic beauty, delivered across Bangladesh' },
   ]),
-  section('strip', 'Promise strip', { ratio: R(25, 1), mobileRatio: R(10, 1) }, [
-    { image: real('strip-desktop'), poster: poster('strip-desktop'), mobileImage: real('strip-mobile'), mobilePoster: poster('strip-mobile'), link: '/products', alt: 'Best price in Bangladesh, guaranteed. 100% authentic. Cash on delivery. Nationwide delivery.' },
-  ]),
+  section('strip', 'Promise strip', { ticker: ['Best price in Bangladesh, guaranteed', '100% authentic', 'Cash on delivery', 'Nationwide delivery'], viewAllLink: '/products' }),
   section('image-grid', 'Shop our favourites', { ratio: R(1, 1), cols: { mobile: 2, tablet: 4, desktop: 4 }, mobileLayout: 'grid', accent: '#A41B15' }, [
     { image: real('deal-1'), poster: poster('deal-1'), link: '/products?brand=FENNEL&category=Makeup', alt: 'Fennel makeup, best price in Bangladesh guaranteed' },
     { image: real('deal-2'), poster: poster('deal-2'), link: '/products?brand=KODOMO', alt: 'Kodomo baby care' },

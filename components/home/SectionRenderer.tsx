@@ -4,6 +4,7 @@ import HeroCarousel from "./HeroCarousel";
 import ProductRail from "./ProductRail";
 import Countdown from "./Countdown";
 import TrustBadges from "./TrustBadges";
+import Ticker from "./Ticker";
 import ScrollRow from "@/components/ui/ScrollRow";
 import BrandMarquee from "./BrandMarquee";
 import CustomerReviewsSection from "@/components/sections/CustomerReviewsSection";
@@ -41,6 +42,14 @@ export default function SectionRenderer({ section, data, first }: { section: Hom
       );
 
     case "strip":
+      // Scrolling text takes precedence: native animation, crisp, smooth at any refresh rate.
+      if (st.ticker?.length) {
+        return (
+          <section className="shell pt-4 md:pt-6" aria-label={section.title || "Promotions"}>
+            <Ticker items={st.ticker} link={st.viewAllLink || undefined} label={st.ticker.join(". ")} />
+          </section>
+        );
+      }
       if (!tiles.length) return null;
       return (
         <section className="shell pt-4 md:pt-6" aria-label={section.title || "Promotion"}>

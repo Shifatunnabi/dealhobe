@@ -392,6 +392,16 @@
 }
 @keyframes caret-blink { 50% { opacity: 0; } }
 
+.ticker-track { animation: ticker var(--ticker-dur, 40s) linear infinite; will-change: transform; backface-visibility: hidden; }
+.ticker:hover .ticker-track, .ticker:focus-within .ticker-track { animation-play-state: paused; }
+@keyframes ticker { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(-50%, 0, 0); } }
+@media (prefers-reduced-motion: reduce) {
+  .ticker { height: auto; padding: 0.6rem 0; }
+  .ticker-track { animation: none; flex-wrap: wrap; width: 100%; justify-content: center; }
+  .ticker-track > ul[aria-hidden] { display: none; }
+  .ticker-track > ul { flex-wrap: wrap; justify-content: center; }
+}
+
 .marquee-track { animation: marquee var(--marquee-dur, 30s) linear infinite; }
 .group:hover > .marquee-track,
 .group:focus-within > /* Search placeholder term: slides up into place each time it changes. */

@@ -50,6 +50,7 @@ export function sanitizeSettings(v: unknown): SectionSettings {
   if (o.limit !== undefined) out.limit = int(o.limit, 2, 24, 12);
   const cd = date(o.countdownTo); out.countdownTo = cd ? cd.toISOString() : null;
   if (o.viewAllLink) out.viewAllLink = str(o.viewAllLink, 500);
+  if (Array.isArray(o.ticker)) out.ticker = o.ticker.map((s) => str(s, 80)).filter(Boolean).slice(0, 12);
   if (o.accent) out.accent = str(o.accent, 20);
   return out;
 }
