@@ -12,7 +12,6 @@ import {
   FiUser,
   FiHome,
   FiGrid,
-  FiTag,
   FiMenu,
   FiX,
   FiChevronRight,
@@ -196,13 +195,6 @@ export default function Navbar({ storefront }: { storefront: NavStorefront }) {
 
   const isAdminRoute = pathname?.startsWith("/admin");
 
-  const mobileBottomNav = [
-    { label: "Home",       type: "link",   href: "/",                    icon: FiHome        },
-    { label: "Offers",     type: "link",   href: "/offers",              icon: FiTag         },
-    { label: "Cart",       type: "link",   href: "/cart",                icon: FiShoppingCart, isCenter: true },
-    { label: "Products",   type: "link",   href: "/products",            icon: FiShoppingBag },
-    { label: "Menu",       type: "menu",                                     icon: FiGrid   },
-  ];
 
 
   useEffect(() => {
@@ -446,6 +438,20 @@ export default function Navbar({ storefront }: { storefront: NavStorefront }) {
                   <FiUser size={20} />
                   <span className="hidden text-sm font-semibold xl:inline">{isLoggedIn ? "Account" : "Login"}</span>
                 </Link>
+                {/* Phones: compact bag button with a count badge (the bottom bar is gone) */}
+                <button
+                  type="button"
+                  onClick={openCart}
+                  aria-label={`Bag, ${cartCount} items`}
+                  className="relative flex h-10 w-10 items-center justify-center rounded-full bg-primary-pink text-white shadow-button transition-transform active:scale-95 md:hidden"
+                >
+                  <FiShoppingBag size={19} />
+                  {cartCount > 0 && (
+                    <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-plum px-1 text-[10px] font-bold leading-none text-white ring-2 ring-white">
+                      {cartCount > 99 ? "99+" : cartCount}
+                    </span>
+                  )}
+                </button>
                 <button
                   type="button"
                   onClick={openCart}
@@ -624,67 +630,6 @@ export default function Navbar({ storefront }: { storefront: NavStorefront }) {
           </>
         )}
       </AnimatePresence>
-
-      {/* ── Mobile bottom nav ────────────────────────────────────── */}
-      <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-[#e9edf3] bg-white/95 backdrop-blur-sm md:hidden">
-        <div className="relative grid grid-cols-5 gap-0 px-1 pb-[calc(0.35rem+env(safe-area-inset-bottom))] pt-2">
-          {mobileBottomNav.map((item) => {
-            const Icon = item.icon;
-            if (item.type === "link") {
-              const isActive =
-                item.href === "/"
-                  ? pathname === "/"
-                  : pathname?.startsWith(item.href ?? "");
-
-              if (item.isCenter) {
-                return (
-                  <button
-                    key={item.label}
-                    onClick={() => router.push(item.href ?? "/cart", { scroll: true })}
-                    className="flex flex-col items-center justify-center gap-1 text-[11px] font-semibold text-primary-pink"
-                    aria-label={item.label}
-                  >
-                    <span className="relative -mt-7 flex h-14 w-14 items-center justify-center rounded-full bg-primary-pink text-white shadow-button">
-                      <Icon size={22} />
-                      {cartCount > 0 && (
-                        <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-white text-[10px] font-bold text-primary-pink shadow">
-                          {cartCount}
-                        </span>
-                      )}
-                    </span>
-                    <span className="uppercase text-[#6a7280]">{item.label}</span>
-                  </button>
-                );
-              }
-
-              return (
-                <button
-                  key={item.label}
-                  onClick={() => router.push(item.href ?? "/", { scroll: true })}
-                  className={`flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-xl text-[11px] font-semibold transition-colors ${
-                    isActive ? "text-primary-pink" : "text-[#6a7280]"
-                  }`}
-                  aria-current={isActive ? "page" : undefined}
-                >
-                  <Icon size={18} />
-                  <span className="uppercase">{item.label}</span>
-                </button>
-              );
-            }
-
-            return (
-              <button
-                key={item.label}
-                onClick={() => setSidebarOpen(true)}
-                className="flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-xl text-[11px] font-semibold text-[#6a7280] transition-colors"
-              >
-                <Icon size={18} />
-                <span className="uppercase">{item.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </nav>
     </>
   );
 }

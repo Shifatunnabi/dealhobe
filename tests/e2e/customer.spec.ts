@@ -100,7 +100,7 @@ test('Variants, gallery, bag quantities, remove and Buy now', async ({ page, aud
     await audit.check(); await expect(page.getByRole('region', { name: 'You may also like', exact: true })).toBeVisible();
     await page.getByRole('button', { name: 'Increase quantity', exact: true }).click();
     await page.getByRole('button', { name: 'Add to bag', exact: true }).click();
-    if (isMobile) await page.getByRole('button', { name: 'Cart', exact: true }).click();
+    if (isMobile) await page.getByRole('button', { name: /^Bag/ }).filter({ visible: true }).click();
     const bag = isMobile ? page.locator('main') : page.getByRole('dialog', { name: 'Shopping bag' });
     await expect(bag).toContainText(data.name); await expect(bag).toContainText('৳700'); await expect(bag.getByRole('progressbar', { name: 'Progress to free delivery' })).toBeVisible();
     await bag.getByRole('button', { name: /^Increase quantity of/ }).click(); await expect(bag).toContainText('৳1,050');
