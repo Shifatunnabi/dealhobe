@@ -35,8 +35,11 @@ const concern = (slug: string, label: string, q: string) => tile(`concern-${slug
 export const DEFAULT_SECTIONS: Seed[] = [
   section('hero', 'Hero', { ratio: R(16, 5), mobileRatio: R(1, 1), autoplayMs: 6000 }, [
     { image: real('hero-1-desktop'), poster: poster('hero-1-desktop'), mobileImage: real('hero-1-mobile'), mobilePoster: poster('hero-1-mobile'), link: '/products?brand=KODOMO', alt: 'Kodomo baby care: gentle care for little ones' },
+    { image: real('hero-5-desktop'), poster: poster('hero-5-desktop'), mobileImage: real('hero-5-mobile'), mobilePoster: poster('hero-5-mobile'), link: '/products?brand=FENNEL&category=Skin%20Care', alt: 'Fennel skincare: glow made simple, best price in Bangladesh guaranteed' },
     { image: real('hero-2-desktop'), poster: poster('hero-2-desktop'), mobileImage: real('hero-2-mobile'), mobilePoster: poster('hero-2-mobile'), link: '/products?brand=FENNEL&category=Makeup', alt: 'Fennel makeup: find your colour, best price in Bangladesh guaranteed' },
+    { image: real('hero-6-desktop'), poster: poster('hero-6-desktop'), mobileImage: real('hero-6-mobile'), mobilePoster: poster('hero-6-mobile'), link: '/products?brand=FENNEL&category=Makeup', alt: 'Fennel makeup: colour with attitude, best price in Bangladesh guaranteed' },
     { image: real('hero-3-desktop'), poster: poster('hero-3-desktop'), mobileImage: real('hero-3-mobile'), mobilePoster: poster('hero-3-mobile'), link: '/products?brand=FENNEL&category=Skin%20Care', alt: 'Fennel skincare: serums and face washes, best price in Bangladesh guaranteed' },
+    { image: real('hero-7-desktop'), poster: poster('hero-7-desktop'), mobileImage: real('hero-7-mobile'), mobilePoster: poster('hero-7-mobile'), link: '/products', alt: 'Authentic Fennel and Kodomo beauty, delivered across Bangladesh, best price guaranteed' },
     { image: real('hero-4-desktop'), poster: poster('hero-4-desktop'), mobileImage: real('hero-4-mobile'), mobilePoster: poster('hero-4-mobile'), link: '/products', alt: 'Authentic beauty, delivered across Bangladesh' },
   ]),
   section('strip', 'Promise strip', { ratio: R(25, 1), mobileRatio: R(10, 1) }, [

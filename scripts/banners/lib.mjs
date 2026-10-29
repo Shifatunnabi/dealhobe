@@ -33,6 +33,12 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;-webkit-font-smoothing
 .disc{position:absolute;border-radius:50%}
 .band{position:absolute;left:0;right:0;bottom:0}
 @keyframes kb{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
+@keyframes sway{0%,100%{transform:rotate(calc(var(--r,0deg) - 1.8deg))}50%{transform:rotate(calc(var(--r,0deg) + 1.8deg))}}
+@keyframes drift{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
+@keyframes driftx{0%,100%{transform:translate(0,0)}50%{transform:translate(10px,-14px)}}
+.sw{animation:sway 4s ease-in-out infinite;animation-delay:calc(var(--p,0s) * -1)}
+.dr{animation:drift 4s ease-in-out infinite;animation-delay:calc(var(--p,0s) * -1)}
+.drx{animation:driftx 4s ease-in-out infinite;animation-delay:calc(var(--p,0s) * -1)}
 .kb{animation:kb 4s ease-in-out infinite;transform-origin:62% 70%}
 .d{font-family:Fraunces,Georgia,serif;font-weight:700;letter-spacing:-.02em}
 .d em{font-style:italic;font-weight:700}
@@ -113,7 +119,7 @@ export function seal({ size, ring, fill, ink, d = 1.1 }) {
  * widths (negative = deliberate overlap), centred in the region, and shrunk uniformly if they don't fit.
  * items: [{ file, h, z?, lift? }]. Returns prod() HTML with staggered entrance + float phases.
  */
-export function row(items, { x0, x1, gy, gap = 18, d0 = 0.5, step = 0.12, dy = 60 }) {
+export function layoutRow(items, { x0, x1, gap = 18 }) {
   const dims = items.map((it) => { const { w, h } = assetSize(it.file); return { ...it, ar: w / h }; });
   const gapAt = (i) => (dims[i].gapAfter ?? gap);
   const gaps = dims.slice(0, -1).reduce((s, _, i) => s + gapAt(i), 0);
@@ -123,17 +129,50 @@ export function row(items, { x0, x1, gy, gap = 18, d0 = 0.5, step = 0.12, dy = 6
   return dims.map((it, i) => {
     const h = it.h * k, w = it.ar * h;
     const cx = x + w / 2; x += w + gapAt(i);
-    return prod(it.file, { cx: Math.round(cx), gy: gy + (it.lift || 0), h: Math.round(h), z: it.z ?? 1, d: +(d0 + i * step).toFixed(2), p: +(i * 0.7).toFixed(2), dy, rot: it.rot || 0 });
-  }).join('');
+    return { ...it, h, w, cx };
+  });
 }
+
+export function row(items, { x0, x1, gy, gap = 18, d0 = 0.5, step = 0.12, dy = 60 }) {
+  return layoutRow(items, { x0, x1, gap }).map((it, i) =>
+    prod(it.file, { cx: Math.round(it.cx), gy: gy + (it.lift || 0), h: Math.round(it.h), z: it.z ?? 1, d: +(d0 + i * step).toFixed(2), p: +(i * 0.7).toFixed(2), dy, rot: it.rot || 0 })).join('');
+}
+
+/** A product floating in mid-air (no ground): centre (cx, cy) in stage px, tilted, gently swaying and bobbing. */
+export function floatProd(file, { cx, cy, h, rot = 0, z = 1, d = 0, p = 0, shadow = 'rgba(30,8,40,.38)', dy = 70, blur = 24 }) {
+  const { w: nw, h: nh } = assetSize(file);
+  const w = Math.round((nw / nh) * h);
+  return `<div class="abs" style="left:${Math.round(cx - w / 2)}px;top:${Math.round(cy - h / 2)}px;width:${w}px;height:${h}px;z-index:${z}">
+    <div class="in" style="--d:${d}s;--dy:${dy}px;--dx:0px;width:100%;height:100%"><div class="fl" style="--p:${p}s;width:100%;height:100%"><div class="sw" style="--r:${rot}deg;--p:${p}s;width:100%;height:100%;transform:rotate(${rot}deg)">
+      <img src="assets/${file}" style="display:block;width:100%;height:100%;filter:drop-shadow(0 ${Math.round(blur * 0.9)}px ${blur}px ${shadow})">
+    </div></div></div></div>`;
+}
+
+/** An image layer composited with a blend mode (e.g. water on black with `screen`). */
+export const blendLayer = (src, { left = 0, top = 0, width, height, blend = 'screen', opacity = 1, cls = '', z = 0, d = 0.4, p = 0 } = {}) =>
+  `<img class="abs ${cls}" src="${src}" style="left:${left}px;top:${top}px;width:${width}px;${height ? `height:${height}px;` : ''}mix-blend-mode:${blend};opacity:${opacity};z-index:${z};--p:${p}s;pointer-events:none">`;
+
+/** Flat-graphic podium (cylinder) under a product: top ellipse + shaded body. */
+export const podium = ({ cx, w, h, top, body, shade }) =>
+  `<div class="abs" style="left:${Math.round(cx - w / 2)}px;bottom:${0}px;width:${Math.round(w)}px;height:${Math.round(h + 14)}px;z-index:0">
+    <div style="position:absolute;left:0;right:0;top:14px;bottom:0;background:linear-gradient(90deg,${body} 0 62%,${shade} 62% 100%)"></div>
+    <div style="position:absolute;left:0;right:0;top:0;height:28px;border-radius:50%;background:${top}"></div>
+  </div>`;
+
+/**
+ * Calm loops: the site plays these videos on repeat, so the entrance / exit animations (text sliding in and fading out
+ * every 4 s) would blink the copy off for ~40% of the time. With CALM the copy and layout stay put; only the products
+ * float and sway, the backdrop drifts and the button shines — all periodic over 4 s, so the loop is seamless.
+ */
+const CALM = '.in,.pop,.ln>span,.eyebrow i{animation:none!important;opacity:1!important;transform:none!important}';
 
 /** DealHobe logo on a white rounded chip (reads on every backdrop). */
 export const logoChip = ({ m, d = 0.15 }) =>
   `<div class="abs in" style="--d:${d}s;--dy:-12px;${m ? 'right:48px;top:40px' : 'left:96px;top:24px'};background:#fff;border-radius:${m ? 20 : 16}px;padding:${m ? 9 : 6}px;box-shadow:0 8px 22px rgba(15,4,12,.24);line-height:0"><img src="assets/dealhobe-logo.png" style="height:${m ? 66 : 50}px;width:auto;display:block"></div>`;
 
-export function page({ W, H, bg, body, script = '', photo = '', photoPos = 'center', photoSize = 'cover', veil = '', veilDir = '90deg' }) {
+export function page({ W, H, bg, body, script = '', photo = '', photoPos = 'center', photoSize = 'cover', veil = '', veilDir = '90deg', calm = true }) {
   const layer = photo ? `<div class="abs kb" style="inset:0;background:url('backdrops/${photo}') ${photoPos}/${photoSize} no-repeat"></div>` : '';
   const veilLayer = veil ? `<div class="abs" style="inset:0;background:linear-gradient(${veilDir},${veil},rgba(255,255,255,0) 62%)"></div>` : '';
-  return `<!doctype html><html><head><meta charset="utf-8">${FONT_LINK}<style>${css(W, H)}</style></head>
+  return `<!doctype html><html><head><meta charset="utf-8">${FONT_LINK}<style>${css(W, H)}${calm ? CALM : ''}</style></head>
 <body><div class="stage" style="background:${bg}">${layer}${veilLayer}${body}</div>${script ? `<script>${script}</script>` : ''}</body></html>`;
 }

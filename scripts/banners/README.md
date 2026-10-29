@@ -23,7 +23,10 @@ Output notes
   (`components/home/LazyVideo.tsx`); reduced-motion users keep the poster.
 - GIFs are rendered into `public/banners/gif/` (12 fps, drift frozen, ~2 MB each) for uploading via
   Admin › Homepage Builder; that folder is git-ignored.
-- Every loop starts on the finished composition, plays its exit and re-entrance, and returns to it seamlessly.
+- Loops are **calm**: copy and layout stay put (no text fading out/in every 4 s); only products float and sway, the
+  backdrop drifts and the button shines. Everything is periodic over 4 s, so the loop is seamless. (`CALM` in `lib.mjs`.)
+- Seven heroes: 1 Kodomo studio, 2 Fennel makeup studio, 3 Fennel skincare studio, 4 trust (studio), 5 Fennel skincare
+  iridescent splash, 6 Fennel makeup editorial smear, 7 flat graphic podiums. All stay in the starter carousel.
 - The DealHobe logo appears on every hero as a masthead lockup (mark + wordmark on a white pill, divider, brand label).
 - No prices appear in any banner. Fennel banners carry "Best price in Bangladesh, guaranteed."
 - Fennel packshots are the official 371×500 originals (nothing larger is published); they are upscaled 2× with
