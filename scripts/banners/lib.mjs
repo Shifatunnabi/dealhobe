@@ -24,6 +24,10 @@ export function assetSize(file) {
   return { w: buf.readUInt32BE(16), h: buf.readUInt32BE(20) };
 }
 
+/** Dark Fennel packshots (black lids, tubes, boxes) get a thin white rim light + soft halo so they never melt into a dark or mid-tone backdrop. */
+export const DARK_PRODUCTS = new Set(['fennel-matte-lipstick.png', 'fennel-volume-express-mascara.png', 'fennel-blush-on.png', 'fennel-loose-rice-powder.png', 'fennel-romance-compact-powder.png', 'fennel-aqua-lip-tint.png']);
+export const rim = (file) => (DARK_PRODUCTS.has(file) ? 'drop-shadow(0 0 1.2px rgba(255,255,255,.95)) drop-shadow(0 0 9px rgba(255,255,255,.28)) ' : '');
+
 export const css = (W, H) => `
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:${W}px;height:${H}px;overflow:hidden;background:#fff}
@@ -93,7 +97,7 @@ export function prod(file, { cx, gy, h, z = 1, d = 0, p = 0, rot = 0, dy = 60 })
   return `<div class="pw" style="left:${cx}px;bottom:${gy}px;z-index:${z}">
     <div class="in" style="--d:${d}s;--dy:${dy}px;--dx:0px">
       <div class="gs2" style="width:${Math.round(w * 0.98)}px"></div><div class="gs1" style="width:${Math.round(w * 0.66)}px"></div>
-      <div class="fl" style="--p:${p}s"><img src="assets/${file}" style="height:${h}px;width:${w}px;transform:rotate(${rot}deg);transform-origin:50% 100%"></div>
+      <div class="fl" style="--p:${p}s"><img src="assets/${file}" style="height:${h}px;width:${w}px;transform:rotate(${rot}deg);transform-origin:50% 100%${rim(file) ? ';filter:' + rim(file) + 'drop-shadow(0 5px 7px rgba(15,4,12,.18))' : ''}"></div>
     </div></div>`;
 }
 
@@ -144,7 +148,7 @@ export function floatProd(file, { cx, cy, h, rot = 0, z = 1, d = 0, p = 0, shado
   const w = Math.round((nw / nh) * h);
   return `<div class="abs" style="left:${Math.round(cx - w / 2)}px;top:${Math.round(cy - h / 2)}px;width:${w}px;height:${h}px;z-index:${z}">
     <div class="in" style="--d:${d}s;--dy:${dy}px;--dx:0px;width:100%;height:100%"><div class="fl" style="--p:${p}s;width:100%;height:100%"><div class="sw" style="--r:${rot}deg;--p:${p}s;width:100%;height:100%;transform:rotate(${rot}deg)">
-      <img src="assets/${file}" style="display:block;width:100%;height:100%;filter:drop-shadow(0 ${Math.round(blur * 0.9)}px ${blur}px ${shadow})">
+      <img src="assets/${file}" style="display:block;width:100%;height:100%;filter:${rim(file)}drop-shadow(0 ${Math.round(blur * 0.9)}px ${blur}px ${shadow})">
     </div></div></div></div>`;
 }
 
@@ -175,4 +179,17 @@ export function page({ W, H, bg, body, script = '', photo = '', photoPos = 'cent
   const veilLayer = veil ? `<div class="abs" style="inset:0;background:linear-gradient(${veilDir},${veil},rgba(255,255,255,0) 62%)"></div>` : '';
   return `<!doctype html><html><head><meta charset="utf-8">${FONT_LINK}<style>${css(W, H)}${calm ? CALM : ''}</style></head>
 <body><div class="stage" style="background:${bg}">${layer}${veilLayer}${body}</div>${script ? `<script>${script}</script>` : ''}</body></html>`;
+}
+
+
+/**
+ * A portrait photo of a model inside an arch / circle / rounded frame. The photos are 2:3 studio shots on a warm
+ * cream-peach seamless, so the frame keeps the clean edge (no cut-out needed) and the frame itself gives the
+ * separation from the backdrop. The photo drifts very slowly (calm motion). `iw` = rendered photo width, `ix`/`iy` its
+ * offset inside the frame.
+ */
+export function modelFrame(file, { left, top, w, h, shape = 'arch', iw, ix = 0, iy = 0, z = 3, ring = 'rgba(255,255,255,.75)', shadow = 'rgba(60,15,30,.28)', p = 0 }) {
+  const r = shape === 'circle' ? '50%' : shape === 'arch' ? `${w / 2}px ${w / 2}px 0 0` : shape === 'round' ? '28px' : '0';
+  return `<div class="abs" style="left:${left}px;top:${top}px;width:${w}px;height:${h}px;z-index:${z};border-radius:${r};overflow:hidden;background:#F6E3D8;box-shadow:0 0 0 4px ${ring},0 18px 38px ${shadow}">
+    <img class="kb" src="assets/${file}" style="position:absolute;left:${ix}px;top:${iy}px;width:${iw}px;height:auto;display:block;transform-origin:50% 30%;animation-delay:calc(${p}s * -1)"></div>`;
 }

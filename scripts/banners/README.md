@@ -31,3 +31,11 @@ Output notes
 - No prices appear in any banner. Fennel banners carry "Best price in Bangladesh, guaranteed."
 - Fennel packshots are the official 371×500 originals (nothing larger is published); they are upscaled 2× with
   Lanczos + light sharpening. Send higher-resolution originals from Fennel to improve them.
+
+Models and separation (feat/fennel-models)
+- `designs-models.mjs` holds the model-led Fennel makeup banners (hero-2, hero-6, deal-1, brand-2, cat-makeup) and the
+  one-product `fav-mascara|powder|lipstick|bbcream` tiles. It overrides same-named banners from designs.mjs.
+- `assets/model-*.jpg`: original generated portraits of Bangladeshi women (ChatGPT image generation via Codex), 800x1200, on a
+  cream-peach seamless, no logos. They sit in arch/circle frames (`modelFrame` in lib.mjs) beside the real Fennel packshots.
+- Contrast rule: products never sit on a backdrop of similar tone. Makeup banners use light rose/apricot fields, pale discs or
+  portrait frames behind dark packshots; dark Fennel packshots also get a thin white rim light (`rim` in lib.mjs).

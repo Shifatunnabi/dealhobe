@@ -5,6 +5,7 @@
 
 import { COLORS as C, arrow, blendLayer, cta, floatProd, layoutRow, lines, page, podium, prod, row } from './lib.mjs';
 import { EXTRA_BANNERS } from './designs-extra.mjs';
+import { MODEL_BANNERS } from './designs-models.mjs';
 
 const HERO_D = { W: 1600, H: 500, scale: 1.5 };  // 2400×750 (16:5)
 const HERO_M = { W: 900, H: 900, scale: 1.2 };   // 1080×1080 (1:1)
@@ -19,14 +20,14 @@ const SETS = {
 };
 
 /** Text column: absolutely placed flex column. */
-const column = (m, inner) =>
+export const column = (m, inner) =>
   m
     ? `<div class="abs" style="left:64px;right:64px;top:40px;display:flex;flex-direction:column;align-items:flex-start">${inner}</div>`
     : `<div class="abs" style="left:96px;top:0;bottom:0;width:640px;display:flex;flex-direction:column;justify-content:center;align-items:flex-start">${inner}</div>`;
 
 // Masthead lockup: DealHobe logo (mark + wordmark on a white pill), hairline divider, brand label — one row
 // sharing the text column's left edge, so the logo reads as part of the layout rather than a sticker.
-const eyebrow = (text, color, size, d = 0.05) => {
+export const eyebrow = (text, color, size, d = 0.05) => {
   const m = size > 20;
   const pill = m ? 84 : 58, mark = m ? 60 : 41, word = m ? 34 : 23;
   return `<div class="in" style="--d:${d}s;--dy:10px;display:flex;align-items:center;gap:${m ? 24 : 16}px">
@@ -89,7 +90,7 @@ function hero(n, m) {
  * 6  Fennel makeup   — dark editorial: lipstick/cream smear texture, products fanned and tilted, text on the right
  * 7  Trust banner    — flat graphic: brand-red arches, gold sun, podiums (no photography)
  */
-const text = (m) => {
+export const text = (m) => {
   const headSize = m ? 80 : 68, subSize = m ? 32 : 22;
   return {
     head: (arr, color, size = headSize) => `<h2 class="d" style="font-size:${size}px;line-height:1;color:${color};margin-top:${m ? 22 : 20}px">${lines(arr)}</h2>`,
@@ -218,6 +219,7 @@ export const BANNERS = {
   'strip-desktop': () => strip(false), 'strip-mobile': () => strip(true),
   'deal-1': () => deal(1), 'deal-2': () => deal(2), 'deal-3': () => deal(3), 'deal-4': () => deal(4),
   ...EXTRA_BANNERS,   // brand / offer / category / concern tiles (designs-extra.mjs)
+  ...MODEL_BANNERS,   // model-led Fennel makeup banners + fav-* product tiles; these override hero-2/6, deal-1, brand-2, cat-makeup (designs-models.mjs)
 };
 
 export const build = (name) => {
