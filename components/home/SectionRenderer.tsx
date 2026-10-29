@@ -33,7 +33,7 @@ export default function SectionRenderer({ section, data, first }: { section: Hom
           <HeroCarousel count={tiles.length} autoplayMs={st.autoplayMs}>
             {tiles.map((t, i) => (
               <div key={t._id ?? i} className="w-full shrink-0 snap-center">
-                <TileLink tile={t} ratio={st.ratio} mobileRatio={st.mobileRatio} sizes="(min-width: 1320px) 1320px, 100vw" priority={first && i === 0} className="rounded-none! shadow-none!" />
+                <TileLink tile={t} ratio={st.ratio} mobileRatio={st.mobileRatio} sizes="(min-width: 1320px) 1320px, 100vw" priority={first && i === 0} late={!(first && i === 0)} className="rounded-none! shadow-none!" />
               </div>
             ))}
           </HeroCarousel>
@@ -44,7 +44,7 @@ export default function SectionRenderer({ section, data, first }: { section: Hom
       if (!tiles.length) return null;
       return (
         <section className="shell pt-4 md:pt-6" aria-label={section.title || "Promotion"}>
-          <TileLink tile={tiles[0]} ratio={st.ratio} mobileRatio={st.mobileRatio} sizes="(min-width: 1320px) 1320px, 100vw" priority={first} />
+          <TileLink tile={tiles[0]} ratio={st.ratio} mobileRatio={st.mobileRatio} sizes="(min-width: 1320px) 1320px, 100vw" late />
         </section>
       );
 
@@ -61,7 +61,7 @@ export default function SectionRenderer({ section, data, first }: { section: Hom
             trackStyle={{ "--cols-m": st.cols?.mobile ?? 2, "--cols-t": st.cols?.tablet ?? 3, "--cols-d": st.cols?.desktop ?? 4 } as React.CSSProperties}
           >
             {tiles.map((t, i) => (
-              <TileLink key={t._id ?? i} tile={t} ratio={st.ratio} sizes={gridSizes(st.cols)} priority={first && i < 4} />
+              <TileLink key={t._id ?? i} tile={t} ratio={st.ratio} sizes={gridSizes(st.cols)} priority={first && i < 4} late={!first} />
             ))}
           </ScrollRow>
         </section>

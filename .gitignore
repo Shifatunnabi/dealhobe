@@ -41,3 +41,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# banner renderer scratch
+scripts/banners/_*.html
+scripts/banners/.frames/
+scripts/banners/.preview/
+
+# full-quality banner GIFs are generated deliverables (~2-3 MB each)
+public/banners/gif/

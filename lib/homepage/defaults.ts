@@ -4,6 +4,8 @@ import type { HomeSection, Ratio, SectionSettings, Storefront, Tile } from './ty
 // (public/banners/placeholders) that prints its recommended upload size, so swapping in real art is obvious.
 
 const ph = (name: string) => `/banners/placeholders/${name}.svg`;
+/** Real animated banners rendered by scripts/banners (animated WebP; the matching GIFs are for uploading via admin). */
+const real = (name: string) => `/banners/${name}.webp`;
 const tile = (name: string, link: string, alt: string, extra: Partial<Tile> = {}): Tile => ({ image: ph(name), link, alt, ...extra });
 
 const R = (w: number, h: number): Ratio => ({ w, h });
@@ -12,8 +14,8 @@ const R = (w: number, h: number): Ratio => ({ w, h });
 export const RATIO_PRESETS: { label: string; ratio: Ratio; size: string }[] = [
   { label: 'Hero desktop (16:5)',  ratio: R(16, 5), size: '1920 × 600' },
   { label: 'Hero mobile (1:1)',    ratio: R(1, 1),  size: '1080 × 1080' },
-  { label: 'Strip desktop (10:1)', ratio: R(10, 1), size: '1920 × 192' },
-  { label: 'Strip mobile (4:1)',   ratio: R(4, 1),  size: '1080 × 270' },
+  { label: 'Strip desktop (25:1)', ratio: R(25, 1), size: '2000 × 80' },
+  { label: 'Strip mobile (10:1)',  ratio: R(10, 1), size: '1080 × 108' },
   { label: 'Square (1:1)',         ratio: R(1, 1),  size: '600 × 600' },
   { label: 'Wide (2:1)',           ratio: R(2, 1),  size: '800 × 400' },
   { label: 'Landscape (3:2)',      ratio: R(3, 2),  size: '600 × 400' },
@@ -30,16 +32,20 @@ const cat = (slug: string, name: string) => tile(`cat-${slug}`, `/products?categ
 const concern = (slug: string, label: string, q: string) => tile(`concern-${slug}`, `/products?q=${encodeURIComponent(q)}`, label);
 
 export const DEFAULT_SECTIONS: Seed[] = [
-  section('hero', 'Hero', { ratio: R(16, 5), mobileRatio: R(1, 1), autoplayMs: 6000 }, [1, 2, 3, 4].map((n) =>
-    tile(`hero-${n}-desktop`, '/products', `Featured campaign ${n}`, { mobileImage: ph(`hero-${n}-mobile`) }))),
-  section('strip', 'Flash strip', { ratio: R(10, 1), mobileRatio: R(4, 1) }, [
-    tile('strip-desktop', '/offers', 'Flash sale', { mobileImage: ph('strip-mobile') }),
+  section('hero', 'Hero', { ratio: R(16, 5), mobileRatio: R(1, 1), autoplayMs: 6000 }, [
+    { image: real('hero-1-desktop'), mobileImage: real('hero-1-mobile'), link: '/products?brand=KODOMO', alt: 'Kodomo baby care: gentle care for little ones' },
+    { image: real('hero-2-desktop'), mobileImage: real('hero-2-mobile'), link: '/products?brand=FENNEL&category=Makeup', alt: 'Fennel makeup: find your colour, best price in Bangladesh guaranteed' },
+    { image: real('hero-3-desktop'), mobileImage: real('hero-3-mobile'), link: '/products?brand=FENNEL&category=Skin%20Care', alt: 'Fennel skincare: serums and face washes, best price in Bangladesh guaranteed' },
+    { image: real('hero-4-desktop'), mobileImage: real('hero-4-mobile'), link: '/products', alt: 'Authentic beauty, delivered across Bangladesh' },
   ]),
-  section('image-grid', 'Deals you cannot miss', { ratio: R(1, 1), cols: { mobile: 2, tablet: 4, desktop: 4 }, mobileLayout: 'grid', accent: '#A41B15' }, [
-    tile('deal-1', '/products', 'Under ৳499'),
-    tile('deal-2', '/products', 'Bestsellers'),
-    tile('deal-3', '/products', 'New arrivals'),
-    tile('deal-4', '/products', 'Gift sets'),
+  section('strip', 'Promise strip', { ratio: R(25, 1), mobileRatio: R(10, 1) }, [
+    { image: real('strip-desktop'), mobileImage: real('strip-mobile'), link: '/products', alt: 'Best price in Bangladesh, guaranteed. 100% authentic. Cash on delivery. Nationwide delivery.' },
+  ]),
+  section('image-grid', 'Shop our favourites', { ratio: R(1, 1), cols: { mobile: 2, tablet: 4, desktop: 4 }, mobileLayout: 'grid', accent: '#A41B15' }, [
+    { image: real('deal-1'), link: '/products?brand=FENNEL&category=Makeup', alt: 'Fennel makeup, best price in Bangladesh guaranteed' },
+    { image: real('deal-2'), link: '/products?brand=KODOMO', alt: 'Kodomo baby care' },
+    { image: real('deal-3'), link: '/products?sort=best-selling', alt: 'Bestsellers' },
+    { image: real('deal-4'), link: '/products?q=gift', alt: 'Gift sets' },
   ]),
   section('image-grid', 'Top brands and offers', { ratio: R(2, 1), cols: { mobile: 1, tablet: 2, desktop: 3 }, mobileLayout: 'scroll', accent: '#3B0D2E' },
     [1, 2, 3, 4, 5, 6].map((n) => tile(`brand-${n}`, '/offers', `Brand offer ${n}`))),
