@@ -6,6 +6,7 @@ import type { Metadata } from 'next';
 import ProductsPageClient from '@/components/pages/ProductsPageClient';
 import { catalogSearch, catalogSeo, filterAndSort, parseCatalogQuery, PER_PAGE } from '@/lib/catalog';
 import { catalogJsonLd, loadCatalog } from '@/lib/catalog-server';
+import { shareOg, shareTwitter } from '@/lib/share';
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 
@@ -18,7 +19,8 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     description: seo.description,
     alternates: { canonical: seo.canonical },
     robots: seo.noindex ? { index: false, follow: true } : undefined,
-    openGraph: { title: seo.title, description: seo.description, url: seo.canonical, type: 'website' },
+    openGraph: { title: seo.title, description: seo.description, url: seo.canonical, type: 'website', ...shareOg },
+    twitter: { card: 'summary_large_image', title: seo.title, description: seo.description, ...shareTwitter },
   };
 }
 

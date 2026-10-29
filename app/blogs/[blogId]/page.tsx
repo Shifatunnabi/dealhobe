@@ -44,9 +44,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       modifiedTime: blog.updatedAt,
       section: blog.category,
       authors: ["DealHobe Team"],
-      images: blog.imageUrl ? [{ url: blog.imageUrl, alt: blog.title }] : undefined,
     },
-    twitter: { card: "summary_large_image", title: blog.title, description, images: blog.imageUrl ? [blog.imageUrl] : undefined },
+    twitter: { card: "summary_large_image", title: blog.title, description },
   };
 }
 

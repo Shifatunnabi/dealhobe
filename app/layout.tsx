@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import { preconnect } from "react-dom";
 import { Plus_Jakarta_Sans, Fraunces } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
@@ -74,54 +75,38 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_BD",
-    url: siteUrl,
+    alternateLocale: ["bn_BD"],
     siteName: "DealHobe Bangladesh",
     title: "DealHobe - premium cosmetics, real beauty!",
     description:
       "Premium imported cosmetics and beauty essentials for every woman in Bangladesh. Authentic, safe, and affordable — delivered to your door.",
-    images: [
-      {
-        url: "/logo/main-logo.png",
-        width: 800,
-        height: 600,
-        alt: "DealHobe Bangladesh — Premium Imported Cosmetics",
-      },
-    ],
+    // images: the generated 1200x630 card in app/opengraph-image.tsx (inherited by every page without its own)
   },
   twitter: {
     card: "summary_large_image",
     title: "DealHobe - premium cosmetics, real beauty!",
     description:
       "Premium imported cosmetics and beauty essentials for every woman in Bangladesh. Authentic, safe, and affordable.",
-    images: ["/logo/main-logo.png"],
   },
+  // Each page canonicalises to itself (without query string) unless it sets its own; the root must not point everything at "/".
   alternates: {
-    canonical: siteUrl,
+    canonical: "./",
+  },
+  applicationName: "DealHobe",
+  formatDetection: { telephone: false, email: false, address: false },
+  appleWebApp: { capable: true, title: "DealHobe", statusBarStyle: "default" },
+  verification: {
+    google: process.env.GOOGLE_SITE_VERIFICATION || undefined,
+    other: process.env.BING_SITE_VERIFICATION ? { "msvalidate.01": process.env.BING_SITE_VERIFICATION } : undefined,
   },
 };
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Store",
-  name: "DealHobe Bangladesh",
-  description:
-    "Premium imported cosmetics and beauty essentials for every woman in Bangladesh. Authentic, safe, and affordable.",
-  url: siteUrl,
-  telephone: "+8801338886611",
-  email: "dealhobe26@gmail.com",
-  address: {
-    "@type": "PostalAddress",
-    streetAddress: "House 1/10, Block #A, Road #5, Lalmatia",
-    addressLocality: "Dhaka",
-    addressRegion: "Dhaka Division",
-    addressCountry: "BD",
-  },
-  priceRange: "৳৳",
-  areaServed: { "@type": "Country", name: "Bangladesh" },
-  currenciesAccepted: "BDT",
-  paymentAccepted: "Cash on Delivery, Online Payment",
-  image: `${siteUrl}/logo/main-logo.png`,
-  logo: `${siteUrl}/logo/main-logo.png`,
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  // Colours the browser chrome (Android Chrome address bar, iOS Safari) to match the announcement bar.
+  themeColor: "#3B0D2E",
+  colorScheme: "light",
 };
 
 // The navbar/footer chrome must render even if the database is briefly unreachable.
@@ -134,18 +119,60 @@ async function loadStorefront() {
   }
 }
 
-// WebSite + SearchAction: lets search engines show a sitelinks search box that lands on /products?q=…
-const websiteJsonLd = {
-  "@type": "WebSite",
-  name: "DealHobe",
-  url: siteUrl,
-  inLanguage: ["en-BD", "bn-BD"],
-  potentialAction: {
-    "@type": "SearchAction",
-    target: { "@type": "EntryPoint", urlTemplate: `${siteUrl}/products?q={search_term_string}` },
-    "query-input": "required name=search_term_string",
-  },
-};
+type Storefront = Awaited<ReturnType<typeof loadStorefront>>;
+
+/**
+ * Site-wide structured data (one @graph): the store as an Organization/Store with logo, contact points and
+ * social profiles taken from Admin › Homepage Builder › Storefront, and a WebSite with a search action
+ * (sitelinks search box) that lands on /products?q=…
+ */
+function siteGraph(sf: Storefront) {
+  const abs = (u: string) => (u.startsWith("/") ? `${siteUrl}${u}` : u);
+  const sameAs = Object.values(sf.socials ?? {}).filter((u): u is string => !!u && /^https?:\/\//.test(u));
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": ["Store", "Organization"],
+        "@id": `${siteUrl}/#store`,
+        name: "DealHobe Bangladesh",
+        alternateName: "DealHobe",
+        description: "Premium imported cosmetics and beauty essentials for every woman in Bangladesh. Authentic, safe, and affordable.",
+        url: siteUrl,
+        logo: { "@type": "ImageObject", url: abs(sf.logoUrl || "/logo/main-logo.png"), width: 1254, height: 1254 },
+        image: `${siteUrl}/opengraph-image`,
+        telephone: sf.contact.phone,
+        email: sf.contact.email,
+        address: {
+          "@type": "PostalAddress",
+          streetAddress: "House 1/10, Block #A, Road #5, Lalmatia",
+          addressLocality: "Dhaka",
+          addressRegion: "Dhaka Division",
+          addressCountry: "BD",
+        },
+        contactPoint: [{ "@type": "ContactPoint", contactType: "customer service", telephone: sf.contact.phone, email: sf.contact.email, areaServed: "BD", availableLanguage: ["en", "bn"] }],
+        ...(sameAs.length ? { sameAs } : {}),
+        priceRange: "৳৳",
+        areaServed: { "@type": "Country", name: "Bangladesh" },
+        currenciesAccepted: "BDT",
+        paymentAccepted: "Cash on Delivery",
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${siteUrl}/#website`,
+        name: "DealHobe",
+        url: siteUrl,
+        inLanguage: ["en-BD", "bn-BD"],
+        publisher: { "@id": `${siteUrl}/#store` },
+        potentialAction: {
+          "@type": "SearchAction",
+          target: { "@type": "EntryPoint", urlTemplate: `${siteUrl}/products?q={search_term_string}` },
+          "query-input": "required name=search_term_string",
+        },
+      },
+    ],
+  };
+}
 
 export default async function RootLayout({
   children,
@@ -153,6 +180,8 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const storefront = await loadStorefront();
+  // Early connection to the image CDN: product photos and banners are the LCP element on most pages.
+  preconnect("https://res.cloudinary.com");
   return (
     <html lang="en-BD">
       <body
@@ -160,7 +189,7 @@ export default async function RootLayout({
       >
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@graph": [jsonLd, websiteJsonLd] }).replace(/</g, "\\u003c") }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(siteGraph(storefront)).replace(/</g, "\\u003c") }}
         />
         <ScrollReset />
 

@@ -5,6 +5,7 @@ import { FiArrowRight, FiSearch } from "react-icons/fi";
 export const metadata: Metadata = {
   title: "Page not found",
   robots: { index: false, follow: true },
+  alternates: { canonical: null },   // the framework would otherwise canonicalise to /_not-found
 };
 
 const CATEGORIES = [

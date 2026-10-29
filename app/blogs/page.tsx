@@ -5,6 +5,7 @@ import type { Metadata } from 'next';
 import BlogsPageClient from './BlogsPageClient';
 import { getBlogs } from '@/lib/data';
 import { blogPlainText, excerptOf, readingTime, type BlogSummary } from '@/components/content/blog';
+import { shareOg, shareTwitter } from '@/lib/share';
 
 export const metadata: Metadata = {
   title: 'The Beauty Journal — Skincare & Makeup Guides',
@@ -16,7 +17,9 @@ export const metadata: Metadata = {
     description: 'Skincare routines, makeup tips, ingredient guides and honest reviews from the DealHobe team.',
     url: '/blogs',
     type: 'website',
+    ...shareOg,
   },
+  twitter: { card: 'summary_large_image', ...shareTwitter },
 };
 
 export default async function BlogsPage() {
